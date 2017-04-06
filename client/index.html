@@ -2,56 +2,55 @@
 <html>
 
 <head>
-    <meta charset="UTF-8">
-    <title>Sample page</title>
-    <link href='json-formatter/JSONFormatter.css' media='all' rel='stylesheet' type='text/css'>
-    <script src="json-formatter/JSONFormatter.js"></script>
-    <link rel="stylesheet" href="leaflet/leaflet.css" />
-    <script src="leaflet/leaflet.js"></script>
-    <script type="text/javascript" src="jquery-latest.min.js"></script>
-    <style>
-    #mapid {
-        height: 720px;
-    }
-    </style>
-    <script type="text/javascript">
-
-    // exécute le javascript quand la page est complètement chargée
-    $(document).ready(function() {
-        var mymap = L.map('mapid').setView([43.93002883039214, 2.1581183602941194], 13);
-
-
-        L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
-            attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
-            maxZoom: 18,
-            id: 'mapbox.streets',
-            accessToken: 'pk.eyJ1IjoibXJmcmVlemUiLCJhIjoiY2owNWg2a2kyMDA2cjMycGZndzA2ZzZneCJ9.-wsVwihnGBO41Z9FvV_UAQ'
-        }).addTo(mymap);
+  <meta charset="UTF-8">
+  <title>Sample page</title>
+  <link href='json-formatter/JSONFormatter.css' media='all' rel='stylesheet' type='text/css'>
+  <script src="json-formatter/JSONFormatter.js"></script>
+  <link rel="stylesheet" href="leaflet/leaflet.css" />
+  <script src="leaflet/leaflet.js"></script>
+  <script type="text/javascript" src="jquery-latest.min.js"></script>
+  <style>
+  #mapid {
+    height: 720px;
+  }
+  </style>
+  <script type="text/javascript">
+  // exécute le javascript quand la page est complètement chargée
+  $(document).ready(function() {
+    var mymap = L.map('mapid').setView([43.93002883039214, 2.1581183602941194], 13);
 
 
-        // demande au serveur le json des informations bénéficiares pour les afficher
-        $.ajax({
-            type: "GET",
-            dataType: "json",
-            url: "beneficiaries",
-            success: function(data, textStatus, jqXHR) {
+    L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+      attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+      maxZoom: 18,
+      id: 'mapbox.streets',
+      accessToken: 'pk.eyJ1IjoibXJmcmVlemUiLCJhIjoiY2owNWg2a2kyMDA2cjMycGZndzA2ZzZneCJ9.-wsVwihnGBO41Z9FvV_UAQ'
+    }).addTo(mymap);
 
-                console.log(data);
-                // L.geoJSON(data).addTo(mymap);
 
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                console.log("error : " + textStatus + errorThrown);
-            }
-        });
+    // demande au serveur le json des informations bénéficiares pour les afficher
+    $.ajax({
+      type: "GET",
+      dataType: "json",
+      url: "beneficiaries",
+      success: function(data, textStatus, jqXHR) {
 
+        console.log(data);
+        // L.geoJSON(data).addTo(mymap);
+
+      },
+      error: function(jqXHR, textStatus, errorThrown) {
+        console.log("error : " + textStatus + errorThrown);
+      }
     });
-    </script>
+
+  });
+  </script>
 </head>
 
 <body>
-    <h1>Sample page</h1>
-    <div id="mapid"></div>
+  <h1>Sample page</h1>
+  <div id="mapid"></div>
 </body>
 
 </html>
