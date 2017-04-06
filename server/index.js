@@ -47,7 +47,7 @@ app.get('/beneficiaries', function(req, res) {
   function feature(address) {
     var f = {
 
-      type: 'feature',
+      type: 'Feature',
       geometry: {
         type: 'Point',
         coordinates: [address.lng, address.lat]
