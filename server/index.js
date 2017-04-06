@@ -27,73 +27,55 @@ app.get('/beneficiaries', function(req, res) {
     database: 'ccas_beneficiaries'
   });
 
-  connection.connect();
+  const sqlSelectAddresses = ' SELECT distinct a.id, a.label, a.additional, a.lat, a.lng \n' +
+    ' FROM address a \n' +
+    ' RIGHT JOIN beneficiary ON a.id=beneficiary.address_id ; ';
 
-  const query = ' SELECT distinct a.label, a.additional, a.lat, a.lng \n' +
-                ' FROM address a \n' +
-                ' RIGHT JOIN beneficiary ON a.id=beneficiary.address_id ; ';
+  const sqlSelectBenef = ' SELECT id, name, birthdate \n' +
+    ' FROM beneficiary \n' +
+    ' WHERE address_id = ?';
 
-  console.log(query);
+  console.log(sqlSelectAddresses);
+
+  var addresses = [];
+
+  var queriesDone = 0;
+
+  function addBenef(i, rowsLength) {
+
+    return function(err, benefRows, fields) {
+
+      if (err) throw err
+
+      addresses[i].beneficiaries = benefRows;
+
+      if (++queriesDone == rowsLength)
+        res.send(addresses);
+
+    };
+
+  }
 
   connection.query(
-    query,
+    sqlSelectAddresses,
     function(err, rows, fields) {
 
       if (err) throw err
 
-      res.send(rows);
+      for (var i = 0; i < rows.length; ++i) {
 
+        addresses.push(rows[i]);
+
+        const selectBenef = mysql.format(sqlSelectBenef, [rows[i].id]);
+
+        connection.query(
+          selectBenef,
+          addBenef(i, rows.length));
+
+      }
     });
 
-  connection.end();
-
 });
-
-
-// app.get('/patinoires', function(req, res) {
-
-//     var db = new sqlite3.Database(DATABASE_NAME);
-
-//     db.serialize(function() {
-
-//         db.all("SELECT * FROM patinoires", function(err, rows) {
-
-//             for (var i = 0; i < rows.length; ++i) {
-//                 rows[i].coordinates = [rows[i].lng, rows[i].lat];
-
-//                 delete rows[i].lng;
-//                 delete rows[i].lat;
-//             }
-//             console.log(rows);
-//             res.send(rows);
-//         });
-
-//     });
-
-//     db.close();
-// });
-
-// app.get('/boulodromes', function(req, res) {
-
-//     var db = new sqlite3.Database(DATABASE_NAME);
-
-//     db.serialize(function() {
-
-//         db.all("SELECT * FROM boulodromes", function(err, rows) {
-
-//             for (var i = 0; i < rows.length; ++i) {
-//                 rows[i].coordinates = [rows[i].lng, rows[i].lat];
-
-//                 delete rows[i].lng;
-//                 delete rows[i].lat;
-//             }
-//             res.send(rows);
-//         });
-
-//     });
-
-//     db.close();
-// });
 
 app.listen(config.port, function() {
   console.log('listening on *:' + config.port);
