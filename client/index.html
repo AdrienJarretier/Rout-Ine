@@ -36,7 +36,15 @@
       success: function(data, textStatus, jqXHR) {
 
         console.log(data);
-        L.geoJSON(data).addTo(mymap);
+
+        function onEachFeature(feature, layer) {
+          layer.bindPopup(feature.properties);
+        }
+        L.geoJSON(data, {
+          onEachFeature: onEachFeature
+        }).addTo(mymap);
+
+
 
       },
       error: function(jqXHR, textStatus, errorThrown) {
