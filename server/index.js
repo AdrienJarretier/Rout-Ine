@@ -8,11 +8,11 @@ var app = express();
 
 const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 
+// sert le contenu statique de ../client, c.a.d les pages web.
 app.use(express.static(__dirname + '/../client'));
 
-app.get('/', function(req, res) {
-    res.sendfile('index.html');
-});
+
+
 
 // app.get('/patinoires', function(req, res) {
 
