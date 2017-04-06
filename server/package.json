@@ -1,0 +1,11 @@
+{
+  "name": "locate-beneficiaries",
+  "version": "0.1.0",
+  "description": "display on a map location of beneficiaries found in db",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "jarretier adrien",
+  "license": "ISC"
+}
