@@ -37,9 +37,37 @@ app.get('/beneficiaries', function(req, res) {
 
   console.log(sqlSelectAddresses);
 
-  var addresses = [];
+  var addresses = {
+    type: 'FeatureCollection',
+    features: []
+  };
 
   var queriesDone = 0;
+
+  function feature(address) {
+    var f = {
+
+      type: 'feature',
+      geometry: {
+        type: 'Point',
+        coordinates: [address.lng, address.lat]
+      },
+      properties: {
+        label: address.label,
+        additional: address.additional,
+      },
+      id: address.id
+    };
+
+    return f;
+  }
+
+  function featureAddBeneficiary(feat, ben) {
+
+    feat.properties.beneficiary = ben;
+
+    return feat;
+  }
 
   function addBenef(i, rowsLength) {
 
@@ -47,7 +75,7 @@ app.get('/beneficiaries', function(req, res) {
 
       if (err) throw err
 
-      addresses[i].beneficiaries = benefRows;
+      addresses.features[i] = featureAddBeneficiary(addresses.features[i], benefRows);
 
       if (++queriesDone == rowsLength)
         res.send(addresses);
@@ -64,7 +92,7 @@ app.get('/beneficiaries', function(req, res) {
 
       for (var i = 0; i < rows.length; ++i) {
 
-        addresses.push(rows[i]);
+        addresses.features.push(feature(rows[i]));
 
         const selectBenef = mysql.format(sqlSelectBenef, [rows[i].id]);
 
