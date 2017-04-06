@@ -1,7 +1,12 @@
 const express = require('express');
-// charge le module express (web framework)
 const fs = require('fs');
-// charge le module de systeme de fichiers
+const mysql = require('mysql');
+/*
+  chargement des différents modules :
+  - express (web framework)
+  - fs : systeme de fichiers
+  - mysql
+*/
 
 var app = express();
 // The app object conventionally denotes the Express application
@@ -12,6 +17,34 @@ const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 app.use(express.static(__dirname + '/../client'));
 
 
+// repondre aux requetes get sur l'url /beneficiaries
+app.get('/beneficiaries', function(req, res) {
+
+  var connection = mysql.createConnection({
+    host: 'localhost',
+    user: 'root',
+    password: 'mysql',
+    database: 'ccas_beneficiaries'
+  });
+
+  connection.connect();
+
+  connection.query(
+    'SELECT address.id,label,additional,town,lat,lng,beneficiary.id,name,birthdate,phone_number' +
+    'FROM address' +
+    'LEFT JOIN beneficiary ON address.id=beneficiary.address_id' +
+    'LEFT JOIN beneficiary_phone ON beneficiary.id=beneficiary_phone.beneficiary_id;',
+    function(err, rows, fields) {
+
+      if (err) throw err
+
+      res.send(rows);
+
+    });
+
+  connection.end();
+
+});
 
 
 // app.get('/patinoires', function(req, res) {
@@ -60,5 +93,5 @@ app.use(express.static(__dirname + '/../client'));
 // });
 
 app.listen(config.port, function() {
-    console.log('listening on *:' + config.port);
+  console.log('listening on *:' + config.port);
 });
