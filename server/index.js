@@ -29,11 +29,14 @@ app.get('/beneficiaries', function(req, res) {
 
   connection.connect();
 
+  const query = ' SELECT distinct a.label, a.additional, a.lat, a.lng \n' +
+                ' FROM address a \n' +
+                ' RIGHT JOIN beneficiary ON a.id=beneficiary.address_id ; ';
+
+  console.log(query);
+
   connection.query(
-    'SELECT address.id,label,additional,town,lat,lng,beneficiary.id,name,birthdate,phone_number' +
-    'FROM address' +
-    'LEFT JOIN beneficiary ON address.id=beneficiary.address_id' +
-    'LEFT JOIN beneficiary_phone ON beneficiary.id=beneficiary_phone.beneficiary_id;',
+    query,
     function(err, rows, fields) {
 
       if (err) throw err
