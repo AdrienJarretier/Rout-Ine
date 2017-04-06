@@ -15,8 +15,10 @@
     }
     </style>
     <script type="text/javascript">
+
+    // exécute le javascript quand la page est complètement chargée
     $(document).ready(function() {
-        var mymap = L.map('mapid').setView([43.6, 1.44], 13);
+        var mymap = L.map('mapid').setView([43.93002883039214, 2.1581183602941194], 13);
 
 
         L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
@@ -26,14 +28,16 @@
             accessToken: 'pk.eyJ1IjoibXJmcmVlemUiLCJhIjoiY2owNWg2a2kyMDA2cjMycGZndzA2ZzZneCJ9.-wsVwihnGBO41Z9FvV_UAQ'
         }).addTo(mymap);
 
+
+        // demande au serveur le json des informations bénéficiares pour les afficher
         $.ajax({
             type: "GET",
             dataType: "json",
-            url: "patinoires",
+            url: "beneficiaries",
             success: function(data, textStatus, jqXHR) {
 
                 console.log(data);
-                L.geoJSON(data).addTo(mymap);
+                // L.geoJSON(data).addTo(mymap);
 
             },
             error: function(jqXHR, textStatus, errorThrown) {
@@ -41,67 +45,6 @@
             }
         });
 
-        $.ajax({
-            type: "GET",
-            dataType: "json",
-            url: "boulodromes",
-            success: function(data, textStatus, jqXHR) {
-
-                var boulodromesLayer = L.geoJSON(data).addTo(mymap);
-
-
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                console.log("error : " + textStatus + errorThrown);
-            }
-        });
-
-        // var patinoires = {
-        //     "type": "FeatureCollection",
-        //     "features": [{
-        //         "type": "Feature",
-        //         "geometry": {
-        //             "type": "Point",
-        //             "coordinates": [1.478720353320572, 43.623946059897456]
-        //         },
-        //         "properties": {
-        //             "adresse": "chemin du Verdon 31500 Toulouse",
-        //             "nom_complet": "PATINOIRE ALEX JANY",
-        //             "telephone": "05 81 91 78 56",
-        //             "geo_point_2d": [43.623946059897456, 1.478720353320572]
-        //         }
-        //     }, {
-        //         "type": "Feature",
-        //         "geometry": {
-        //             "type": "Point",
-        //             "coordinates": [1.45329381099674, 43.56777824246614]
-        //         },
-        //         "properties": {
-        //             "adresse": "69ter route de Narbonne 31000 TOULOUSE",
-        //             "nom_complet": "PATINOIRE BELLEVUE",
-        //             "telephone": "05 61 52 93 53",
-        //             "geo_point_2d": [43.56777824246614, 1.45329381099674]
-        //         }
-        //     }]
-        // };
-
-        // var patinoires = [{
-        //     type: "Point",
-        //     id: 1,
-        //     coordinates: '43.6239460599, 1.47872035332',
-        //     nom_complet: 'PATINOIRE ALEX JANY',
-        //     adresse: 'chemin du Verdon 31500 Toulouse',
-        //     telephone: '05 81 91 78 56'
-        // }, {
-        //     type: "Point",
-        //     id: 2,
-        //     coordinates: '43.5677782425, 1.453293811',
-        //     nom_complet: 'PATINOIRE BELLEVUE',
-        //     adresse: '69ter route de Narbonne 31000 TOULOUSE',
-        //     telephone: '05 61 52 93 53'
-        // }];
-
-        // L.geoJSON(patinoires).addTo(mymap);
     });
     </script>
 </head>
