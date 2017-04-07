@@ -33,12 +33,7 @@ app.use(express.static(__dirname + '/../client'));
 // repondre aux requetes get sur l'url /beneficiaries
 app.get('/beneficiaries', function(req, res) {
 
-  var connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'mysql',
-    database: 'ccas_beneficiaries'
-  });
+  var connection = mysql.createConnection(config.db);
 
   const sqlSelectAddresses = ' SELECT distinct a.id, a.label, a.town, a.additional, a.lat, a.lng \n' +
     ' FROM address a \n' +
