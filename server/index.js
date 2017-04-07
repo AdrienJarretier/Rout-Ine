@@ -1,3 +1,12 @@
+'use strict';
+/*
+Strict mode makes several changes to normal JavaScript semantics.
+First, strict mode eliminates some JavaScript silent errors by changing them to throw errors.
+Second, strict mode fixes mistakes that make it difficult for JavaScript engines to perform optimizations:
+strict mode code can sometimes be made to run faster than identical code that's not strict mode.
+Third, strict mode prohibits some syntax likely to be defined in future versions of ECMAScript.
+*/
+
 const express = require('express');
 const fs = require('fs');
 const mysql = require('mysql');
@@ -27,7 +36,7 @@ app.get('/beneficiaries', function(req, res) {
     database: 'ccas_beneficiaries'
   });
 
-  const sqlSelectAddresses = ' SELECT distinct a.id, a.label, a.additional, a.lat, a.lng \n' +
+  const sqlSelectAddresses = ' SELECT distinct a.id, a.label, a.town, a.additional, a.lat, a.lng \n' +
     ' FROM address a \n' +
     ' RIGHT JOIN beneficiary ON a.id=beneficiary.address_id ; ';
 
@@ -55,6 +64,7 @@ app.get('/beneficiaries', function(req, res) {
       properties: {
         label: address.label,
         additional: address.additional,
+        town: address.town
       },
       id: address.id
     };
@@ -64,7 +74,7 @@ app.get('/beneficiaries', function(req, res) {
 
   function featureAddBeneficiary(feat, ben) {
 
-    feat.properties.beneficiary = ben;
+    feat.properties.beneficiaries = ben;
 
     return feat;
   }
