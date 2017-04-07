@@ -44,6 +44,10 @@ app.get('/beneficiaries', function(req, res) {
     ' FROM beneficiary \n' +
     ' WHERE address_id = ?';
 
+  const sqlSelectPhones = ' SELECT DISTINCT phone_number \n' +
+    ' FROM beneficiary_phone \n' +
+    ' WHERE beneficiary_id IN (?)';
+
   console.log(sqlSelectAddresses);
 
   var addresses = {
@@ -64,7 +68,9 @@ app.get('/beneficiaries', function(req, res) {
       properties: {
         label: address.label,
         additional: address.additional,
-        town: address.town
+        town: address.town,
+        beneficiaries: [],
+        phones: []
       },
       id: address.id
     };
@@ -86,6 +92,43 @@ app.get('/beneficiaries', function(req, res) {
       if (err) throw err
 
       addresses.features[i] = featureAddBeneficiary(addresses.features[i], benefRows);
+
+      // recuperons la liste des ids beneficiaires
+      let ids = '';
+      for (let b of benefRows) {
+        ids += b.id + ',';
+      }
+      ids = ids.slice(0, -1);
+      // enlever la dernire virgule
+
+      const selectPhones = mysql.format(sqlSelectPhones, [ids]);
+
+      connection.query(
+        selectPhones,
+        addPhones(i, rowsLength));
+
+    };
+
+  }
+
+
+  function featureAddPhone(feat, phones) {
+
+    for (let phone of phones) {
+
+      feat.properties.phones.push(phone.phone_number);
+    }
+
+    return feat;
+  }
+
+  function addPhones(i, rowsLength) {
+
+    return function(err, phonesRows, fields) {
+
+      if (err) throw err
+
+      addresses.features[i] = featureAddPhone(addresses.features[i], phonesRows);
 
       if (++queriesDone == rowsLength)
         res.send(addresses);

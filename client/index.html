@@ -57,9 +57,13 @@
             // l'age de la personne en millisecondes
             let age = Date.now() - (new Date(b.birthdate));
 
-            let years = age/31557600000
+            let years = age / 31557600000
 
             popContent = addLine(popContent, b.name + ', ' + Math.floor(years) + ' ans');
+          }
+
+          for (let phone of p.phones) {
+            popContent = addLine(popContent, phone);
           }
           layer.bindPopup(popContent);
         }
