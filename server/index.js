@@ -57,32 +57,35 @@ app.get('/beneficiaries', function(req, res) {
 
   var queriesDone = 0;
 
-  function feature(address) {
-    var f = {
-
-      type: 'Feature',
-      geometry: {
+  class Feature {
+    constructor(address) {
+      this.type = 'Feature';
+      this.geometry = {
         type: 'Point',
         coordinates: [address.lng, address.lat]
-      },
-      properties: {
+      };
+      this.properties = {
         label: address.label,
         additional: address.additional,
         town: address.town,
         beneficiaries: [],
         phones: []
-      },
-      id: address.id
-    };
+      };
+      this.id = address.id;
+    }
 
-    return f;
-  }
+    addBeneficiaries(ben) {
 
-  function featureAddBeneficiary(feat, ben) {
+      this.properties.beneficiaries = ben;
+    }
 
-    feat.properties.beneficiaries = ben;
+    addPhones(phones) {
 
-    return feat;
+      for (let phone of phones) {
+
+        this.properties.phones.push(phone.phone_number);
+      }
+    }
   }
 
   function addBenef(i, rowsLength) {
@@ -91,7 +94,7 @@ app.get('/beneficiaries', function(req, res) {
 
       if (err) throw err
 
-      addresses.features[i] = featureAddBeneficiary(addresses.features[i], benefRows);
+      addresses.features[i].addBeneficiaries(benefRows);
 
       // recuperons la liste des ids beneficiaires
       let ids = '';
@@ -111,24 +114,13 @@ app.get('/beneficiaries', function(req, res) {
 
   }
 
-
-  function featureAddPhone(feat, phones) {
-
-    for (let phone of phones) {
-
-      feat.properties.phones.push(phone.phone_number);
-    }
-
-    return feat;
-  }
-
   function addPhones(i, rowsLength) {
 
     return function(err, phonesRows, fields) {
 
       if (err) throw err
 
-      addresses.features[i] = featureAddPhone(addresses.features[i], phonesRows);
+      addresses.features[i].addPhones(phonesRows);
 
       if (++queriesDone == rowsLength)
         res.send(addresses);
@@ -145,7 +137,7 @@ app.get('/beneficiaries', function(req, res) {
 
       for (var i = 0; i < rows.length; ++i) {
 
-        addresses.features.push(feature(rows[i]));
+        addresses.features.push(new Feature(rows[i]));
 
         const selectBenef = mysql.format(sqlSelectBenef, [rows[i].id]);
 
