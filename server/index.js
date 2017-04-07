@@ -118,6 +118,7 @@ app.get('/beneficiaries', function(req, res) {
 
 });
 
+// le serveur attend les connexions sur le port 'config.port'
 app.listen(config.port, function() {
   console.log('listening on *:' + config.port);
 });
