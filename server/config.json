@@ -1,9 +1,13 @@
 {
-  "port" : 9226,
-  "db" : {
+  "port": 9226,
+  "db": {
     "host": "localhost",
     "user": "root",
     "password": "mysql",
     "database": "ccas_beneficiaries"
+  },
+  "osrm-server": {
+    "ip": "10.1.0.205",
+    "port": 5000
   }
 }
