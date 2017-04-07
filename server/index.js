@@ -17,6 +17,10 @@ const mysql = require('mysql');
   - mysql
 */
 
+// chargement de la classe AddressFeature
+// AddressFeature.js est un module qui exporte la defenition de la classe
+const AddressFeature = require('./AddressFeature.js');
+
 var app = express();
 // The app object conventionally denotes the Express application
 
@@ -56,37 +60,6 @@ app.get('/beneficiaries', function(req, res) {
   };
 
   var queriesDone = 0;
-
-  class Feature {
-    constructor(address) {
-      this.type = 'Feature';
-      this.geometry = {
-        type: 'Point',
-        coordinates: [address.lng, address.lat]
-      };
-      this.properties = {
-        label: address.label,
-        additional: address.additional,
-        town: address.town,
-        beneficiaries: [],
-        phones: []
-      };
-      this.id = address.id;
-    }
-
-    addBeneficiaries(ben) {
-
-      this.properties.beneficiaries = ben;
-    }
-
-    addPhones(phones) {
-
-      for (let phone of phones) {
-
-        this.properties.phones.push(phone.phone_number);
-      }
-    }
-  }
 
   function addBenef(i, rowsLength) {
 
@@ -137,7 +110,7 @@ app.get('/beneficiaries', function(req, res) {
 
       for (var i = 0; i < rows.length; ++i) {
 
-        addresses.features.push(new Feature(rows[i]));
+        addresses.features.push(new AddressFeature(rows[i]));
 
         const selectBenef = mysql.format(sqlSelectBenef, [rows[i].id]);
 
