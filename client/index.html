@@ -26,7 +26,7 @@
 
   // execute le javascript quand la page est completement chargee
   $(document).ready(function() {
-    var mymap = L.map('mapid').setView([43.93002883039214, 2.1581183602941194], 13);
+    let mymap = L.map('mapid').setView([43.93002883039214, 2.1581183602941194], 13);
 
 
     L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
@@ -36,6 +36,9 @@
       accessToken: 'pk.eyJ1IjoibXJmcmVlemUiLCJhIjoiY2owNWg2a2kyMDA2cjMycGZndzA2ZzZneCJ9.-wsVwihnGBO41Z9FvV_UAQ'
     }).addTo(mymap);
 
+    function addLine(string, line) {
+      return string + '<br>' + line;
+    }
 
     // demande au serveur le json des informations beneficiares pour les afficher
     $.ajax({
@@ -47,11 +50,18 @@
         console.log(data);
 
         function onEachFeature(feature, layer) {
-          var p = feature.properties;
-          var popContent = p.label + (p.additional.length > 0 ? ', ' + p.additional : '');
-          // // for
-          // popContent +=
-          //   layer.bindPopup(popContent);
+          let p = feature.properties;
+          let popContent = p.label + (p.additional.length > 0 ? ', ' + p.additional : '');
+
+          for (let b of p.beneficiaries) {
+            // l'age de la personne en millisecondes
+            let age = Date.now() - (new Date(b.birthdate));
+
+            let years = age/31557600000
+
+            popContent = addLine(popContent, b.name + ', ' + Math.floor(years) + ' ans');
+          }
+          layer.bindPopup(popContent);
         }
         L.geoJSON(data, {
           onEachFeature: onEachFeature
