@@ -118,6 +118,13 @@ app.get('/beneficiaries', function(req, res) {
 
 });
 
+
+// repondre aux requetes get sur l'url /trip
+app.get('/trip', function(req, res) {
+
+  res.send();
+}
+
 // le serveur attend les connexions sur le port 'config.port'
 app.listen(config.port, function() {
   console.log('listening on *:' + config.port);

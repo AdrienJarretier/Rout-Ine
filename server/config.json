@@ -6,7 +6,8 @@
     "password": "mysql",
     "database": "ccas_beneficiaries"
   },
-  "osrm-server": {
+  "osrm": {
+    "protocol": "http",
     "ip": "10.1.0.205",
     "port": 5000
   }
