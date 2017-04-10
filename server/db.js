@@ -187,4 +187,5 @@ function getFullAddressesData() {
 
 }
 
+exports.getAddresses = getAddresses;
 exports.getFullAddressesData = getFullAddressesData;
