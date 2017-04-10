@@ -108,7 +108,7 @@ function getTrip() {
 
         }
 
-        return oReq.makeUrl();
+        return new Promise((resolve, reject) => { resolve(oReq.makeUrl()) });
 
       })
       .then((madeUrl) => {
