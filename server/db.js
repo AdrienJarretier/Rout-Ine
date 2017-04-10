@@ -39,7 +39,7 @@ function getAddresses() {
 
         if (err) throw err
 
-        connection.end();
+        connection.destroy();
 
         resolve(rows);
 
@@ -77,7 +77,7 @@ function getBenefs(address) {
         if (err) throw err
 
 
-        connection.end();
+        connection.destroy();
         resolve(rows);
 
       });
@@ -119,7 +119,7 @@ function getPhones(benefRows) {
         if (err) throw err
 
 
-        connection.end();
+        connection.destroy();
         resolve(rows);
 
       });
