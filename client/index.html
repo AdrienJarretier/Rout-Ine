@@ -54,12 +54,18 @@
           let popContent = p.label + (p.additional.length > 0 ? ', ' + p.additional : '');
 
           for (let b of p.beneficiaries) {
-            // l'age de la personne en millisecondes
-            let age = Date.now() - (new Date(b.birthdate));
 
-            let years = age / 31557600000
+            popContent = addLine(popContent, b.name);
 
-            popContent = addLine(popContent, b.name + ', ' + Math.floor(years) + ' ans');
+            if (b.birthdate != null) {
+
+              // l'age de la personne en millisecondes
+              let age = Date.now() - (new Date(b.birthdate));
+
+              let years = age / 31557600000
+
+              popContent += ', ' + Math.floor(years) + ' ans';
+            }
           }
 
           for (let phone of p.phones) {
@@ -73,6 +79,26 @@
 
 
 
+      },
+      error: function(jqXHR, textStatus, errorThrown) {
+        console.log("error : " + textStatus + errorThrown);
+      }
+    });
+
+    // demande au serveur le geojson du voyage
+    $.ajax({
+      type: "GET",
+      dataType: "json",
+      url: "trip",
+      success: function(data, textStatus, jqXHR) {
+
+        let routeLayer = L.geoJSON().addTo(mymap);
+        routeLayer.addData(data.geometry);
+        routeLayer.setStyle(function(feature) {
+          return {
+            color: "red"
+          };
+        });
       },
       error: function(jqXHR, textStatus, errorThrown) {
         console.log("error : " + textStatus + errorThrown);

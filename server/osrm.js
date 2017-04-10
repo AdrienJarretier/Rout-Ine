@@ -3,6 +3,8 @@
 const fs = require('fs');
 const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 const request = require('request');
+const db = require('./db.js');
+const shuffle = require('shuffle-array');
 
 class OsrmRequest {
   constructor() {
@@ -90,33 +92,41 @@ class OsrmRequest {
  */
 function getTrip() {
 
-  let oReq = new OsrmRequest();
-
-  oReq.addCoords(43,2);
-  oReq.addCoords(43.1,2.1);
-  oReq.addCoords(43.2,2.2);
-
-  console.log(oReq);
-
-  let madeUrl = oReq.makeUrl();
-
-  console.log(madeUrl);
-
   return new Promise((resolve, reject) => {
 
-    request(madeUrl, (error, response, body) => {
+    let oReq = new OsrmRequest();
 
-      if (error) {
-        console.log('error:', error); // Print the error if one occurred
-        console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
-      } else {
+    db.getAddresses().then((addresses) => {
 
-        let response = JSON.parse(body);
+        shuffle(addresses);
 
-        resolve(response.trips[0]);
+        addresses.length = Math.floor(addresses.length / 6);
 
-      }
-    });
+        for (let addr of addresses) {
+
+          oReq.addCoords(addr.lat, addr.lng);
+
+        }
+
+        return oReq.makeUrl();
+
+      })
+      .then((madeUrl) => {
+
+        request(madeUrl, (error, response, body) => {
+
+          if (error) {
+            console.log('error:', error); // Print the error if one occurred
+            console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
+          } else {
+
+            let response = JSON.parse(body);
+
+            resolve(response.trips[0]);
+
+          }
+        });
+      });
 
   });
 
