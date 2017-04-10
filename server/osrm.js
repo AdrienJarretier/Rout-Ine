@@ -132,37 +132,36 @@ let osrmReq = {
 
 };
 
-function handleOsrmResponse(error, response, body) {
 
-  if (error) {
-    console.log('error:', error); // Print the error if one occurred
-    console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
-  } else {
-
-    let response = JSON.parse(body);
-
-    // console.log(response);
-
-    // envoyer "response.trips[0]" au client
-
-  }
-}
-
-// console.log(osrmReq);
-
-let madeUrl = makeUrl(osrmReq);
-
-// console.log(madeUrl);
-
+/**
+ *
+ *
+ * returns a Promise which is fulfilled with the trip array when the OSRM server answers
+ */
 function getTrip() {
 
+  let madeUrl = makeUrl(osrmReq);
 
-request(madeUrl, handleOsrmResponse);
+  console.log(madeUrl);
 
-  return function(req, res) {
+  return new Promise((resolve, reject) => {
 
-    res.send();
+    request(madeUrl, (error, response, body) => {
 
-  }
+      if (error) {
+        console.log('error:', error); // Print the error if one occurred
+        console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
+      } else {
+
+        let response = JSON.parse(body);
+
+        resolve(response.trips[0]);
+
+      }
+    });
+
+  });
 
 }
+
+exports.getTrip = getTrip;

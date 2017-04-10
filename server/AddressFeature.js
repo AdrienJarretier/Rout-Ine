@@ -29,6 +29,6 @@ class AddressFeature {
   }
 }
 
-// exporte la defenition de la classe
+// exporte la definition de la classe
 // nodejs peut alors charger ce fichier comme un module qui construit AddressFeature
 module.exports = AddressFeature;

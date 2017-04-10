@@ -21,6 +21,8 @@ const mysql = require('mysql');
 // AddressFeature.js est un module qui exporte la defenition de la classe
 const AddressFeature = require('./AddressFeature.js');
 
+const osrm = require('./osrm.js');
+
 var app = express();
 // The app object conventionally denotes the Express application
 
@@ -122,8 +124,14 @@ app.get('/beneficiaries', function(req, res) {
 // repondre aux requetes get sur l'url /trip
 app.get('/trip', function(req, res) {
 
-  res.send();
-}
+  // quand la Promise retournee par getTrip est realisee
+  // on peut envoyer le tableau de donnees au client
+  osrm.getTrip().then((tripArray) => {
+
+    res.send(tripArray);
+
+  });
+});
 
 // le serveur attend les connexions sur le port 'config.port'
 app.listen(config.port, function() {
