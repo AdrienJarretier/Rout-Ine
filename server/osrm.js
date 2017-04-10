@@ -120,8 +120,6 @@ function getTrip() {
             console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
           } else {
 
-            console.log(body);
-
             let response = JSON.parse(body);
 
             resolve(response.trips[0]);

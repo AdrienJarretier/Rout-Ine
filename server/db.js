@@ -23,7 +23,7 @@ const AddressFeature = require('./AddressFeature.js');
  *
  * @returns {Promise} la promesse de retourner le tableau contenant les adresses.
  */
-function getAddresses(dbCon) {
+function getAddresses() {
 
   const sqlSelectAddresses = ' SELECT distinct a.id, a.label, a.town, a.additional, a.lat, a.lng \n' +
     ' FROM address a \n' +
@@ -31,14 +31,15 @@ function getAddresses(dbCon) {
 
   return new Promise((resolve, reject) => {
 
+    let dbCon = mysql.createConnection(config.db);
     dbCon.query(
       sqlSelectAddresses,
       (err, rows, fields) => {
 
         if (err) throw err
 
+        dbCon.end();
         resolve(rows);
-
 
       });
 
@@ -56,6 +57,7 @@ function getAddresses(dbCon) {
  */
 function getBenefs(address, dbCon) {
 
+
   const sqlSelectBenef = ' SELECT id, name, birthdate \n' +
     ' FROM beneficiary \n' +
     ' WHERE address_id = ?';
@@ -64,14 +66,12 @@ function getBenefs(address, dbCon) {
 
   return new Promise((resolve, reject) => {
 
-    let dbCon = mysql.createConnection(config.db);
     dbCon.query(
       selectBenef,
       (err, rows, fields) => {
 
         if (err) throw err
 
-        dbCon.end();
         resolve(rows);
 
       });
@@ -138,11 +138,11 @@ function getFullAddressesData() {
 
     let queriesDone = 0;
 
-    let dbCon = mysql.createConnection(config.db);
-
     // Lorsque l'on obtient les adresses alors on va pour chaque adresse
     // recuperer les details des beneficiaires du portage de repas y habitant
     getAddresses().then((rows) => {
+
+      let dbCon = mysql.createConnection(config.db);
 
       let rowsLength = rows.length; // cette ligne est utilisee pour compter le nombre de requetes traitees
       // extremement utile puisque dans un fonctionnement asynchrone
@@ -151,6 +151,7 @@ function getFullAddressesData() {
 
         let addrFeat = new AddressFeature(address);
 
+
         // recuperons les beneficiares a cette adresse
         // quand on a la reponse alors on peut recuperer les numeros de telephone
         getBenefs(address, dbCon).then((benefsRows) => {
@@ -158,14 +159,14 @@ function getFullAddressesData() {
             addrFeat.addBeneficiaries(benefsRows);
 
             // on a les beneficiares on va alors recuperer les numeros de telephone
-            return getPhones(benefsRows);
+            return getPhones(benefsRows, dbCon);
           })
           // on a les numeros de telephones on peut alors terminer notre enchainement de .then()
           // et si le compte est bon on resoud la promesse
           //    sinon il reste des donnees a recuperer on ne fait rien
           .then((phoneRows) => {
 
-            addrFeat.addPhones(phoneRows, dbCon);
+            addrFeat.addPhones(phoneRows);
 
             addresses.features.push(addrFeat);
 
