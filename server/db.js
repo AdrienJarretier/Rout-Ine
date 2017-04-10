@@ -23,7 +23,7 @@ const AddressFeature = require('./AddressFeature.js');
  *
  * @returns {Promise} la promesse de retourner le tableau contenant les adresses.
  */
-function getAddresses() {
+function getAddresses(dbCon) {
 
   const sqlSelectAddresses = ' SELECT distinct a.id, a.label, a.town, a.additional, a.lat, a.lng \n' +
     ' FROM address a \n' +
@@ -31,15 +31,11 @@ function getAddresses() {
 
   return new Promise((resolve, reject) => {
 
-    let connection = mysql.createConnection(config.db);
-
-    connection.query(
+    dbCon.query(
       sqlSelectAddresses,
       (err, rows, fields) => {
 
         if (err) throw err
-
-        connection.destroy();
 
         resolve(rows);
 
@@ -58,7 +54,7 @@ function getAddresses() {
  *
  * @returns {Promise} la promesse de retourner le tableau contenant les beneficiaires.
  */
-function getBenefs(address) {
+function getBenefs(address, dbCon) {
 
   const sqlSelectBenef = ' SELECT id, name, birthdate \n' +
     ' FROM beneficiary \n' +
@@ -68,16 +64,14 @@ function getBenefs(address) {
 
   return new Promise((resolve, reject) => {
 
-    let connection = mysql.createConnection(config.db);
-
-    connection.query(
+    let dbCon = mysql.createConnection(config.db);
+    dbCon.query(
       selectBenef,
       (err, rows, fields) => {
 
         if (err) throw err
 
-
-        connection.destroy();
+        dbCon.end();
         resolve(rows);
 
       });
@@ -94,7 +88,7 @@ function getBenefs(address) {
  *
  * @returns {Promise} la promesse de retourner le tableau contenant les numeros de telephone.
  */
-function getPhones(benefRows) {
+function getPhones(benefRows, dbCon) {
 
   const sqlSelectPhones = ' SELECT DISTINCT phone_number \n' +
     ' FROM beneficiary_phone \n' +
@@ -111,15 +105,13 @@ function getPhones(benefRows) {
   const selectPhones = mysql.format(sqlSelectPhones, [ids]);
 
   return new Promise((resolve, reject) => {
-    let connection = mysql.createConnection(config.db);
-    connection.query(
+
+    dbCon.query(
       selectPhones,
       (err, rows, fields) => {
 
         if (err) throw err
 
-
-        connection.destroy();
         resolve(rows);
 
       });
@@ -146,6 +138,8 @@ function getFullAddressesData() {
 
     let queriesDone = 0;
 
+    let dbCon = mysql.createConnection(config.db);
+
     // Lorsque l'on obtient les adresses alors on va pour chaque adresse
     // recuperer les details des beneficiaires du portage de repas y habitant
     getAddresses().then((rows) => {
@@ -159,7 +153,7 @@ function getFullAddressesData() {
 
         // recuperons les beneficiares a cette adresse
         // quand on a la reponse alors on peut recuperer les numeros de telephone
-        getBenefs(address).then((benefsRows) => {
+        getBenefs(address, dbCon).then((benefsRows) => {
 
             addrFeat.addBeneficiaries(benefsRows);
 
@@ -171,14 +165,16 @@ function getFullAddressesData() {
           //    sinon il reste des donnees a recuperer on ne fait rien
           .then((phoneRows) => {
 
-            addrFeat.addPhones(phoneRows);
+            addrFeat.addPhones(phoneRows, dbCon);
 
             addresses.features.push(addrFeat);
 
             // compter ici le nombre de requetes traitees
             // si on a tout traiter on peut remplir notre promesse avec le GeoJson
-            if (++queriesDone == rowsLength)
+            if (++queriesDone == rowsLength) {
+              dbCon.end();
               resolve(addresses);
+            }
           });
 
       }
