@@ -1,0 +1,116 @@
+'use strict';
+/*
+Strict mode makes several changes to normal JavaScript semantics.
+First, strict mode eliminates some JavaScript silent errors by changing them to throw errors.
+Second, strict mode fixes mistakes that make it difficult for JavaScript engines to perform optimizations:
+strict mode code can sometimes be made to run faster than identical code that's not strict mode.
+Third, strict mode prohibits some syntax likely to be defined in future versions of ECMAScript.
+*/
+
+const fs = require('fs');
+const mysql = require('mysql');
+
+const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
+
+function getAddresses() {
+
+  const sqlSelectAddresses = ' SELECT distinct a.id, a.label, a.town, a.additional, a.lat, a.lng \n' +
+    ' FROM address a \n' +
+    ' RIGHT JOIN beneficiary ON a.id=beneficiary.address_id ; ';
+
+  return new Promise((resolve, reject) => {
+
+    let connection = mysql.createConnection(config.db);
+
+    connection.query(
+      sqlSelectAddresses,
+      (err, rows, fields) => {
+
+        if (err) throw err
+
+        resolve(rows);
+
+        connection.end();
+
+      });
+
+  });
+
+}
+
+const sqlSelectBenef = ' SELECT id, name, birthdate \n' +
+  ' FROM beneficiary \n' +
+  ' WHERE address_id = ?';
+
+function getBenefs(address) {
+
+  const selectBenef = mysql.format(sqlSelectBenef, [address.id]);
+
+  return new Promise((resolve, reject) => {
+
+    let connection = mysql.createConnection(config.db);
+
+    connection.query(
+      selectBenef,
+      (err, rows, fields) => {
+
+        if (err) throw err
+
+        resolve(rows);
+
+        connection.end();
+
+      });
+
+  });
+
+}
+
+const sqlSelectPhones = ' SELECT DISTINCT phone_number \n' +
+  ' FROM beneficiary_phone \n' +
+  ' WHERE beneficiary_id IN (?)';
+
+function getPhones(benefRows) {
+  // recuperons la liste des ids beneficiaires
+  let ids = '';
+  for (let b of benefRows) {
+    ids += b.id + ',';
+  }
+  ids = ids.slice(0, -1);
+  // enlever la dernire virgule
+
+  const selectPhones = mysql.format(sqlSelectPhones, [ids]);
+
+  return new Promise((resolve, reject) => {
+    let connection = mysql.createConnection(config.db);
+    connection.query(
+      selectPhones,
+      (err, rows, fields) => {
+
+        if (err) throw err
+
+        resolve(rows);
+
+        connection.end();
+
+      });
+
+  });
+}
+
+getAddresses().then((rows) => {
+
+  for (let i = 0; i < 40; ++i) {
+
+    getBenefs(rows[i]).then((rows) => {
+
+      console.log(rows);
+    })
+    .then((rows) => {
+
+      console.log(rows);
+    });
+
+  }
+
+});
