@@ -47,6 +47,8 @@ app.get('/trip', function(req, res) {
   // on peut envoyer le tableau de donnees au client
   osrm.getTrip().then((tripArray) => {
 
+    console.log(tripArray);
+
     res.send(tripArray);
 
   });

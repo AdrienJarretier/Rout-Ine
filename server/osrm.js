@@ -83,50 +83,73 @@ class OsrmRequest {
     this.coords.push([lat, lng]);
   }
 
+  setCoords(coords) {
+
+    this.coords = coords;
+
+  }
+
 }
 
 /**
  *
  *
- * returns a Promise which is fulfilled with the trip array when the OSRM server answers
+ * returns a Promise which is fulfilled with the array of trip arrays when the OSRM server answers
  */
 function getTrip() {
 
   return new Promise((resolve, reject) => {
 
-    let oReq = new OsrmRequest();
+    let countTrips = 0;
+    let trips = [];
 
     db.getAddresses().then((addresses) => {
 
         shuffle(addresses);
 
-        addresses.length = Math.floor(addresses.length / 6);
+        let trips = [
+          addresses.slice(0, Math.floor(addresses.length / 2)),
+          addresses.slice(Math.floor(addresses.length / 2))
+        ];
 
-        for (let addr of addresses) {
-
-          oReq.addCoords(addr.lat, addr.lng);
-
-        }
-
-        return new Promise((resolve, reject) => { resolve(oReq.makeUrl()) });
+        return trips;
 
       })
-      .then((madeUrl) => {
+      .then((trips) => {
 
-        request(madeUrl, (error, response, body) => {
+        for (let trip of trips) {
 
-          if (error) {
-            console.log('error:', error); // Print the error if one occurred
-            console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
-          } else {
+          let oReq = new OsrmRequest();
 
-            let response = JSON.parse(body);
+          oReq.setCoords(trip);
 
-            resolve(response.trips[0]);
+          console.log(oReq);
 
-          }
-        });
-      });
+          request(oReq.makeUrl(), (error, response, body) => {
+
+            if (error) {
+              console.log('error:', error); // Print the error if one occurred
+              console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
+            } else {
+
+              let response = JSON.parse(body);
+
+              return response.trips[0];
+
+            }
+          });
+
+        }
+      })
+      .then((trip) => {
+
+        trips.push(trip);
+
+        if (++countTrips == 2)
+          resolve(trips);
+
+
+      });;
 
   });
 
