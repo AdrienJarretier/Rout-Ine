@@ -12,6 +12,17 @@ const mysql = require('mysql');
 
 const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 
+// chargement de la classe AddressFeature
+// AddressFeature.js est un module qui exporte la definition de la classe
+const AddressFeature = require('./AddressFeature.js');
+
+/**
+ * Retourne une promesse qui
+ * lorsqu'elle est resolue retourne le tableau des adresses se trouvant dans la base de donnees
+ * et ayant au moins 1 beneficiaire y habitant
+ *
+ * @returns {Promise} la promesse de retourner le tableau contenant les adresses.
+ */
 function getAddresses() {
 
   const sqlSelectAddresses = ' SELECT distinct a.id, a.label, a.town, a.additional, a.lat, a.lng \n' +
@@ -38,11 +49,19 @@ function getAddresses() {
 
 }
 
-const sqlSelectBenef = ' SELECT id, name, birthdate \n' +
-  ' FROM beneficiary \n' +
-  ' WHERE address_id = ?';
 
+/**
+ * Retourne une promesse qui
+ * lorsqu'elle est resolue retourne le tableau des beneficiaires
+ * habitants a l'adresse donnee
+ *
+ * @returns {Promise} la promesse de retourner le tableau contenant les beneficiaires.
+ */
 function getBenefs(address) {
+
+  const sqlSelectBenef = ' SELECT id, name, birthdate \n' +
+    ' FROM beneficiary \n' +
+    ' WHERE address_id = ?';
 
   const selectBenef = mysql.format(sqlSelectBenef, [address.id]);
 
@@ -66,11 +85,20 @@ function getBenefs(address) {
 
 }
 
-const sqlSelectPhones = ' SELECT DISTINCT phone_number \n' +
-  ' FROM beneficiary_phone \n' +
-  ' WHERE beneficiary_id IN (?)';
 
+/**
+ * Retourne une promesse qui
+ * lorsqu'elle est resolue retourne le tableau des numero de telephone
+ * d'un groupe de beneficiaires
+ *
+ * @returns {Promise} la promesse de retourner le tableau contenant les numeros de telephone.
+ */
 function getPhones(benefRows) {
+
+  const sqlSelectPhones = ' SELECT DISTINCT phone_number \n' +
+    ' FROM beneficiary_phone \n' +
+    ' WHERE beneficiary_id IN (?)';
+
   // recuperons la liste des ids beneficiaires
   let ids = '';
   for (let b of benefRows) {
@@ -98,19 +126,65 @@ function getPhones(benefRows) {
   });
 }
 
-getAddresses().then((rows) => {
+/**
+ * Retourne une promesse qui
+ * lorsqu'elle est resolue retourne le GeoJson des adresses
+ * avec les details beneficiares et numeros de telephone
+ *
+ * @returns {Promise} la promesse de retourner le tableau contenant les numeros de telephone.
+ */
+function getFullAddressesData() {
 
-  for (let i = 0; i < 40; ++i) {
+  return new Promise((resolve, reject) => {
 
-    getBenefs(rows[i]).then((rows) => {
+    // objet GeoJson
+    let addresses = {
+      type: 'FeatureCollection',
+      features: []
+    };
 
-      console.log(rows);
-    })
-    .then((rows) => {
+    let queriesDone = 0;
 
-      console.log(rows);
+    // Lorsque l'on obtient les adresses alors on va pour chaque adresse
+    // recuperer les details des beneficiaires du portage de repas y habitant
+    getAddresses().then((rows) => {
+
+      let rowsLength = rows.length; // cette ligne est utilisee pour compter le nombre de requetes traitees
+      // extremement utile puisque dans un fonctionnement asynchrone
+      // impossible de savoir quelle sera la derniere requete traitee
+      for (let address of rows) {
+
+        let addrFeat = new AddressFeature(address);
+
+        // recuperons les beneficiares a cette adresse
+        // quand on a la reponse alors on peut recuperer les numeros de telephone
+        getBenefs(address).then((benefsRows) => {
+
+            addrFeat.addBeneficiaries(benefsRows);
+
+            // on a les beneficiares on va alors recuperer les numeros de telephone
+            return getPhones(benefsRows);
+          })
+          // on a les numeros de telephones on peut alors terminer notre enchainement de .then()
+          // et si le compte est bon on resoud la promesse
+          //    sinon il reste des donnees a recuperer on ne fait rien
+          .then((phoneRows) => {
+
+            addrFeat.addPhones(phoneRows);
+
+            addresses.features.push(addrFeat);
+
+            // compter ici le nombre de requetes traitees
+            // si on a tout traiter on peut remplir notre promesse avec le GeoJson
+            if (++queriesDone == rowsLength)
+              resolve(addresses);
+          });
+
+      }
+
     });
+  });
 
-  }
+}
 
-});
+exports.getFullAddressesData = getFullAddressesData;
