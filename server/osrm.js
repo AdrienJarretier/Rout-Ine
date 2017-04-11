@@ -5,6 +5,7 @@ const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 const request = require('request');
 const db = require('./db.js');
 const shuffle = require('shuffle-array');
+const utils = require('./utils.js');
 
 class OsrmRequest {
   constructor() {
@@ -208,37 +209,40 @@ class ResultTrip {
   }
 }
 
-function getHalfTrip() {
+function getHalfTrip(nbTrips) {
 
   return new Promise((resolve, reject) => {
 
     let resultTrips = []; // tableau d'instances de ResultTrip
-
-    let result = new ResultTrip();
 
     db.getFullAddressesData()
       .then((addressesGeoJson) => {
 
         shuffle(addressesGeoJson.features);
 
-        result.setAddressFeatures(addressesGeoJson.features.slice(0, Math.floor(addressesGeoJson.features
-          .length / 7)));
+        let addressesChunks = utils.chunkify(addressesGeoJson.features, nbTrips);
 
-        return result;
+        for (let chunk of addressesChunks) {
 
-      }).then((resultTrip) => {
+          let result = new ResultTrip();
 
-        return getTripFromAddresses(resultTrip.addresses);
+          result.setAddressFeatures(chunk);
 
-      }).then((trip) => {
+          getTripFromAddresses(result.addresses)
+            .then((trip) => {
 
-        result.setTrip(trip);
-        resultTrips.push(result);
+              result.setTrip(trip);
+              resultTrips.push(result);
 
-        resolve(resultTrips);
+              if (resultTrips.length == nbTrips)
+                resolve(resultTrips);
+            });
+
+        }
+
       });
 
   });
 }
 
-exports.getTrip = getHalfTrip;
+exports.getTrips = getHalfTrip;
