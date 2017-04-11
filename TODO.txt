@@ -1,1 +1,4 @@
 numéroter les marker, voir ionicons pour les personaliser
+lister les adresses dans l'ordre de visite
+sortir une feuille de route, avec osrm-text-instructions
+afficher le départ
