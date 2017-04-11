@@ -92,13 +92,21 @@
       url: "trip",
       success: function(data, textStatus, jqXHR) {
 
-        let routeLayer = L.geoJSON().addTo(mymap);
-        routeLayer.addData(data.geometry);
+        let routeLayer = L.geoJSON(data[0].geometry).addTo(mymap);
         routeLayer.setStyle(function(feature) {
           return {
             color: "red"
           };
         });
+
+        let routeLayer2 = L.geoJSON(data[1].geometry).addTo(mymap);
+        routeLayer2.setStyle(function(feature) {
+          return {
+            color: "green"
+          };
+        });
+
+
       },
       error: function(jqXHR, textStatus, errorThrown) {
         console.log("error : " + textStatus + errorThrown);

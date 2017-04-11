@@ -45,11 +45,9 @@ app.get('/trip', function(req, res) {
 
   // quand la Promise retournee par getTrip est realisee
   // on peut envoyer le tableau de donnees au client
-  osrm.getTrip().then((tripArray) => {
+  osrm.getTrip().then((trips) => {
 
-    console.log(tripArray);
-
-    res.send(tripArray);
+    res.send(trips);
 
   });
 });

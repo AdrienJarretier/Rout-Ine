@@ -85,7 +85,9 @@ class OsrmRequest {
 
   setCoords(coords) {
 
-    this.coords = coords;
+    for (let c of coords) {
+      this.addCoords(c.lat, c.lng);
+    }
 
   }
 
@@ -101,27 +103,29 @@ function getTrip() {
   return new Promise((resolve, reject) => {
 
     let countTrips = 0;
-    let trips = [];
+    let addressesSliced = [];
 
     db.getAddresses().then((addresses) => {
 
         shuffle(addresses);
 
-        let trips = [
+        let addressesSliced = [
           addresses.slice(0, Math.floor(addresses.length / 2)),
           addresses.slice(Math.floor(addresses.length / 2))
         ];
 
-        return trips;
+        return addressesSliced;
 
       })
-      .then((trips) => {
+      .then((addressesSliced) => {
 
-        for (let trip of trips) {
+        let trips = [];
+
+        for (let addresses of addressesSliced) {
 
           let oReq = new OsrmRequest();
 
-          oReq.setCoords(trip);
+          oReq.setCoords(addresses);
 
           console.log(oReq);
 
@@ -134,22 +138,16 @@ function getTrip() {
 
               let response = JSON.parse(body);
 
-              return response.trips[0];
+              trips.push(response.trips[0]);
+
+              if (trips.length == addressesSliced.length)
+                resolve(trips);
 
             }
           });
 
         }
-      })
-      .then((trip) => {
-
-        trips.push(trip);
-
-        if (++countTrips == 2)
-          resolve(trips);
-
-
-      });;
+      });
 
   });
 
