@@ -127,8 +127,6 @@ function getTrip() {
 
           oReq.setCoords(addresses);
 
-          console.log(oReq);
-
           request(oReq.makeUrl(), (error, response, body) => {
 
             if (error) {
