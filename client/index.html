@@ -149,25 +149,21 @@
       url: "trip",
       success: function(data, textStatus, jqXHR) {
 
-        let trip = data[0];
+        let trip1 = data[0];
+        let trip2 = data[1];
 
-        let group1 = layerGroup(trip, 'red');
+        let group1 = layerGroup(trip1, 'red');
+        let group2 = layerGroup(trip2, 'green');
 
         let overlayMaps = {
-          "trip 1": group1
+          "trip 1": group1,
+          "trip 2": group2
         };
 
         group1.addTo(mymap);
+        group2.addTo(mymap);
 
         L.control.layers(null, overlayMaps).addTo(mymap);
-
-        // let routeLayer2 = L.geoJSON(data[1].geometry).addTo(mymap);
-        // routeLayer2.setStyle(function(feature) {
-        //   return {
-        //     color: "green"
-        //   };
-        // });
-
 
       },
       error: function(jqXHR, textStatus, errorThrown) {
