@@ -55,12 +55,19 @@
 
           if (b.birthdate != null) {
 
+            let now = new Date(Date.now());
+            let birthdate = new Date(b.birthdate);
+
             // l'age de la personne en millisecondes
-            let age = Date.now() - (new Date(b.birthdate));
+            let age = now - birthdate;
 
             let years = age / 31557600000
 
             popContent += ', ' + Math.floor(years) + ' ans';
+            if (now.getDate() == birthdate.getDate() && now.getMonth() == birthdate.getMont()) {
+
+              popContent = addLine(popContent, '<img src="cake-with-2-candles-md.png">');
+            }
           }
         }
 
