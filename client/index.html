@@ -40,53 +40,6 @@
       return string + '<br>' + line;
     }
 
-    // demande au serveur le json des informations beneficiares pour les afficher
-    // $.ajax({
-    //   type: "GET",
-    //   dataType: "json",
-    //   url: "beneficiaries",
-    //   success: function(data, textStatus, jqXHR) {
-
-    //     console.log(data);
-
-    //     function onEachFeature(feature, layer) {
-    //       let p = feature.properties;
-    //       let popContent = p.label + (p.additional.length > 0 ? ', ' + p.additional : '');
-
-    //       for (let b of p.beneficiaries) {
-
-    //         popContent = addLine(popContent, b.name);
-
-    //         if (b.birthdate != null) {
-
-    //           // l'age de la personne en millisecondes
-    //           let age = Date.now() - (new Date(b.birthdate));
-
-    //           let years = age / 31557600000
-
-    //           popContent += ', ' + Math.floor(years) + ' ans';
-    //         }
-    //       }
-
-    //       for (let phone of p.phones) {
-    //         popContent = addLine(popContent, phone);
-    //       }
-    //       layer.bindPopup(popContent);
-    //     }
-    //     L.geoJSON(data, {
-    //       onEachFeature: onEachFeature
-    //     }).addTo(mymap);
-
-
-
-    //   },
-    //   error: function(jqXHR, textStatus, errorThrown) {
-    //     console.log("error : " + textStatus + errorThrown);
-    //   }
-    // });
-
-
-
     function addressesMarkers(resultTrip) {
 
       function onEachFeature(feature, layer) {
