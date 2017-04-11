@@ -14,6 +14,18 @@ npm install
 ```
 configuration dans `config.json`
 
+Le fichier `utils.js` qui se trouve dans le dossier client ne doit pas être modifié directement, c'est en fait la version "navigateur" du fichier server/utils.js obtenu avec les modules `browserify` et `watchify`
+
+installation globales de ces modules :
+
+`npm instal -g browserify watchify`
+
+utilisation :
+
+```bash
+watchify utils.js -o ../client/utils.js -s utils -v
+```
+
 ### Démarrer le serveur
 ```bash
 node .
@@ -60,6 +72,7 @@ Le serveur est fin prêt !
 ### Lancement du serveur osrm :
 
 `osrm-routed albi_large.osrm --max-trip-size 400`
+
 L'option `--max-trip-size` spécifie le maximum de coordonnées que le serveur acceptera pour le service `trip`
 
 Le serveur écoute sur le port 5000 par défaut, un test dans le navigateur sur l'ip du serveur et le port 5000 doit retourner du json similaire à
