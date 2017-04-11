@@ -45,7 +45,7 @@ app.get('/trip', function(req, res) {
 
   // quand la Promise retournee par getTrip est realisee
   // on peut envoyer le tableau de donnees au client
-  osrm.getTrips(2).then((trips) => {
+  osrm.getTrips(req.query.nbTrips).then((trips) => {
 
     res.send(trips);
 

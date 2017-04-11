@@ -11,6 +11,7 @@
   <script type="text/javascript" src="jquery-latest.min.js"></script>
   <script src='leaflet-groupedlayercontrol-0.6.0/dist/leaflet.groupedlayercontrol.min.js'></script>
   <link rel="stylesheet" href="leaflet-groupedlayercontrol-0.6.0/dist/leaflet.groupedlayercontrol.min.css">
+  <script src='utils.js'></script>
   <style>
   #mapid {
     height: 720px;
@@ -96,19 +97,20 @@
       ]);
     }
 
+    const NUMBER_OF_TRIPS = 2;
 
     // demande au serveur le geojson du voyage
     $.ajax({
       type: "GET",
       dataType: "json",
-      url: "trip",
+      url: "trip?nbTrips=" + NUMBER_OF_TRIPS,
       success: function(data, textStatus, jqXHR) {
 
         let trip1 = data[0];
         let trip2 = data[1];
 
-        let group1 = layerGroup(trip1, 'red');
-        let group2 = layerGroup(trip2, 'green');
+        let group1 = layerGroup(trip1, utils.randomColor());
+        let group2 = layerGroup(trip2, utils.randomColor());
 
         let overlayMaps = {
           "trips": {
