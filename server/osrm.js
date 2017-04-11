@@ -91,7 +91,16 @@ class OsrmRequest {
 
   }
 
+  setFromAddresses(addresses) {
+
+    for (let c of addresses.features) {
+      this.addCoords(c.coordinates[1], c.coordinates[0]);
+    }
+
+  }
+
 }
+
 
 /**
  *
@@ -101,9 +110,6 @@ class OsrmRequest {
 function getTrip() {
 
   return new Promise((resolve, reject) => {
-
-    let countTrips = 0;
-    let addressesSliced = [];
 
     db.getAddresses().then((addresses) => {
 
@@ -151,4 +157,88 @@ function getTrip() {
 
 }
 
-exports.getTrip = getTrip;
+
+/**
+ *
+ *
+ * returns a Promise which is fulfilled with the array of trip arrays when the OSRM server answers
+ */
+function getTripFromAddresses(addresses) {
+
+  return new Promise((resolve, reject) => {
+
+    let oReq = new OsrmRequest();
+
+    oReq.setFromAddresses(addresses);
+
+    request(oReq.makeUrl(), (error, response, body) => {
+
+      if (error) {
+        console.log('error:', error); // Print the error if one occurred
+        console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
+      } else {
+
+        let response = JSON.parse(body);
+
+        resolve(response.trips[0]);
+
+      }
+    });
+
+  });
+
+}
+
+class ResultTrip {
+  constructor() {
+    this.addresses = { // resultat de db.getAddresses (mais avec seulement une partie des adresses)
+      type: 'FeatureCollection',
+      features: []
+    };
+
+    this.trip = {}; // resultat du service trip de OSRM
+  }
+
+  setAddressFeatures(addressFeatures) {
+    this.addresses.features = addressFeatures;
+  }
+
+  setTrip(trip) {
+    this.trip = trip;
+  }
+}
+
+function getHalfTrip() {
+
+  return new Promise((resolve, reject) => {
+
+    let resultTrips = []; // tableau d'instances de ResultTrip
+
+    let result = new ResultTrip();
+
+    db.getFullAddressesData()
+      .then((addressesGeoJson) => {
+
+        shuffle(addressesGeoJson.features);
+
+        result.setAddressFeatures(addressesGeoJson.features.slice(0, Math.floor(addressesGeoJson.features
+          .length / 7)));
+
+        return result;
+
+      }).then((resultTrip) => {
+
+        return getTripFromAddresses(resultTrip.addresses);
+
+      }).then((trip) => {
+
+        result.setTrip(trip);
+        resultTrips.push(result);
+
+        resolve(resultTrips);
+      });
+
+  });
+}
+
+exports.getTrip = getHalfTrip;

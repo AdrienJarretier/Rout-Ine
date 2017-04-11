@@ -41,49 +41,106 @@
     }
 
     // demande au serveur le json des informations beneficiares pour les afficher
-    $.ajax({
-      type: "GET",
-      dataType: "json",
-      url: "beneficiaries",
-      success: function(data, textStatus, jqXHR) {
+    // $.ajax({
+    //   type: "GET",
+    //   dataType: "json",
+    //   url: "beneficiaries",
+    //   success: function(data, textStatus, jqXHR) {
 
-        console.log(data);
+    //     console.log(data);
 
-        function onEachFeature(feature, layer) {
-          let p = feature.properties;
-          let popContent = p.label + (p.additional.length > 0 ? ', ' + p.additional : '');
+    //     function onEachFeature(feature, layer) {
+    //       let p = feature.properties;
+    //       let popContent = p.label + (p.additional.length > 0 ? ', ' + p.additional : '');
 
-          for (let b of p.beneficiaries) {
+    //       for (let b of p.beneficiaries) {
 
-            popContent = addLine(popContent, b.name);
+    //         popContent = addLine(popContent, b.name);
 
-            if (b.birthdate != null) {
+    //         if (b.birthdate != null) {
 
-              // l'age de la personne en millisecondes
-              let age = Date.now() - (new Date(b.birthdate));
+    //           // l'age de la personne en millisecondes
+    //           let age = Date.now() - (new Date(b.birthdate));
 
-              let years = age / 31557600000
+    //           let years = age / 31557600000
 
-              popContent += ', ' + Math.floor(years) + ' ans';
-            }
+    //           popContent += ', ' + Math.floor(years) + ' ans';
+    //         }
+    //       }
+
+    //       for (let phone of p.phones) {
+    //         popContent = addLine(popContent, phone);
+    //       }
+    //       layer.bindPopup(popContent);
+    //     }
+    //     L.geoJSON(data, {
+    //       onEachFeature: onEachFeature
+    //     }).addTo(mymap);
+
+
+
+    //   },
+    //   error: function(jqXHR, textStatus, errorThrown) {
+    //     console.log("error : " + textStatus + errorThrown);
+    //   }
+    // });
+
+
+
+    function addressesMarkers(resultTrip) {
+
+      function onEachFeature(feature, layer) {
+        let p = feature.properties;
+        let popContent = p.label + (p.additional.length > 0 ? ', ' + p.additional : '');
+
+        for (let b of p.beneficiaries) {
+
+          popContent = addLine(popContent, b.name);
+
+          if (b.birthdate != null) {
+
+            // l'age de la personne en millisecondes
+            let age = Date.now() - (new Date(b.birthdate));
+
+            let years = age / 31557600000
+
+            popContent += ', ' + Math.floor(years) + ' ans';
           }
-
-          for (let phone of p.phones) {
-            popContent = addLine(popContent, phone);
-          }
-          layer.bindPopup(popContent);
         }
-        L.geoJSON(data, {
-          onEachFeature: onEachFeature
-        }).addTo(mymap);
 
-
-
-      },
-      error: function(jqXHR, textStatus, errorThrown) {
-        console.log("error : " + textStatus + errorThrown);
+        for (let phone of p.phones) {
+          popContent = addLine(popContent, phone);
+        }
+        layer.bindPopup(popContent);
       }
-    });
+
+      let markersLayer = L.geoJSON(resultTrip.addresses, {
+        onEachFeature: onEachFeature
+      });
+
+      return markersLayer;
+    }
+
+
+    function tripLayer(resultTrip, color) {
+
+      let routeLayer = L.geoJSON(resultTrip.trip.geometry);
+      routeLayer.setStyle(function(feature) {
+        return {
+          color: color
+        };
+      });
+
+      return routeLayer;
+    }
+
+    function layerGroup(resultTrip, tripColor) {
+      return L.layerGroup([
+        tripLayer(resultTrip, tripColor),
+        addressesMarkers(resultTrip)
+      ]);
+    }
+
 
     // demande au serveur le geojson du voyage
     $.ajax({
@@ -92,19 +149,24 @@
       url: "trip",
       success: function(data, textStatus, jqXHR) {
 
-        let routeLayer = L.geoJSON(data[0].geometry).addTo(mymap);
-        routeLayer.setStyle(function(feature) {
-          return {
-            color: "red"
-          };
-        });
+        let trip = data[0];
 
-        let routeLayer2 = L.geoJSON(data[1].geometry).addTo(mymap);
-        routeLayer2.setStyle(function(feature) {
-          return {
-            color: "green"
-          };
-        });
+        let group1 = layerGroup(trip, 'red');
+
+        let overlayMaps = {
+          "trip 1": group1
+        };
+
+        group1.addTo(mymap);
+
+        L.control.layers(null, overlayMaps).addTo(mymap);
+
+        // let routeLayer2 = L.geoJSON(data[1].geometry).addTo(mymap);
+        // routeLayer2.setStyle(function(feature) {
+        //   return {
+        //     color: "green"
+        //   };
+        // });
 
 
       },

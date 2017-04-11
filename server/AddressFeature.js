@@ -27,6 +27,10 @@ class AddressFeature {
       this.properties.phones.push(phone.phone_number);
     }
   }
+
+  get coordinates() {
+    return this.geometry.coordinates;
+  }
 }
 
 // exporte la definition de la classe
