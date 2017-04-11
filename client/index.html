@@ -6,9 +6,11 @@
   <title>Localisation bénéficiaires</title>
   <link href='json-formatter/JSONFormatter.css' media='all' rel='stylesheet' type='text/css'>
   <script src="json-formatter/JSONFormatter.js"></script>
-  <link rel="stylesheet" href="leaflet/leaflet.css" />
+  <link rel="stylesheet" href="leaflet/leaflet.css">
   <script src="leaflet/leaflet.js"></script>
   <script type="text/javascript" src="jquery-latest.min.js"></script>
+  <script src='leaflet-groupedlayercontrol-0.6.0/dist/leaflet.groupedlayercontrol.min.js'></script>
+  <link rel="stylesheet" href="leaflet-groupedlayercontrol-0.6.0/dist/leaflet.groupedlayercontrol.min.css">
   <style>
   #mapid {
     height: 720px;
@@ -109,14 +111,20 @@
         let group2 = layerGroup(trip2, 'green');
 
         let overlayMaps = {
-          "trip 1": group1,
-          "trip 2": group2
+          "trips": {
+            "trip 1": group1,
+            "trip 2": group2
+          }
+        };
+
+        var options = {
+          // Make the "Landmarks" group exclusive (use radio inputs)
+          exclusiveGroups: ["trips"]
         };
 
         group1.addTo(mymap);
-        group2.addTo(mymap);
 
-        L.control.layers(null, overlayMaps).addTo(mymap);
+        L.control.groupedLayers(null, overlayMaps, options).addTo(mymap);
 
       },
       error: function(jqXHR, textStatus, errorThrown) {
