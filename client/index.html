@@ -110,12 +110,24 @@
           "trips": {}
         };
 
+        let tripNames = [];
+
         for (let i = 0; i < data.length; ++i) {
 
           let trip = data[i];
           let group = layerGroup(trip, utils.randomColor());
 
-          overlayMaps.trips["trajet " + (i+1)] = group;
+          console.log(trip);
+
+          let seconds = trip.trip.duration;
+          let hours = Math.floor(seconds / 3600);
+          let minutes = Math.ceil((seconds % 3600) / 60);
+
+          let tripName = "trajet " + (i + 1) + ' (' + hours + ' h ' + minutes + ' min)';
+
+          tripNames.push(tripName);
+
+          overlayMaps.trips[tripName] = group;
         }
 
         var options = {
@@ -123,7 +135,7 @@
           exclusiveGroups: ["trips"]
         };
 
-        overlayMaps.trips["trajet 1"].addTo(mymap);
+        overlayMaps.trips[tripNames[0]].addTo(mymap);
 
         L.control.groupedLayers(null, overlayMaps, options).addTo(mymap);
 
