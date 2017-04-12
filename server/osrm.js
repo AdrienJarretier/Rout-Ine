@@ -106,7 +106,7 @@ class OsrmRequest {
 /**
  *
  *
- * returns a Promise which is fulfilled with the array of trip arrays when the OSRM server answers
+ * returns a Promise which is fulfilled with the trip when the OSRM server answers
  */
 function getTripFromAddresses(addresses) {
 
@@ -125,7 +125,7 @@ function getTripFromAddresses(addresses) {
 
         let response = JSON.parse(body);
 
-        resolve(response.trips[0]);
+        resolve(response);
 
       }
     });
@@ -151,6 +151,10 @@ class ResultTrip {
   setTrip(trip) {
     this.route = trip;
   }
+
+  getAddressFeature(i) {
+    return this.features[i];
+  }
 }
 
 function getHalfTrip(nbTrips) {
@@ -161,6 +165,8 @@ function getHalfTrip(nbTrips) {
 
     db.getFullAddressesData()
       .then((addressesGeoJson) => {
+        // addressesGeoJson est une FeatureCollection
+        // où chaque Feature est un objet AddressFeature
 
         shuffle(addressesGeoJson.features);
 
@@ -175,7 +181,13 @@ function getHalfTrip(nbTrips) {
           getTripFromAddresses(result.addresses)
             .then((trip) => {
 
-              result.setTrip(trip);
+              for (let i = 0; i < trip.waypoints.length; ++i) {
+
+                let w_ind = trip.waypoints[i].waypoint_index;
+                result.addresses.features[i].setWaypointIndex(w_ind);
+              }
+
+              result.setTrip(trip.trips[0]);
               resultTrips.push(result);
 
               if (resultTrips.length == nbTrips)

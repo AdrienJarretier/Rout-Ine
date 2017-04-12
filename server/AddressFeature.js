@@ -10,7 +10,8 @@ class AddressFeature {
       additional: address.additional,
       town: address.town,
       beneficiaries: [],
-      phones: []
+      phones: [],
+      waypoint_index: 0 // index de cette adresse dans le trajet, obtenu par osrm
     };
     this.id = address.id;
   }
@@ -30,6 +31,10 @@ class AddressFeature {
 
   get coordinates() {
     return this.geometry.coordinates;
+  }
+
+  setWaypointIndex(w_ind) {
+    this.properties.waypoint_index = w_ind;
   }
 }
 

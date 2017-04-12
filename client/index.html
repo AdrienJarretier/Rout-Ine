@@ -56,7 +56,7 @@
 
         let marker = L.marker(latlng, {
           icon: new L.AwesomeNumberMarkers({
-            number: 999,
+            number: feature.properties.waypoint_index,
             markerColor: "darkred"
           })
         });
