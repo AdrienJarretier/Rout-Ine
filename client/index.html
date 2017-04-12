@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="leaflet-groupedlayercontrol-0.6.0/dist/leaflet.groupedlayercontrol.min.css">
   <!--  -->
   <script src='utils.js'></script>
+  <script src="leaflet-svgicon-master/svg-icon.js"></script>
   <style>
   #mapid {
     height: 720px;
@@ -45,9 +46,12 @@
       return string + '<br>' + line;
     }
 
-    function addressesMarkers(resultTrip) {
+    function addressesMarkers(resultTrip, color) {
 
-      function onEachFeature(feature, layer) {
+      function markerMaker(feature, latlng) {
+
+        let marker = new L.Marker.SVGMarker(latlng, { iconOptions: { color: color }})
+
         let p = feature.properties;
         let popContent = p.label + (p.additional.length > 0 ? ', ' + p.additional : '');
 
@@ -76,11 +80,13 @@
         for (let phone of p.phones) {
           popContent = addLine(popContent, phone);
         }
-        layer.bindPopup(popContent);
+        marker.bindPopup(popContent);
+
+        return marker;
       }
 
       let markersLayer = L.geoJSON(resultTrip.addresses, {
-        onEachFeature: onEachFeature
+        pointToLayer: markerMaker
       });
 
       return markersLayer;
@@ -102,7 +108,7 @@
     function layerGroup(resultTrip, tripColor) {
       return L.layerGroup([
         tripLayer(resultTrip, tripColor),
-        addressesMarkers(resultTrip)
+        addressesMarkers(resultTrip, utils.negateColor(tripColor))
       ]);
     }
 
