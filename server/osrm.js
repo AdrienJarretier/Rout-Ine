@@ -197,7 +197,7 @@ class ResultTrip {
       features: []
     };
 
-    this.trip = {}; // resultat du service trip de OSRM
+    this.route = {}; // resultat du service trip de OSRM, element du tableau Trips : cad un objet Route
   }
 
   setAddressFeatures(addressFeatures) {
@@ -205,7 +205,7 @@ class ResultTrip {
   }
 
   setTrip(trip) {
-    this.trip = trip;
+    this.route = trip;
   }
 }
 
