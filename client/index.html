@@ -14,7 +14,7 @@
   <link rel="stylesheet" href="leaflet-groupedlayercontrol-0.6.0/dist/leaflet.groupedlayercontrol.min.css">
   <!--  -->
   <script src='utils.js'></script>
-  <script src="leaflet-svgicon-master/svg-icon.js"></script>
+  <script src="Leaflet.MakiMarkers-3.1.0/Leaflet.MakiMarkers.js"></script>
   <style>
   #mapid {
     height: 720px;
@@ -30,6 +30,8 @@
   Third, strict mode prohibits some syntax likely to be defined in future versions of ECMAScript.
   */
 
+  const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoibXJmcmVlemUiLCJhIjoiY2owNWg2a2kyMDA2cjMycGZndzA2ZzZneCJ9.-wsVwihnGBO41Z9FvV_UAQ';
+
   // execute le javascript quand la page est completement chargee
   $(document).ready(function() {
     let mymap = L.map('mapid').setView([43.93002883039214, 2.1581183602941194], 13);
@@ -39,8 +41,11 @@
       attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
       maxZoom: 18,
       id: 'mapbox.streets',
-      accessToken: 'pk.eyJ1IjoibXJmcmVlemUiLCJhIjoiY2owNWg2a2kyMDA2cjMycGZndzA2ZzZneCJ9.-wsVwihnGBO41Z9FvV_UAQ'
+      accessToken: MAPBOX_ACCESS_TOKEN
     }).addTo(mymap);
+
+
+    L.MakiMarkers.accessToken = MAPBOX_ACCESS_TOKEN;
 
     function addLine(string, line) {
       return string + '<br>' + line;
@@ -50,7 +55,21 @@
 
       function markerMaker(feature, latlng) {
 
-        let marker = new L.Marker.SVGMarker(latlng, { iconOptions: { color: color }})
+        // Specify a Maki icon name, hex color, and size (s, m, or l).
+        // A list of available icon names can be found at
+        //   https://raw.githubusercontent.com/mapbox/maki/master/layouts/all.json
+        // Lowercase letters a-z and digits 0-9 can also be used. A value of null will result in no icon.
+        // Color may also be set to null, which will result in a gray marker.
+        var icon = L.MakiMarkers.icon({
+          icon: "rocket",
+          color: color,
+          size: "l"
+        });
+        let marker = L.marker(latlng, {
+          icon: icon
+        });
+
+
 
         let p = feature.properties;
         let popContent = p.label + (p.additional.length > 0 ? ', ' + p.additional : '');
