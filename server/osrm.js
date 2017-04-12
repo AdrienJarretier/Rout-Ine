@@ -108,62 +108,6 @@ class OsrmRequest {
  *
  * returns a Promise which is fulfilled with the array of trip arrays when the OSRM server answers
  */
-function getTrip() {
-
-  return new Promise((resolve, reject) => {
-
-    db.getAddresses().then((addresses) => {
-
-        shuffle(addresses);
-
-        let addressesSliced = [
-          addresses.slice(0, Math.floor(addresses.length / 2)),
-          addresses.slice(Math.floor(addresses.length / 2))
-        ];
-
-        return addressesSliced;
-
-      })
-      .then((addressesSliced) => {
-
-        let trips = [];
-
-        for (let addresses of addressesSliced) {
-
-          let oReq = new OsrmRequest();
-
-          oReq.setCoords(addresses);
-
-          request(oReq.makeUrl(), (error, response, body) => {
-
-            if (error) {
-              console.log('error:', error); // Print the error if one occurred
-              console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
-            } else {
-
-              let response = JSON.parse(body);
-
-              trips.push(response.trips[0]);
-
-              if (trips.length == addressesSliced.length)
-                resolve(trips);
-
-            }
-          });
-
-        }
-      });
-
-  });
-
-}
-
-
-/**
- *
- *
- * returns a Promise which is fulfilled with the array of trip arrays when the OSRM server answers
- */
 function getTripFromAddresses(addresses) {
 
   return new Promise((resolve, reject) => {
