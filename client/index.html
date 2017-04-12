@@ -14,7 +14,9 @@
   <link rel="stylesheet" href="leaflet-groupedlayercontrol-0.6.0/dist/leaflet.groupedlayercontrol.min.css">
   <!--  -->
   <script src='utils.js'></script>
-  <!--  -->
+  <!-- awesome-numbered-marker -->
+  <link rel="stylesheet" href="Leaflet.awesome-numbered-marker-master/src/leaflet_awesome_number_markers.css" />
+  <script src="Leaflet.awesome-numbered-marker-master/src/leaflet_awesome_number_markers.js"></script>
   <!--  -->
   <style>
   #mapid {
@@ -51,6 +53,13 @@
     function addressesMarkers(resultTrip, color) {
 
       function markerMaker(feature, latlng) {
+
+        let marker = L.marker(latlng, {
+          icon: new L.AwesomeNumberMarkers({
+            number: 999,
+            markerColor: "darkred"
+          })
+        });
 
         let p = feature.properties;
         let popContent = p.label + (p.additional.length > 0 ? ', ' + p.additional : '');
