@@ -8,9 +8,9 @@ const shuffle = require('shuffle-array');
 const utils = require('./utils.js');
 
 class OsrmRequest {
-  constructor() {
+  constructor(service) {
     // One of the following values: route, nearest, table, match, trip, tile
-    this.service = "trip";
+    this.service = service;
 
     // Version of the protocol implemented by the service. v1 for all OSRM 5.x installations
     this.version = "v1";
@@ -34,11 +34,22 @@ class OsrmRequest {
 
         overview : Add overview geometry either `full`, `simplified` according to highest zoom level it could be display on, or not at all (`false`).
     */
-    this.options = {
-      steps: false,
-      geometries: "geojson", // Returned route geometry in Geojson for Leaflet
-      overview: "full" // full overview geometry
-    };
+
+    switch (service) {
+
+      case 'trip':
+        this.options = {
+          steps: false,
+          geometries: "geojson", // Returned route geometry in Geojson for Leaflet
+          overview: "full" // full overview geometry
+        };
+        break;
+
+      default:
+        this.options = {};
+        break;
+
+    }
   }
 
   /**
@@ -112,7 +123,7 @@ function getTripFromAddresses(addresses) {
 
   return new Promise((resolve, reject) => {
 
-    let oReq = new OsrmRequest();
+    let oReq = new OsrmRequest('trip');
 
     oReq.setFromAddresses(addresses);
 
@@ -126,6 +137,57 @@ function getTripFromAddresses(addresses) {
         let response = JSON.parse(body);
 
         resolve(response);
+
+      }
+    });
+
+  });
+
+}
+
+
+function getTableFromAddresses(addresses) {
+
+  return new Promise((resolve, reject) => {
+
+    let oReq = new OsrmRequest('table');
+
+    oReq.setFromAddresses(addresses);
+
+    request(oReq.makeUrl(), (error, response, body) => {
+
+      if (error) {
+        console.log('error:', error); // Print the error if one occurred
+        console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
+      } else {
+
+        let response = JSON.parse(body);
+
+        let durations = [
+          []
+        ];
+
+        for (let i = 0; i < response.durations.length; ++i) {
+          let uniDurations = [];
+          for (let j = 0; j < response.durations[i].length; ++j) {
+
+            if (i != j)
+              uniDurations.push({
+                dur: response.durations[i][j],
+                source_id: addresses.features[i].id,
+                destination_id: addresses.features[j].id,
+                dest_feature: addresses.features[j]
+              });
+          }
+
+          uniDurations.sort((a, b) => {
+            return a.dur - b.dur
+          });
+
+          durations.push(uniDurations);
+        }
+
+        resolve(durations);
 
       }
     });
@@ -157,6 +219,73 @@ class ResultTrip {
   }
 }
 
+function removeDestination(durations, dest_id) {
+
+  for (let i = 1; i < durations.length; ++i) {
+
+    for (let j = 0; j < durations[i].length; ++j) {
+
+      // console.log(durations[i][j]);
+
+      if (durations[i][j].destination_id == dest_id) {
+        durations[i].splice(j, 1);
+        break;
+      }
+    }
+  }
+}
+
+function greedyChunk(addressesGeoJson, nbTrips) {
+
+  return new Promise((resolve, reject) => {
+    getTableFromAddresses(addressesGeoJson)
+      .then((dur) => {
+
+        // console.log(addressesGeoJson);
+
+        let trips = [];
+
+        for (let i = 0; i < nbTrips; ++i) {
+          trips.push([addressesGeoJson.features[0]]);
+
+        }
+        removeDestination(dur, addressesGeoJson.features[0].id);
+
+        // // console.log('ok 1 ');
+
+        while (dur[1].length > 0) {
+
+          for (let i = 0; i < nbTrips && dur[1].length > 0; ++i) {
+
+            // console.log('ok 2 ');
+            let lastDest = trips[i][trips[i].length - 1];
+
+            // console.log(lastDest);
+
+            // console.log(lastDest);
+            let nextDest = dur[lastDest.id][0];
+
+            // console.log('ok 3 ');
+            trips[i].push(nextDest.dest_feature);
+
+            removeDestination(dur, nextDest.destination_id);
+          }
+        }
+
+        resolve(trips);
+
+      });
+
+  });
+
+}
+
+// db.getFullAddressesData()
+//   .then((addressesGeoJson) => {
+//     mjkljkvv(addressesGeoJson, 6);
+
+//   });
+
 function getHalfTrip(nbTrips) {
 
   return new Promise((resolve, reject) => {
@@ -168,33 +297,40 @@ function getHalfTrip(nbTrips) {
         // addressesGeoJson est une FeatureCollection
         // où chaque Feature est un objet AddressFeature
 
-        shuffle(addressesGeoJson.features);
+        // shuffle(addressesGeoJson.features);
 
-        let addressesChunks = utils.chunkify(addressesGeoJson.features, nbTrips);
+        // let addressesChunks = utils.chunkify(addressesGeoJson.features, nbTrips);
 
-        for (let chunk of addressesChunks) {
+        greedyChunk(addressesGeoJson, nbTrips)
+          .then((addressesChunks) => {
+            console.log(addressesChunks);
 
-          let result = new ResultTrip();
+            for (let chunk of addressesChunks) {
 
-          result.setAddressFeatures(chunk);
+              let result = new ResultTrip();
 
-          getTripFromAddresses(result.addresses)
-            .then((trip) => {
+              result.setAddressFeatures(chunk);
 
-              for (let i = 0; i < trip.waypoints.length; ++i) {
+              getTripFromAddresses(result.addresses)
+                .then((trip) => {
 
-                let w_ind = trip.waypoints[i].waypoint_index;
-                result.addresses.features[i].setWaypointIndex(w_ind);
-              }
+                  for (let i = 0; i < trip.waypoints.length; ++i) {
 
-              result.setTrip(trip.trips[0]);
-              resultTrips.push(result);
+                    let w_ind = trip.waypoints[i].waypoint_index;
+                    result.addresses.features[i].setWaypointIndex(w_ind);
+                  }
 
-              if (resultTrips.length == nbTrips)
-                resolve(resultTrips);
-            });
+                  result.setTrip(trip.trips[0]);
+                  resultTrips.push(result);
 
-        }
+                  if (resultTrips.length == nbTrips)
+                    resolve(resultTrips);
+                });
+
+            }
+
+          });
+
 
       });
 
