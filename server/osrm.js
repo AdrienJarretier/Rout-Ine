@@ -251,22 +251,19 @@ function greedyChunk(addressesGeoJson, nbTrips) {
 
         let trips = [];
 
-        console.log(addressesGeoJson);
-        console.log(dur);
-
         for (let i = 0; i < nbTrips; ++i) {
           trips.push([addressesGeoJson.features[0]]);
 
         }
         removeDestination(dur, addressesGeoJson.features[0].id);
 
-        // // console.log('ok 1 ');
+        console.log('ok 1 ');
 
         while (dur[1].length > 0) {
 
           for (let i = 0; i < nbTrips && dur[1].length > 0; ++i) {
 
-            // console.log('ok 2 ');
+            console.log('ok 2 ');
             let lastDest = trips[i][trips[i].length - 1];
 
             // console.log(lastDest);
@@ -274,7 +271,7 @@ function greedyChunk(addressesGeoJson, nbTrips) {
             // console.log(lastDest);
             let nextDest = dur[lastDest.id][0];
 
-            // console.log('ok 3 ');
+            console.log('ok 3 ');
             trips[i].push(nextDest.dest_feature);
 
             removeDestination(dur, nextDest.destination_id);
