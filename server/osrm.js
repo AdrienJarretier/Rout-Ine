@@ -289,54 +289,49 @@ function greedyChunk(addressesGeoJson, nbTrips) {
 
 }
 
+function computeAllTrips(addressesChunks) {
 
+  return new Promise((resolve, reject) => {
+    let resultTrips = []; // tableau d'instances de ResultTrip
+
+    for (let chunk of addressesChunks) {
+
+      let result = new ResultTrip();
+
+      result.setAddressFeatures(chunk);
+
+      getTripFromAddresses(result.addresses)
+        .then((trip) => {
+
+          for (let i = 0; i < trip.waypoints.length; ++i) {
+
+            let w_ind = trip.waypoints[i].waypoint_index;
+            result.addresses.features[i].setWaypointIndex(w_ind);
+          }
+
+          result.setTrip(trip.trips[0]);
+          resultTrips.push(result);
+
+          if (resultTrips.length == addressesChunks.length)
+            resolve(resultTrips);
+        });
+
+    }
+  });
+}
 
 function getHalfTrip(nbTrips) {
 
-  return new Promise((resolve, reject) => {
+  return db.getFullAddressesData()
+    .then((addressesGeoJson) => {
+      // addressesGeoJson est une FeatureCollection
+      // où chaque Feature est un objet AddressFeature
 
-    let resultTrips = []; // tableau d'instances de ResultTrip
+      return greedyChunk(addressesGeoJson, nbTrips);
 
-    db.getFullAddressesData()
-      .then((addressesGeoJson) => {
-        // addressesGeoJson est une FeatureCollection
-        // où chaque Feature est un objet AddressFeature
+    })
+    .then(computeAllTrips);
 
-
-        greedyChunk(addressesGeoJson, nbTrips)
-          .then((addressesChunks) => {
-
-
-            for (let chunk of addressesChunks) {
-
-              let result = new ResultTrip();
-
-              result.setAddressFeatures(chunk);
-
-              getTripFromAddresses(result.addresses)
-                .then((trip) => {
-
-                  for (let i = 0; i < trip.waypoints.length; ++i) {
-
-                    let w_ind = trip.waypoints[i].waypoint_index;
-                    result.addresses.features[i].setWaypointIndex(w_ind);
-                  }
-
-                  result.setTrip(trip.trips[0]);
-                  resultTrips.push(result);
-
-                  if (resultTrips.length == nbTrips)
-                    resolve(resultTrips);
-                });
-
-            }
-
-          });
-
-
-      });
-
-  });
 }
 
 exports.getTrips = getHalfTrip;
