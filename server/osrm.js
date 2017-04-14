@@ -258,8 +258,14 @@ function greedyChunk(addressesGeoJson, nbTrips) {
 
   return new Promise((resolve, reject) => {
     getTableFromAddresses(addressesGeoJson)
-      .then((dur) => {
+      .then((originalDur) => {
 
+
+        // let bef = Date.now();
+
+        let dur = utils.clone(originalDur); // copie du tableau
+
+        // console.log("copié en : " + (Date.now()-bef) + " ms");
 
         let trips = [];
 
