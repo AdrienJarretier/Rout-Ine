@@ -271,7 +271,7 @@ function greedyChunk(addressesGeoJson, nbTrips) {
 
             // console.log(lastDest);
 
-            console.log(dur[lastDest.id]);
+            console.log(lastDest.id);
 
             // la prochaine destination est la plus proche de notre source
             let nextDest = dur[lastDest.id][0];
