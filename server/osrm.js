@@ -257,21 +257,26 @@ function greedyChunk(addressesGeoJson, nbTrips) {
         }
         removeDestination(dur, addressesGeoJson.features[0].id);
 
-        console.log('ok 1 ');
+        // console.log('ok 1 ');
 
         while (dur[1].length > 0) {
 
           for (let i = 0; i < nbTrips && dur[1].length > 0; ++i) {
 
-            console.log('ok 2 ');
+            // console.log('ok 2 ');
+
             let lastDest = trips[i][trips[i].length - 1];
+            // on recupere la destination en fin de liste,
+            // qui devient la source pour al prochaine
 
             // console.log(lastDest);
 
-            // console.log(lastDest);
+            console.log(dur[lastDest.id]);
+
+            // la prochaine destination est la plus proche de notre source
             let nextDest = dur[lastDest.id][0];
 
-            console.log('ok 3 ');
+            // console.log('ok 3 ');
             trips[i].push(nextDest.dest_feature);
 
             removeDestination(dur, nextDest.destination_id);
