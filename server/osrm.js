@@ -232,7 +232,6 @@ function removeDestination(durations, dest_id) {
 
     for (let j = 0; j < durations[i].length; ++j) {
 
-      // console.log(durations[i][j]);
 
       if (durations[i][j].destination_id == dest_id) {
         durations[i].splice(j, 1);
@@ -248,7 +247,6 @@ function greedyChunk(addressesGeoJson, nbTrips) {
     getTableFromAddresses(addressesGeoJson)
       .then((dur) => {
 
-        // console.log(addressesGeoJson);
 
         let trips = [];
 
@@ -262,30 +260,21 @@ function greedyChunk(addressesGeoJson, nbTrips) {
 
         removeDestination(dur, addressesGeoJson.features[0].id);
 
-        // console.log('ok 1 ');
 
         while (dur[firstId].length > 0) {
 
           for (let i = 0; i < nbTrips && dur[firstId].length > 0; ++i) {
 
-            // console.log('ok 2 ');
 
             let lastDest = trips[i][trips[i].length - 1];
             // on recupere la destination en fin de liste,
             // qui devient la source pour al prochaine
 
-            // console.log(lastDest);
 
-            // console.log(dur.length);
-
-            // if(lastDest.id == 619) {
-            //   console.log(lastDest);
-            // }
 
             // la prochaine destination est la plus proche de notre source
             let nextDest = dur[lastDest.id][0];
 
-            // console.log('ok 3 ');
             trips[i].push(nextDest.dest_feature);
 
             removeDestination(dur, nextDest.destination_id);
@@ -300,11 +289,7 @@ function greedyChunk(addressesGeoJson, nbTrips) {
 
 }
 
-// db.getFullAddressesData()
-//   .then((addressesGeoJson) => {
-//     mjkljkvv(addressesGeoJson, 6);
 
-//   });
 
 function getHalfTrip(nbTrips) {
 
@@ -317,13 +302,10 @@ function getHalfTrip(nbTrips) {
         // addressesGeoJson est une FeatureCollection
         // où chaque Feature est un objet AddressFeature
 
-        // shuffle(addressesGeoJson.features);
-
-        // let addressesChunks = utils.chunkify(addressesGeoJson.features, nbTrips);
 
         greedyChunk(addressesGeoJson, nbTrips)
           .then((addressesChunks) => {
-            // console.log(addressesChunks);
+
 
             for (let chunk of addressesChunks) {
 
