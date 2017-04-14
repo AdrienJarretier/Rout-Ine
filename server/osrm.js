@@ -154,12 +154,18 @@ function getTableFromAddresses(addresses) {
 
     oReq.setFromAddresses(addresses);
 
-    request(oReq.makeUrl(), (error, response, body) => {
+    let url = oReq.makeUrl();
+
+    console.log('url length : ' + url.length);
+
+    request(url, (error, response, body) => {
 
       if (error) {
         console.log('error:', error); // Print the error if one occurred
         console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
       } else {
+
+        console.log('body length : ' + body.length);
 
         let response = JSON.parse(body);
 
@@ -303,7 +309,7 @@ function getHalfTrip(nbTrips) {
 
         greedyChunk(addressesGeoJson, nbTrips)
           .then((addressesChunks) => {
-            console.log(addressesChunks);
+            // console.log(addressesChunks);
 
             for (let chunk of addressesChunks) {
 
