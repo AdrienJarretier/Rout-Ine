@@ -6,6 +6,8 @@ const request = require('request');
 const db = require('./db.js');
 const shuffle = require('shuffle-array');
 const utils = require('./utils.js');
+const Random = require("random-js");
+const mt = Random.engines.mt19937().autoSeed();
 
 class OsrmRequest {
   constructor(service) {
@@ -173,30 +175,43 @@ function getTableFromAddresses(addressesGeoJson) {
 
         let response = JSON.parse(body);
 
-        let durations = [
-          []
-        ];
+        let durations = [];
 
         for (let i = 0; i < response.durations.length; ++i) {
+
           let uniDurations = [];
+
+          let durationsSum = 0.0;
+
           for (let j = 0; j < response.durations[i].length; ++j) {
 
-            if (i != j)
+            if (i != j) {
               uniDurations.push({
                 dur: response.durations[i][j],
                 source_id: addressesGeoJson.features[i].id,
                 destination_id: addressesGeoJson.features[j].id,
                 dest_feature: addressesGeoJson.features[j]
               });
+
+              durationsSum += response.durations[i][j];
+            }
+
           }
 
           uniDurations.sort((a, b) => {
             return a.dur - b.dur
           });
 
+          // pour chaque destination on va ajotuer un attribut d'aptitude
+          for (let uniDur of uniDurations) {
+            uniDur.durationsFitness = 1/(uniDur.dur * durationsSum);
+          }
+
           durations[addressesGeoJson.features[i].id] = uniDurations;
         }
 
+        console.log(durations[71]);
+        console.log(durations[74]);
         resolve(durations);
 
       }
@@ -205,6 +220,8 @@ function getTableFromAddresses(addressesGeoJson) {
   });
 
 }
+
+getHalfTrip(2);
 
 class ResultTrip {
   constructor() {
