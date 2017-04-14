@@ -115,17 +115,17 @@ class OsrmRequest {
 
 
 /**
+ * @param {GeoJson FeatureCollection object} addressesGeoJson collection de AddressFeature
  *
- *
- * returns a Promise which is fulfilled with the trip when the OSRM server answers
+ * @returns {Promise} la promesse realisee avec le voyage quand le serveur OSRM repond
  */
-function getTripFromAddresses(addresses) {
+function getTripFromAddresses(addressesGeoJson) {
 
   return new Promise((resolve, reject) => {
 
     let oReq = new OsrmRequest('trip');
 
-    oReq.setFromAddresses(addresses);
+    oReq.setFromAddresses(addressesGeoJson);
 
     request(oReq.makeUrl(), (error, response, body) => {
 
@@ -145,14 +145,18 @@ function getTripFromAddresses(addresses) {
 
 }
 
-
-function getTableFromAddresses(addresses) {
+/**
+ * @param {GeoJson FeatureCollection object} addressesGeoJson collection de AddressFeature
+ *
+ * @returns {Promise} la promesse realisee avec la matric de durees quand le serveur OSRM repond
+ */
+function getTableFromAddresses(addressesGeoJson) {
 
   return new Promise((resolve, reject) => {
 
     let oReq = new OsrmRequest('table');
 
-    oReq.setFromAddresses(addresses);
+    oReq.setFromAddresses(addressesGeoJson);
 
     let url = oReq.makeUrl();
 
@@ -180,9 +184,9 @@ function getTableFromAddresses(addresses) {
             if (i != j)
               uniDurations.push({
                 dur: response.durations[i][j],
-                source_id: addresses.features[i].id,
-                destination_id: addresses.features[j].id,
-                dest_feature: addresses.features[j]
+                source_id: addressesGeoJson.features[i].id,
+                destination_id: addressesGeoJson.features[j].id,
+                dest_feature: addressesGeoJson.features[j]
               });
           }
 
@@ -190,7 +194,7 @@ function getTableFromAddresses(addresses) {
             return a.dur - b.dur
           });
 
-          durations[addresses.features[i].id] = uniDurations;
+          durations[addressesGeoJson.features[i].id] = uniDurations;
         }
 
         resolve(durations);
@@ -245,7 +249,7 @@ function removeDestination(durations, dest_id) {
  * decoupe l'objet addressesGeoJson en <nbTrips> tableaux
  * avec un algorithme glouton qui fait appel a la matrice de durees entre toutes les coordonnees
  *
- * @param {FeatureCollection object} addressesGeoJson, l'objet geoJson correspondant a une collection de AddressFeature
+ * @param {GeoJson FeatureCollection object} addressesGeoJson, l'objet geoJson correspondant a une collection de AddressFeature
  * @param {Integer} nbTrips le nombre de sous tableaux demandes
  *
  * @returns {Promise} la promesse qui se resoudra avec un tableau 2D [num voyage][AddressFeature]
