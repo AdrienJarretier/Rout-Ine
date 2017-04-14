@@ -251,6 +251,9 @@ function greedyChunk(addressesGeoJson, nbTrips) {
 
         let trips = [];
 
+        console.log(addressesGeoJson);
+        console.log(dur);
+
         for (let i = 0; i < nbTrips; ++i) {
           trips.push([addressesGeoJson.features[0]]);
 
