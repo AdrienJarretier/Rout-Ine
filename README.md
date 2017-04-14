@@ -71,9 +71,10 @@ Le serveur est fin prêt !
 
 ### Lancement du serveur osrm :
 
-`osrm-routed albi_large.osrm --max-trip-size 400`
+`osrm-routed albi_large.osrm --max-trip-size 400 --max-table-size 700`
 
 L'option `--max-trip-size` spécifie le maximum de coordonnées que le serveur acceptera pour le service `trip`
+L'option `--max-table-size` spécifie le maximum de coordonnées que le serveur acceptera pour le service `table`
 
 Le serveur écoute sur le port 5000 par défaut, un test dans le navigateur sur l'ip du serveur et le port 5000 doit retourner du json similaire à
 
