@@ -251,58 +251,54 @@ function removeDestination(durations, dest_id) {
  *
  * @param {GeoJson FeatureCollection object} addressesGeoJson, l'objet geoJson correspondant a une collection de AddressFeature
  * @param {Integer} nbTrips le nombre de sous tableaux demandes
+ * @param {2d array} durationsTable la matrice des durees de trajet entre les adresses
  *
  * @returns {Promise} la promesse qui se resoudra avec un tableau 2D [num voyage][AddressFeature]
  */
-function greedyChunk(addressesGeoJson, nbTrips) {
+function greedyChunk(addressesGeoJson, nbTrips, durationsTable) {
 
   return new Promise((resolve, reject) => {
-    getTableFromAddresses(addressesGeoJson)
-      .then((originalDur) => {
+
+    // let bef = Date.now();
+
+    let dur = utils.clone(durationsTable); // copie du tableau
+
+    // console.log("copié en : " + (Date.now()-bef) + " ms");
+
+    let trips = [];
+
+    for (let i = 0; i < nbTrips; ++i) {
+      trips.push([addressesGeoJson.features[0]]);
+
+    }
 
 
-        // let bef = Date.now();
+    let firstId = addressesGeoJson.features[0].id;
 
-        let dur = utils.clone(originalDur); // copie du tableau
-
-        // console.log("copié en : " + (Date.now()-bef) + " ms");
-
-        let trips = [];
-
-        for (let i = 0; i < nbTrips; ++i) {
-          trips.push([addressesGeoJson.features[0]]);
-
-        }
+    removeDestination(dur, addressesGeoJson.features[0].id);
 
 
-        let firstId = addressesGeoJson.features[0].id;
+    while (dur[firstId].length > 0) {
 
-        removeDestination(dur, addressesGeoJson.features[0].id);
-
-
-        while (dur[firstId].length > 0) {
-
-          for (let i = 0; i < nbTrips && dur[firstId].length > 0; ++i) {
+      for (let i = 0; i < nbTrips && dur[firstId].length > 0; ++i) {
 
 
-            let lastDest = trips[i][trips[i].length - 1];
-            // on recupere la destination en fin de liste,
-            // qui devient la source pour al prochaine
+        let lastDest = trips[i][trips[i].length - 1];
+        // on recupere la destination en fin de liste,
+        // qui devient la source pour al prochaine
 
 
 
-            // la prochaine destination est la plus proche de notre source
-            let nextDest = dur[lastDest.id][0];
+        // la prochaine destination est la plus proche de notre source
+        let nextDest = dur[lastDest.id][0];
 
-            trips[i].push(nextDest.dest_feature);
+        trips[i].push(nextDest.dest_feature);
 
-            removeDestination(dur, nextDest.destination_id);
-          }
-        }
+        removeDestination(dur, nextDest.destination_id);
+      }
+    }
 
-        resolve(trips);
-
-      });
+    resolve(trips);
 
   });
 
@@ -350,14 +346,17 @@ function getHalfTrip(nbTrips) {
 
   return db.getFullAddressesData()
     .then((addressesGeoJson) => {
-      // addressesGeoJson est une FeatureCollection
-      // où chaque Feature est un objet AddressFeature
 
-      return greedyChunk(addressesGeoJson, nbTrips);
+      return getTableFromAddresses(addressesGeoJson)
+        .then((table) => {
 
-    })
-    .then(computeAllTrips);
+          return greedyChunk(addressesGeoJson, nbTrips, table);
+
+        })
+        .then(computeAllTrips);
+    });
 
 }
+
 
 exports.getTrips = getHalfTrip;
