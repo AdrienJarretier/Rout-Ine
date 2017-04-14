@@ -190,7 +190,7 @@ function getTableFromAddresses(addresses) {
             return a.dur - b.dur
           });
 
-          durations.push(uniDurations);
+          durations[addresses.features[i].id] = uniDurations;
         }
 
         resolve(durations);
@@ -271,11 +271,11 @@ function greedyChunk(addressesGeoJson, nbTrips) {
 
             // console.log(lastDest);
 
-            console.log(dur.length);
+            // console.log(dur.length);
 
-            if(lastDest.id == 619) {
-              console.log(lastDest);
-            }
+            // if(lastDest.id == 619) {
+            //   console.log(lastDest);
+            // }
 
             // la prochaine destination est la plus proche de notre source
             let nextDest = dur[lastDest.id][0];
