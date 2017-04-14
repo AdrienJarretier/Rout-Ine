@@ -241,6 +241,15 @@ function removeDestination(durations, dest_id) {
   }
 }
 
+/**
+ * decoupe l'objet addressesGeoJson en <nbTrips> tableaux
+ * avec un algorithme glouton qui fait appel a la matrice de durees entre toutes les coordonnees
+ *
+ * @param {FeatureCollection object} addressesGeoJson, l'objet geoJson correspondant a une collection de AddressFeature
+ * @param {Integer} nbTrips le nombre de sous tableaux demandes
+ *
+ * @returns {Promise} la promesse qui se resoudra avec un tableau 2D [num voyage][AddressFeature]
+ */
 function greedyChunk(addressesGeoJson, nbTrips) {
 
   return new Promise((resolve, reject) => {
@@ -289,6 +298,13 @@ function greedyChunk(addressesGeoJson, nbTrips) {
 
 }
 
+/**
+ * En entree un tableau 2D, demande a OSRM un calcul de voyage pour chaque partition
+ *
+ * @param {array} tableau 2D [num voyage][AddressFeature], les adresses partitionnees
+ *
+ * @return {Promise}
+ */
 function computeAllTrips(addressesChunks) {
 
   return new Promise((resolve, reject) => {
