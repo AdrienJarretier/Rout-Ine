@@ -227,7 +227,8 @@ class ResultTrip {
 
 function removeDestination(durations, dest_id) {
 
-  for (let i = 1; i < durations.length; ++i) {
+  // i prend la valeur des cles de durations qui ne sont pas contigues
+  for (let i in durations) {
 
     for (let j = 0; j < durations[i].length; ++j) {
 
@@ -255,13 +256,17 @@ function greedyChunk(addressesGeoJson, nbTrips) {
           trips.push([addressesGeoJson.features[0]]);
 
         }
+
+
+        let firstId = addressesGeoJson.features[0].id;
+
         removeDestination(dur, addressesGeoJson.features[0].id);
 
         // console.log('ok 1 ');
 
-        while (dur[1].length > 0) {
+        while (dur[firstId].length > 0) {
 
-          for (let i = 0; i < nbTrips && dur[1].length > 0; ++i) {
+          for (let i = 0; i < nbTrips && dur[firstId].length > 0; ++i) {
 
             // console.log('ok 2 ');
 
