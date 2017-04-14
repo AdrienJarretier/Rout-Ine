@@ -55,5 +55,24 @@ function negateColor(htmlColorString) {
 }
 exports.negateColor = negateColor;
 
+/**
+ * Performs and return a deep copy of a 2 dimensional array
+ */
+function clone(matrix) {
+
+  let mat = [];
+
+  for (let i in matrix) {
+    mat[i] = [];
+
+    for (let j in matrix[i]) {
+      mat[i][j] = matrix[i][j];
+    }
+  }
+
+  return mat;
+}
+exports.clone = clone;
+
 },{}]},{},[1])(1)
 });
