@@ -181,7 +181,7 @@ function getTableFromAddresses(addressesGeoJson) {
 
           let uniDurations = [];
 
-          let durationsSum = 0.0;
+          let maxDuration = 0.0;
 
           for (let j = 0; j < response.durations[i].length; ++j) {
 
@@ -193,7 +193,8 @@ function getTableFromAddresses(addressesGeoJson) {
                 dest_feature: addressesGeoJson.features[j]
               });
 
-              durationsSum += response.durations[i][j];
+              if (response.durations[i][j] > maxDuration)
+                maxDuration = response.durations[i][j];
             }
 
           }
@@ -202,16 +203,22 @@ function getTableFromAddresses(addressesGeoJson) {
             return a.dur - b.dur
           });
 
+          let cumulatedFitness = 0.0;
+
           // pour chaque destination on va ajotuer un attribut d'aptitude
           for (let uniDur of uniDurations) {
-            uniDur.durationsFitness = 1/(uniDur.dur * durationsSum);
+
+            uniDur.fitness = maxDuration / uniDur.dur;
+
+            cumulatedFitness += uniDur.fitness;
+
+            uniDur.cumulatedFitness = cumulatedFitness;
           }
 
           durations[addressesGeoJson.features[i].id] = uniDurations;
         }
 
-        console.log(durations[71]);
-        console.log(durations[74]);
+        console.log(durations);
         resolve(durations);
 
       }
