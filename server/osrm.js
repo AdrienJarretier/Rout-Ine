@@ -127,13 +127,15 @@ class OsrmRequest {
 
 let requestsQ = async.queue(function(task, callback) {
 
-  request(task.url, (error, response, body) => {
+  console.log('request to osrm ' + task.oReq.service + ' service');
+  request(task.oReq.makeUrl(), (error, response, body) => {
 
     if (error) {
       console.log('error:', error); // Print the error if one occurred
       console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
     } else {
 
+      console.log('response from ' + task.oReq.service + ' service');
       let response = JSON.parse(body);
       callback(response);
 
@@ -156,7 +158,7 @@ function getTripFromAddresses(addressesGeoJson, fullOverview) {
 
     oReq.setFromAddresses(addressesGeoJson);
 
-    requestsQ.push({ url: oReq.makeUrl() }, function(response) {
+    requestsQ.push({ oReq: oReq }, function(response) {
 
       resolve(response);
     });
@@ -179,7 +181,7 @@ function getTableFromAddresses(addressesGeoJson) {
 
     oReq.setFromAddresses(addressesGeoJson);
 
-    requestsQ.push({ url: oReq.makeUrl() }, function(response) {
+    requestsQ.push({ oReq: oReq }, function(response) {
 
 
       let durations = [];
@@ -357,6 +359,7 @@ function greedyChunk(addressesGeoJson, nbTrips, durationsTable) {
 
     // chaque "ligne" de durationsTable est de meme taille
     // et removeDestination enleve un element de chaque "ligne"
+    console.log('picking destinations');
     while (dur[firstId].length > 0) {
 
       for (let i = 0; i < nbTrips && dur[firstId].length > 0; ++i) {
@@ -375,7 +378,7 @@ function greedyChunk(addressesGeoJson, nbTrips, durationsTable) {
         removeDestination(dur, nextDest.destination_id);
       }
     }
-
+    console.log('partitioning done');
     resolve(trips);
 
   });
@@ -393,6 +396,8 @@ function computeAllTrips(addressesChunks, fullOverview) {
 
   return new Promise((resolve, reject) => {
     let resultTrips = []; // tableau d'instances de ResultTrip
+
+    console.log('computing trips');
 
     for (let chunk of addressesChunks) {
 

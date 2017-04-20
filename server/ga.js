@@ -3,7 +3,7 @@
 const db = require('./db.js');
 const osrm = require('./osrm.js');
 
-const POPULATION_SIZE = 80;
+const POPULATION_SIZE = 6;
 
 class Partition {
 
@@ -35,6 +35,8 @@ function firstPopulation(nbTrips) {
             let population = [];
 
             for (let i = 0; i < POPULATION_SIZE; ++i) {
+
+              console.log('partitioning #' + i);
 
               osrm.greedyChunk(addressesGeoJson, nbTrips, table)
                 .then(osrm.computeAllTrips)
