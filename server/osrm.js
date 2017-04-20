@@ -9,6 +9,9 @@ const utils = require('./utils.js');
 const Random = require("random-js");
 const mt = Random.engines.mt19937().autoSeed();
 
+/**
+ * Represente une requete pour le serveur osrm
+ */
 class OsrmRequest {
   constructor(service) {
     // One of the following values: route, nearest, table, match, trip, tile
@@ -229,6 +232,9 @@ function getTableFromAddresses(addressesGeoJson) {
 
 }
 
+/**
+ * Represente un sous-ensemble d'adresses, qui est un voyage
+ */
 class ResultTrip {
   constructor() {
     this.addresses = { // resultat de db.getAddresses (mais avec seulement une partie des adresses)
@@ -301,7 +307,8 @@ function pickDestination(durationsLine) {
   return durationsLine[j];
 }
 
-getHalfTrip(2);
+
+
 /**
  * decoupe l'objet addressesGeoJson en <nbTrips> tableaux
  * avec un algorithme glouton qui fait appel a la matrice de durees entre toutes les coordonnees
