@@ -193,6 +193,14 @@ function getTableFromAddresses(addressesGeoJson) {
         for (let j = 0; j < response.durations[i].length; ++j) {
 
           if (i != j) {
+
+
+
+          if( response.durations[i][j] == 0 ) {
+            console.log('source : ' + addressesGeoJson.features[i]);
+            console.log('dest : ' + addressesGeoJson.features[j]);
+          }
+
             uniDurations.push({
               dur: response.durations[i][j],
               source_id: addressesGeoJson.features[i].id,
@@ -218,9 +226,6 @@ function getTableFromAddresses(addressesGeoJson) {
         for (let uniDur of uniDurations) {
 
           uniDur.fitness = maxDuration / uniDur.dur;
-
-          if(!isFinite(uniDur.fitness))
-            console.log(uniDur);
 
           cumulatedFitness += uniDur.fitness;
 
@@ -299,7 +304,7 @@ function removeDestination(durations, dest_id) {
 function pickDestination(durationsLine) {
   let maxCumulatedFitness = durationsLine[durationsLine.length - 1].cumulatedFitness;
 
-  console.log('maxCumulatedFitness : ' + maxCumulatedFitness);
+  // console.log('maxCumulatedFitness : ' + maxCumulatedFitness);
 
   let pickedFit = Random.real(0, maxCumulatedFitness, true)(mt);
 
