@@ -54,7 +54,14 @@ let bef = Date.now();
 
 firstPopulation(6).then((population) => {
 
-  // console.log(population[0]);
-  console.log("population genérée en : " + (Date.now() - bef) / 1000 + " sec");
+  let addressesCount = population[0].trips[0].addresses.features.length * population[0].trips.length;
+
+  let totalTime = (Date.now() - bef);
+
+  let avgTime = totalTime / addressesCount / POPULATION_SIZE;
+
+  console.log("population generated in : " + totalTime / 1000 + " sec");
+
+  console.log('average of ' + avgTime + ' ms per address');
 
 });
