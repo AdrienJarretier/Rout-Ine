@@ -1,5 +1,7 @@
 'use strict';
 
+
+const async = require('async');
 const fs = require('fs');
 const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 const request = require('request');
@@ -123,6 +125,22 @@ class OsrmRequest {
 
 }
 
+let requestsQ = async.queue(function(task, callback) {
+
+  request(task.url, (error, response, body) => {
+
+    if (error) {
+      console.log('error:', error); // Print the error if one occurred
+      console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
+    } else {
+
+      let response = JSON.parse(body);
+      callback(response);
+
+    }
+  });
+
+}, 8);
 
 /**
  * @param {GeoJson FeatureCollection object} addressesGeoJson collection de AddressFeature
@@ -138,19 +156,11 @@ function getTripFromAddresses(addressesGeoJson, fullOverview) {
 
     oReq.setFromAddresses(addressesGeoJson);
 
-    request(oReq.makeUrl(), (error, response, body) => {
+    requestsQ.push({ url: oReq.makeUrl() }, function(response) {
 
-      if (error) {
-        console.log('error:', error); // Print the error if one occurred
-        console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
-      } else {
-
-        let response = JSON.parse(body);
-
-        resolve(response);
-
-      }
+      resolve(response);
     });
+
 
   });
 

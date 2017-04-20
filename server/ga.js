@@ -3,7 +3,7 @@
 const db = require('./db.js');
 const osrm = require('./osrm.js');
 
-const POPULATION_SIZE = 10;
+const POPULATION_SIZE = 400;
 
 class Partition {
 
