@@ -65,7 +65,7 @@ function clone(matrix) {
     mat[i] = [];
 
     for (let j in matrix[i]) {
-      mat[i][j] = matrix[i][j];
+      mat[i][j] = Object.assign({}, matrix[i][j]);
     }
   }
 

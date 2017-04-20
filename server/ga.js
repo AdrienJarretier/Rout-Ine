@@ -3,23 +3,46 @@
 const db = require('./db.js');
 const osrm = require('./osrm.js');
 
+const POPULATION_SIZE = 100;
 
-  // db.getFullAddressesData()
-  //   .then((addressesGeoJson) => {
+function firstPopulation(nbTrips) {
 
-  //     osrm.getTableFromAddresses(addressesGeoJson)
-  //       .then((table) => {
+  return new Promise((resolve, reject) => {
 
-  //         console.log(table);
+    db.getFullAddressesData()
+      .then((addressesGeoJson) => {
 
-  //       });
-  //   });
+        osrm.getTableFromAddresses(addressesGeoJson)
+          .then((table) => {
 
+            let population = [];
 
-  db.getFullAddressesData()
-    .then(osrm.getTableFromAddresses)
-    .then((table) => {
+            for (let i = 0; i < POPULATION_SIZE; ++i) {
 
-          console.log(table);
+              osrm.greedyChunk(addressesGeoJson, nbTrips, table)
+                .then((partition) => {
 
-        })
+                  population.push(partition);
+
+                  if (population.length == POPULATION_SIZE) {
+
+                    // console.log(population);
+                    resolve(population);
+                  }
+
+                });
+            }
+
+          });
+      });
+
+  });
+}
+
+let bef = Date.now();
+
+firstPopulation(6).then((population) => {
+
+  console.log("population genérée en : " + (Date.now() - bef)/1000 + " sec");
+
+});
