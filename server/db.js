@@ -27,7 +27,8 @@ function getAddresses() {
 
   const sqlSelectAddresses = ' SELECT distinct a.id, a.label, a.town, a.additional, a.lat, a.lng \n' +
     ' FROM address a \n' +
-    ' RIGHT JOIN beneficiary ON a.id=beneficiary.address_id ; ';
+    ' RIGHT JOIN beneficiary ON a.id=beneficiary.address_id \n' +
+    ' WHERE a.id IS NOT NULL;';
 
   return new Promise((resolve, reject) => {
 
