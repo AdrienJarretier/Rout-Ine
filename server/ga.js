@@ -3,7 +3,17 @@
 const db = require('./db.js');
 const osrm = require('./osrm.js');
 
-const POPULATION_SIZE = 100;
+const POPULATION_SIZE = 10;
+
+class Partition {
+
+  constructor(trips) {
+
+    this.trips = trips;
+
+  }
+
+}
 
 function firstPopulation(nbTrips) {
 
@@ -20,9 +30,10 @@ function firstPopulation(nbTrips) {
             for (let i = 0; i < POPULATION_SIZE; ++i) {
 
               osrm.greedyChunk(addressesGeoJson, nbTrips, table)
-                .then((partition) => {
+                .then(osrm.computeAllTrips)
+                .then((trips) => {
 
-                  population.push(partition);
+                  population.push(new Partition(trips));
 
                   if (population.length == POPULATION_SIZE) {
 
@@ -43,6 +54,7 @@ let bef = Date.now();
 
 firstPopulation(6).then((population) => {
 
-  console.log("population genérée en : " + (Date.now() - bef)/1000 + " sec");
+  // console.log(population[0]);
+  console.log("population genérée en : " + (Date.now() - bef) / 1000 + " sec");
 
 });

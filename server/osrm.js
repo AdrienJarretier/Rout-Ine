@@ -426,3 +426,4 @@ function getHalfTrip(nbTrips) {
 exports.getTrips = getHalfTrip;
 exports.getTableFromAddresses = getTableFromAddresses;
 exports.greedyChunk = greedyChunk;
+exports.computeAllTrips = computeAllTrips;
