@@ -190,7 +190,9 @@ function getTableFromAddresses(addressesGeoJson) {
                 dur: response.durations[i][j],
                 source_id: addressesGeoJson.features[i].id,
                 destination_id: addressesGeoJson.features[j].id,
-                dest_feature: addressesGeoJson.features[j]
+                dest_feature: addressesGeoJson.features[j],
+                fitness: 0.0,
+                cumulatedFitness: 0.0
               });
 
               if (response.durations[i][j] > maxDuration)
@@ -218,7 +220,6 @@ function getTableFromAddresses(addressesGeoJson) {
           durations[addressesGeoJson.features[i].id] = uniDurations;
         }
 
-        console.log(durations);
         resolve(durations);
 
       }
@@ -227,8 +228,6 @@ function getTableFromAddresses(addressesGeoJson) {
   });
 
 }
-
-getHalfTrip(2);
 
 class ResultTrip {
   constructor() {
@@ -253,6 +252,7 @@ class ResultTrip {
   }
 }
 
+
 function removeDestination(durations, dest_id) {
 
   // i prend la valeur des cles de durations qui ne sont pas contigues
@@ -262,6 +262,13 @@ function removeDestination(durations, dest_id) {
 
 
       if (durations[i][j].destination_id == dest_id) {
+
+        // pour chaque element situe apres celui que l'on va retirer,
+        // on soustrait a son score d'aptitude cumule le score d'aptitude de l'emement qui va disparaitre
+        for (let k = j + 1; k < durations[i].length; ++k) {
+          durations[i][k].cumulatedFitness -= durations[i][j].fitness;
+        }
+
         durations[i].splice(j, 1);
         break;
       }
@@ -269,6 +276,32 @@ function removeDestination(durations, dest_id) {
   }
 }
 
+/**
+ * Pioche une destination parmis la liste de destinations recu
+ * tirage aleatoire avec le score d'aptitude des destinations
+ *
+ * @param durationsLine {array} une ligne de la matrice de durees resultantes de getTableFromAddresses
+ *
+ * @return {object} l'objet durations tire au sort
+ */
+function pickDestination(durationsLine) {
+  let maxCumulatedFitness = durationsLine[durationsLine.length - 1].cumulatedFitness;
+
+  let pickedFit = Random.real(0, maxCumulatedFitness, true)(mt);
+
+  let j = 0;
+
+  let currentCumulFit = durationsLine[j].cumulatedFitness;
+
+  while (pickedFit > currentCumulFit) {
+
+    currentCumulFit = durationsLine[++j].cumulatedFitness;
+  }
+
+  return durationsLine[j];
+}
+
+getHalfTrip(2);
 /**
  * decoupe l'objet addressesGeoJson en <nbTrips> tableaux
  * avec un algorithme glouton qui fait appel a la matrice de durees entre toutes les coordonnees
@@ -291,30 +324,30 @@ function greedyChunk(addressesGeoJson, nbTrips, durationsTable) {
 
     let trips = [];
 
+    // toujours commencer par la premiere adresse, le depot
     for (let i = 0; i < nbTrips; ++i) {
       trips.push([addressesGeoJson.features[0]]);
-
     }
 
 
     let firstId = addressesGeoJson.features[0].id;
 
-    removeDestination(dur, addressesGeoJson.features[0].id);
+    removeDestination(dur, firstId);
 
-
+    // chaque "ligne" de durationsTable est de meme taille
+    // et removeDestination enleve un element de chaque "ligne"
     while (dur[firstId].length > 0) {
 
       for (let i = 0; i < nbTrips && dur[firstId].length > 0; ++i) {
-
 
         let lastDest = trips[i][trips[i].length - 1];
         // on recupere la destination en fin de liste,
         // qui devient la source pour al prochaine
 
 
+        // plus une destionation est proche de notre source, plus elle a de chance d'etre choisie
+        let nextDest = pickDestination(dur[lastDest.id]);
 
-        // la prochaine destination est la plus proche de notre source
-        let nextDest = dur[lastDest.id][0];
 
         trips[i].push(nextDest.dest_feature);
 
