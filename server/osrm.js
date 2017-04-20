@@ -219,7 +219,7 @@ function getTableFromAddresses(addressesGeoJson) {
 
           uniDur.fitness = maxDuration / uniDur.dur;
 
-          if(uniDur.fitness == infinity)
+          if(!isFinite(uniDur.fitness))
             console.log(uniDur);
 
           cumulatedFitness += uniDur.fitness;
