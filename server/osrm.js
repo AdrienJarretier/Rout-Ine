@@ -197,8 +197,10 @@ function getTableFromAddresses(addressesGeoJson) {
 
 
           if( response.durations[i][j] == 0 ) {
-            console.log('source : ' + addressesGeoJson.features[i]);
-            console.log('dest : ' + addressesGeoJson.features[j]);
+            console.log('source : ');
+            console.log(addressesGeoJson.features[i]);
+            console.log('dest : ');
+            console.log(addressesGeoJson.features[j]);
           }
 
             uniDurations.push({
