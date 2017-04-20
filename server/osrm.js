@@ -13,7 +13,8 @@ const mt = Random.engines.mt19937().autoSeed();
  * Represente une requete pour le serveur osrm
  */
 class OsrmRequest {
-  constructor(service) {
+  constructor(service, requestOverview) {
+
     // One of the following values: route, nearest, table, match, trip, tile
     this.service = service;
 
@@ -43,10 +44,14 @@ class OsrmRequest {
     switch (service) {
 
       case 'trip':
+
+        if (requestOverview == undefined)
+          requestOverview = false;
+
         this.options = {
           steps: false,
           geometries: "geojson", // Returned route geometry in Geojson for Leaflet
-          overview: "full" // full overview geometry
+          overview: (requestOverview ? 'full' : 'false') // overview geometry
         };
         break;
 
@@ -121,14 +126,15 @@ class OsrmRequest {
 
 /**
  * @param {GeoJson FeatureCollection object} addressesGeoJson collection de AddressFeature
+ * @param {boolean} fullOverview retourne l'apercu complet du trajet (utilise pour l'affichage sur une carte
  *
  * @returns {Promise} la promesse realisee avec le voyage quand le serveur OSRM repond
  */
-function getTripFromAddresses(addressesGeoJson) {
+function getTripFromAddresses(addressesGeoJson, fullOverview) {
 
   return new Promise((resolve, reject) => {
 
-    let oReq = new OsrmRequest('trip');
+    let oReq = new OsrmRequest('trip', fullOverview);
 
     oReq.setFromAddresses(addressesGeoJson);
 
@@ -375,7 +381,7 @@ function greedyChunk(addressesGeoJson, nbTrips, durationsTable) {
  *
  * @return {Promise}
  */
-function computeAllTrips(addressesChunks) {
+function computeAllTrips(addressesChunks, fullOverview) {
 
   return new Promise((resolve, reject) => {
     let resultTrips = []; // tableau d'instances de ResultTrip
@@ -386,7 +392,7 @@ function computeAllTrips(addressesChunks) {
 
       result.setAddressFeatures(chunk);
 
-      getTripFromAddresses(result.addresses)
+      getTripFromAddresses(result.addresses, fullOverview)
         .then((trip) => {
 
           for (let i = 0; i < trip.waypoints.length; ++i) {
@@ -417,7 +423,9 @@ function getHalfTrip(nbTrips) {
           return greedyChunk(addressesGeoJson, nbTrips, table);
 
         })
-        .then(computeAllTrips);
+        .then((addressesChunks) => {
+          return computeAllTrips(addressesChunks, true)
+        });
     });
 
 }
