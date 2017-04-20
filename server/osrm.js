@@ -179,70 +179,57 @@ function getTableFromAddresses(addressesGeoJson) {
 
     oReq.setFromAddresses(addressesGeoJson);
 
-    let url = oReq.makeUrl();
+    requestsQ.push({ url: oReq.makeUrl() }, function(response) {
 
-    console.log('url length : ' + url.length);
 
-    request(url, (error, response, body) => {
+      let durations = [];
 
-      if (error) {
-        console.log('error:', error); // Print the error if one occurred
-        console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
-      } else {
+      for (let i = 0; i < response.durations.length; ++i) {
 
-        console.log('body length : ' + body.length);
+        let uniDurations = [];
 
-        let response = JSON.parse(body);
+        let maxDuration = 0.0;
 
-        let durations = [];
+        for (let j = 0; j < response.durations[i].length; ++j) {
 
-        for (let i = 0; i < response.durations.length; ++i) {
+          if (i != j) {
+            uniDurations.push({
+              dur: response.durations[i][j],
+              source_id: addressesGeoJson.features[i].id,
+              destination_id: addressesGeoJson.features[j].id,
+              dest_feature: addressesGeoJson.features[j],
+              fitness: 0.0,
+              cumulatedFitness: 0.0
+            });
 
-          let uniDurations = [];
-
-          let maxDuration = 0.0;
-
-          for (let j = 0; j < response.durations[i].length; ++j) {
-
-            if (i != j) {
-              uniDurations.push({
-                dur: response.durations[i][j],
-                source_id: addressesGeoJson.features[i].id,
-                destination_id: addressesGeoJson.features[j].id,
-                dest_feature: addressesGeoJson.features[j],
-                fitness: 0.0,
-                cumulatedFitness: 0.0
-              });
-
-              if (response.durations[i][j] > maxDuration)
-                maxDuration = response.durations[i][j];
-            }
-
+            if (response.durations[i][j] > maxDuration)
+              maxDuration = response.durations[i][j];
           }
 
-          uniDurations.sort((a, b) => {
-            return a.dur - b.dur
-          });
-
-          let cumulatedFitness = 0.0;
-
-          // pour chaque destination on va ajotuer un attribut d'aptitude
-          for (let uniDur of uniDurations) {
-
-            uniDur.fitness = maxDuration / uniDur.dur;
-
-            cumulatedFitness += uniDur.fitness;
-
-            uniDur.cumulatedFitness = cumulatedFitness;
-          }
-
-          durations[addressesGeoJson.features[i].id] = uniDurations;
         }
 
-        resolve(durations);
+        uniDurations.sort((a, b) => {
+          return a.dur - b.dur
+        });
 
+        let cumulatedFitness = 0.0;
+
+        // pour chaque destination on va ajotuer un attribut d'aptitude
+        for (let uniDur of uniDurations) {
+
+          uniDur.fitness = maxDuration / uniDur.dur;
+
+          cumulatedFitness += uniDur.fitness;
+
+          uniDur.cumulatedFitness = cumulatedFitness;
+        }
+
+        durations[addressesGeoJson.features[i].id] = uniDurations;
       }
+
+      resolve(durations);
     });
+
 
   });
 
