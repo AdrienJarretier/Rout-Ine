@@ -296,6 +296,8 @@ function removeDestination(durations, dest_id) {
 function pickDestination(durationsLine) {
   let maxCumulatedFitness = durationsLine[durationsLine.length - 1].cumulatedFitness;
 
+  console.log(durationsLine);
+  console.log(durationsLine[durationsLine.length - 1]);
   console.log('maxCumulatedFitness : ' + maxCumulatedFitness);
 
   let pickedFit = Random.real(0, maxCumulatedFitness, true)(mt);
