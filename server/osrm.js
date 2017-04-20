@@ -196,12 +196,12 @@ function getTableFromAddresses(addressesGeoJson) {
 
 
 
-          if( response.durations[i][j] == 0 ) {
-            console.log('source : ');
-            console.log(addressesGeoJson.features[i]);
-            console.log('dest : ');
-            console.log(addressesGeoJson.features[j]);
-          }
+            if (response.durations[i][j] == 0) {
+              console.log('source : ');
+              console.log(addressesGeoJson.features[i]);
+              console.log('dest : ');
+              console.log(addressesGeoJson.features[j]);
+            }
 
             uniDurations.push({
               dur: response.durations[i][j],
@@ -227,7 +227,8 @@ function getTableFromAddresses(addressesGeoJson) {
         // pour chaque destination on va ajotuer un attribut d'aptitude
         for (let uniDur of uniDurations) {
 
-          uniDur.fitness = maxDuration / uniDur.dur;
+          if (uniDur.dur > 0)
+            uniDur.fitness = maxDuration / uniDur.dur;
 
           cumulatedFitness += uniDur.fitness;
 
@@ -304,22 +305,29 @@ function removeDestination(durations, dest_id) {
  * @return {object} l'objet durations tire au sort
  */
 function pickDestination(durationsLine) {
-  let maxCumulatedFitness = durationsLine[durationsLine.length - 1].cumulatedFitness;
 
-  // console.log('maxCumulatedFitness : ' + maxCumulatedFitness);
+  if (durationsLine[0].dur == 0) {
 
-  let pickedFit = Random.real(0, maxCumulatedFitness, true)(mt);
+    return durationsLine[0]
 
-  let j = 0;
+  } else {
 
-  let currentCumulFit = durationsLine[j].cumulatedFitness;
+    let maxCumulatedFitness = durationsLine[durationsLine.length - 1].cumulatedFitness;
 
-  while (pickedFit > currentCumulFit) {
+    // console.log('maxCumulatedFitness : ' + maxCumulatedFitness);
+    let pickedFit = Random.real(0, maxCumulatedFitness, true)(mt);
 
-    currentCumulFit = durationsLine[++j].cumulatedFitness;
+    let j = 0;
+
+    let currentCumulFit = durationsLine[j].cumulatedFitness;
+
+    while (pickedFit > currentCumulFit) {
+
+      currentCumulFit = durationsLine[++j].cumulatedFitness;
+    }
+
+    return durationsLine[j];
   }
-
-  return durationsLine[j];
 }
 
 
