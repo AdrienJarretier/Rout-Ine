@@ -18,6 +18,7 @@ const mysql = require('mysql');
 */
 const db = require('./db.js');
 const osrm = require('./osrm.js');
+const ga = require('./ga.js');
 
 
 
@@ -44,8 +45,8 @@ app.get('/beneficiaries', function(req, res) {
 app.get('/trip', function(req, res) {
 
   // quand la Promise retournee par getTrip est realisee
-  // on peut envoyer le tableau de donnees au client
-  osrm.getTrips(req.query.nbTrips).then((trips) => {
+  // on peut envoyer le tableau de donnees au client{
+  ga.getTrips(req.query.nbTrips).then((trips) => {
 
     res.send(trips);
 

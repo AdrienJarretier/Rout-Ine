@@ -3,13 +3,20 @@
 const db = require('./db.js');
 const osrm = require('./osrm.js');
 
-const POPULATION_SIZE = 400;
+const POPULATION_SIZE = 80;
 
 class Partition {
 
   constructor(trips) {
 
     this.trips = trips;
+
+    // les durees additionnees des trajets en secondes
+    this.totalDuration = 0.0;
+
+    for (let trip of trips) {
+      this.totalDuration += trip.route.duration;
+    }
 
   }
 
@@ -38,6 +45,9 @@ function firstPopulation(nbTrips) {
                   if (population.length == POPULATION_SIZE) {
 
                     // console.log(population);
+                    population.sort((a, b) => {
+                      return a.totalDuration - b.totalDuration
+                    });
                     resolve(population);
                   }
 
@@ -50,18 +60,44 @@ function firstPopulation(nbTrips) {
   });
 }
 
-let bef = Date.now();
+function bestPartitionFromPop(nbTrips) {
 
-firstPopulation(6).then((population) => {
+  let bef = Date.now();
 
-  let addressesCount = population[0].trips[0].addresses.features.length * population[0].trips.length;
+  return firstPopulation(nbTrips).then((population) => {
 
-  let totalTime = (Date.now() - bef);
+    let addressesCount = population[0].trips[0].addresses.features.length * population[0].trips.length;
 
-  let avgTime = totalTime / addressesCount / POPULATION_SIZE;
+    let totalTime = (Date.now() - bef);
 
-  console.log("population generated in : " + totalTime / 1000 + " sec");
+    let avgTime = totalTime / addressesCount / POPULATION_SIZE;
 
-  console.log('average of ' + avgTime + ' ms per address');
+    console.log("population generated in : " + totalTime / 1000 + " sec");
 
-});
+    console.log('average of ' + avgTime + ' ms per address');
+
+
+
+    // console.log(population[0].trips);
+
+    let addresses = [];
+
+    for (let trip of population[0].trips) {
+      addresses.push(trip.addresses.features)
+    }
+
+    return osrm.computeAllTrips(addresses, true);
+
+  });
+
+}
+
+// bestPartitionFromPop(6).then((partition) => {
+
+//   console.log('ok');
+
+//   console.log(partition);
+// });
+
+
+exports.getTrips = bestPartitionFromPop;
