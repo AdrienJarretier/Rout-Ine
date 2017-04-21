@@ -362,7 +362,7 @@ function greedyChunk(addressesGeoJson, nbTrips, durationsTable) {
     console.log('picking destinations');
     while (dur[firstId].length > 0) {
 
-      for (let i = 0; i < nbTrips && dur[firstId].length > 0; ++i) {
+      for (let i = 0; i < nbTrips-1 && dur[firstId].length > 0; ++i) {
 
         let lastDest = trips[i][trips[i].length - 1];
         // on recupere la destination en fin de liste,
@@ -372,8 +372,14 @@ function greedyChunk(addressesGeoJson, nbTrips, durationsTable) {
         // plus une destionation est proche de notre source, plus elle a de chance d'etre choisie
         let nextDest = pickDestination(dur[lastDest.id]);
 
-
-        trips[i].push(nextDest.dest_feature);
+        if(nextDest.dest_feature.properties.town == '81000 ALBI') {
+          trips[i].push(nextDest.dest_feature);
+          // console.log('aaaaaa');
+        }
+        else {
+          trips[nbTrips-1].push(nextDest.dest_feature);
+          // console.log('fqsf');
+        }
 
         removeDestination(dur, nextDest.destination_id);
       }
