@@ -68,7 +68,7 @@ function bestPartitionFromPop(nbTrips) {
 
   let bef = Date.now();
 
-  console.log('generation a population of ' + POPULATION_SIZE + ' partitions');
+  console.log('generating a population of ' + POPULATION_SIZE + ' partitions');
 
   return firstPopulation(nbTrips).then((population) => {
 
