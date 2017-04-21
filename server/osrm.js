@@ -397,8 +397,6 @@ function computeAllTrips(addressesChunks, fullOverview) {
   return new Promise((resolve, reject) => {
     let resultTrips = []; // tableau d'instances de ResultTrip
 
-    console.log('computing trips');
-
     for (let chunk of addressesChunks) {
 
       let result = new ResultTrip();

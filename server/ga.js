@@ -3,7 +3,7 @@
 const db = require('./db.js');
 const osrm = require('./osrm.js');
 
-const POPULATION_SIZE = 6;
+const POPULATION_SIZE = 100;
 
 class Partition {
 
@@ -42,6 +42,8 @@ function firstPopulation(nbTrips) {
                 .then(osrm.computeAllTrips)
                 .then((trips) => {
 
+                  console.log('computed trip #' + i);
+
                   population.push(new Partition(trips));
 
                   if (population.length == POPULATION_SIZE) {
@@ -65,6 +67,8 @@ function firstPopulation(nbTrips) {
 function bestPartitionFromPop(nbTrips) {
 
   let bef = Date.now();
+
+  console.log('generation a population of ' + POPULATION_SIZE + ' partitions');
 
   return firstPopulation(nbTrips).then((population) => {
 
