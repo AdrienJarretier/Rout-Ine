@@ -400,6 +400,9 @@ function greedyChunk(addressesGeoJson, nbTrips, durationsTable) {
  */
 function computeAllTrips(addressesChunks, fullOverview) {
 
+  // console.log('addressesChunks : ');
+  // console.log(addressesChunks);
+
   return new Promise((resolve, reject) => {
     let resultTrips = []; // tableau d'instances de ResultTrip
 

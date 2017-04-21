@@ -85,8 +85,6 @@ function ccasAddress() {
 
 }
 
-getAddresses();
-
 
 /**
  * Retourne une promesse qui
