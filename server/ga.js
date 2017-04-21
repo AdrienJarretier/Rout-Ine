@@ -3,7 +3,7 @@
 const db = require('./db.js');
 const osrm = require('./osrm.js');
 
-const POPULATION_SIZE = 10;
+const POPULATION_SIZE = 8;
 
 class Partition {
 
@@ -78,7 +78,7 @@ function bestPartitionFromPop(nbTrips) {
 
     console.log("population generated in : " + totalTime / 1000 + " sec");
 
-    console.log('average of ' + Math.ceil(avgTime) + ' ms per partition');
+    console.log('average of ' + Math.ceil(avgTime)/1000 + ' sec per partition');
 
 
 
