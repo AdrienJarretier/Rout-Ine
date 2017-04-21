@@ -50,7 +50,7 @@
       return string + '<br>' + line;
     }
 
-    function addressesMarkers(resultTrip, color) {
+    function addressesMarkers(resultTrip) {
 
       function markerMaker(feature, latlng) {
 
@@ -117,7 +117,7 @@
     function layerGroup(resultTrip, tripColor) {
       return L.layerGroup([
         tripLayer(resultTrip, tripColor),
-        addressesMarkers(resultTrip, utils.negateColor(tripColor))
+        addressesMarkers(resultTrip)
       ]);
     }
 
