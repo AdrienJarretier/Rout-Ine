@@ -40,13 +40,52 @@ function getAddresses() {
         if (err) throw err
 
         dbCon.end();
-        resolve(rows);
+
+        ccasAddress()
+          .then((ccasAddress) => {
+
+            rows.unshift(ccasAddress);
+
+            resolve(rows);
+          });
 
       });
 
   });
 
 }
+
+/**
+ * Retourne une promesse qui est resolue avec l'adresse du ccas d'albi
+ */
+function ccasAddress() {
+
+  const sqlSelectCcasAddress = ' SELECT distinct a.id, a.label, a.town, a.additional, a.lat, a.lng \n' +
+    ' FROM address a \n' +
+    ' WHERE a.additional = ?';
+
+  const selectCcasAddress = mysql.format(sqlSelectCcasAddress, ["Centre Communal d'Action Sociale"]);
+
+  return new Promise((resolve, reject) => {
+
+    let dbCon = mysql.createConnection(config.db);
+    dbCon.query(
+      selectCcasAddress,
+      (err, rows, fields) => {
+
+        if (err) throw err
+
+        dbCon.end();
+
+        resolve(rows[0]);
+
+      });
+
+  });
+
+}
+
+getAddresses();
 
 
 /**
