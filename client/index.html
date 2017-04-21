@@ -161,7 +161,7 @@
 
           console.log(trip);
 
-          let seconds = trip.route.duration;
+          let seconds = trip.route.duration + 180*trip.addresses.features.length;
           totalSeconds += seconds;
 
           let meters = trip.route.distance;
