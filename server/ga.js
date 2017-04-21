@@ -68,15 +68,13 @@ function bestPartitionFromPop(nbTrips) {
 
   return firstPopulation(nbTrips).then((population) => {
 
-    let addressesCount = population[0].trips[0].addresses.features.length * population[0].trips.length;
-
     let totalTime = (Date.now() - bef);
 
-    let avgTime = totalTime / addressesCount / POPULATION_SIZE;
+    let avgTime = totalTime / POPULATION_SIZE;
 
     console.log("population generated in : " + totalTime / 1000 + " sec");
 
-    console.log('average of ' + avgTime + ' ms per address');
+    console.log('average of ' + Math.ceil(avgTime) + ' ms per partition');
 
 
 

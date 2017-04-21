@@ -127,7 +127,7 @@ class OsrmRequest {
 
 let requestsQ = async.queue(function(task, callback) {
 
-  console.log('request to osrm ' + task.oReq.service + ' service');
+  // console.log('request to osrm ' + task.oReq.service + ' service');
   request(task.oReq.makeUrl(), (error, response, body) => {
 
     if (error) {
@@ -135,7 +135,7 @@ let requestsQ = async.queue(function(task, callback) {
       console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
     } else {
 
-      console.log('response from ' + task.oReq.service + ' service');
+      // console.log('response from ' + task.oReq.service + ' service');
       let response = JSON.parse(body);
       callback(response);
 

@@ -48,6 +48,7 @@ app.get('/trip', function(req, res) {
   // on peut envoyer le tableau de donnees au client{
   ga.getTrips(req.query.nbTrips).then((trips) => {
 
+    console.log('sending trips to client');
     res.send(trips);
 
   });
