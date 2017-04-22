@@ -406,7 +406,11 @@ function computeAllTrips(addressesChunks, fullOverview) {
   return new Promise((resolve, reject) => {
     let resultTrips = []; // tableau d'instances de ResultTrip
 
-    for (let chunk of addressesChunks) {
+    let resultsCount = 0;
+
+    for (let j in addressesChunks) {
+      let chunk = addressesChunks[j];
+    // for (let chunk of addressesChunks) {
 
       let result = new ResultTrip();
 
@@ -415,6 +419,7 @@ function computeAllTrips(addressesChunks, fullOverview) {
       getTripFromAddresses(result.addresses, fullOverview)
         .then((trip) => {
 
+          // pour chaque adresse on recupere sa position dans le trajet
           for (let i = 0; i < trip.waypoints.length; ++i) {
 
             let w_ind = trip.waypoints[i].waypoint_index;
@@ -422,9 +427,11 @@ function computeAllTrips(addressesChunks, fullOverview) {
           }
 
           result.setTrip(trip.trips[0]);
-          resultTrips.push(result);
+          resultTrips[j] = result;
 
-          if (resultTrips.length == addressesChunks.length)
+          ++resultsCount;
+
+          if (resultsCount == addressesChunks.length)
             resolve(resultTrips);
         });
 

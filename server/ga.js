@@ -51,10 +51,10 @@ function firstPopulation(nbTrips) {
 
         // la premiere adresse est le depart, c'est l'adresse du ccas,
         // elle est positionne en 1ere position par la fonction getAddresses du module db
+        let startAddress = addressesGeoJson.features[0];
         let addresses = {
-          start: addressesGeoJson.features[0],
-          albi: new FeatureCollection([addressesGeoJson.features[0]]),
-          outside: new FeatureCollection([])
+          albi: new FeatureCollection([startAddress]),
+          outside: new FeatureCollection([startAddress])
         }
 
         for (let i = 1; i < addressesGeoJson.features.length; ++i) {
@@ -83,11 +83,19 @@ function firstPopulation(nbTrips) {
 
               console.log('partitioning #' + i);
 
-              greedyChunk(addresses.albi, nbTrips, table, addresses.start)
+              greedyChunk(addresses.albi, nbTrips - 1, table)
+                .then((partition) => {
+
+                  console.log('keys : ');
+                  for(let key in partition) {
+                    console.log(key);
+                  }
+                  partition.push(addresses.outside.features);
+                  return partition;
+                })
                 .then(osrm.computeAllTrips)
                 .then((trips) => {
 
-                  // console.log(trips);
                   console.log('computed trip #' + i);
 
                   population.push(new Partition(trips));
@@ -121,7 +129,7 @@ function firstPopulation(nbTrips) {
  *
  * @returns {Promise} la promesse qui se resoudra avec un tableau 2D [num voyage][AddressFeature]
  */
-function greedyChunk(addressesGeoJson, nbTrips, durationsTable, startAddress) {
+function greedyChunk(addressesGeoJson, nbTrips, durationsTable) {
 
   return new Promise((resolve, reject) => {
 
@@ -132,6 +140,8 @@ function greedyChunk(addressesGeoJson, nbTrips, durationsTable, startAddress) {
     // console.log("copié en : " + (Date.now()-bef) + " ms");
 
     let trips = [];
+
+    let startAddress = addressesGeoJson.features[0];
 
     // toujours commencer par la premiere adresse, le depot
     for (let i = 0; i < nbTrips; ++i) {
@@ -164,7 +174,7 @@ function greedyChunk(addressesGeoJson, nbTrips, durationsTable, startAddress) {
       }
     }
     console.log('partitioning done');
-    console.log(trips);
+    // console.log(trips);
     resolve(trips);
 
   });
