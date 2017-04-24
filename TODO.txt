@@ -1,4 +1,13 @@
-numéroter les marker, voir ionicons pour les personaliser
-lister les adresses dans l'ordre de visite
-sortir une feuille de route, avec osrm-text-instructions
-afficher le départ
+enregistrer un planning, pour un jour donné, quelles adresses doivent etre livrées
+
+quand on lance ga.js, l'algorithme génétique doit faire son travail et à chaque fois qu'une meilleure partition est trouvée la sauvegarder,
+  SQLite ?
+  dans la base mysql ccas_beneficiaries ?
+
+le serveur web doit envoyer au client la meilleure partition trouvée.
+
+donner la possibilité de faire des simulations, cad :
+  - parametrer le jour du planning à calculer
+  - parametrer le temps d'arret (actuellement 3 min pour albi)
+  - afficher le temps d'arret et surtout en fonction de la duree max d'un trajet afficher le temps d'arret max / adresse possible
+  - parametrer le nombre de trajets et/ou pour une duree max par trajet et d'un temps d'arret afficher le nombre minimum de tajets à prévoir
