@@ -152,6 +152,8 @@
         console.log(data);
 
         let totalSeconds = 0;
+        let maxSeconds = 0;
+        let maxTripNum = 0;
         let totalMeters = 0;
 
         for (let i = 0; i < data.length; ++i) {
@@ -164,6 +166,11 @@
           let seconds = trip.route.duration;
           if (i < data.length - 1) {
             seconds += 180 * trip.addresses.features.length;
+          }
+
+          if (seconds > maxSeconds) {
+            maxSeconds = seconds;
+            maxTripNum = i + 1;
           }
 
           totalSeconds += seconds;
@@ -179,6 +186,8 @@
         }
 
         $('#totalTime').text(s2hours(totalSeconds));
+        $('#maxTime').text(s2hours(maxSeconds));
+        $('#maxTripNum').text(maxTripNum);
         $('#totalDistance').text(m2km(totalMeters));
 
         var options = {
@@ -203,7 +212,7 @@
 <body>
   <h1>Localisation des bénéficiaires</h1>
   <p>
-    temps total : <span id='totalTime'></span>
+    temps total cumulé : <span id='totalTime'></span> (temps max : <span id='maxTime'></span>, trajet : <span id='maxTripNum'></span> )
     <br> distance totale : <span id='totalDistance'></span>
   </p>
   <div id="mapid"></div>
