@@ -5,7 +5,7 @@ const db = require('./db.js');
 const osrm = require('./osrm.js');
 const utils = require('./utils.js');
 
-const POPULATION_SIZE = 8;
+const POPULATION_SIZE = 100;
 
 
 
@@ -43,7 +43,7 @@ class Partition {
 }
 
 
-bestPartitionFromPop(7);
+// bestPartitionFromPop(7);
 
 
 function firstPopulation(nbTrips) {
@@ -87,7 +87,7 @@ function firstPopulation(nbTrips) {
 
               console.log('partitioning #' + i);
 
-              greedyChunk(addresses.albi, nbTrips - 1, table)
+              greedyChunk(addresses.albi, nbTrips - 1, table, i)
                 .then((partition) => {
 
                   // console.log('keys : ');
@@ -132,12 +132,15 @@ function firstPopulation(nbTrips) {
  * @param {GeoJson FeatureCollection object} addressesGeoJson, l'objet geoJson correspondant a une collection de AddressFeature
  * @param {Integer} nbTrips le nombre de sous tableaux demandes
  * @param {2d array} durationsTable la matrice des durees de trajet entre les adresses
+ * @param {Integer} partitionNumber le numero de cette partition, utile dans l'algo pour savoir quand on reparti dans d'autres trajets
  *
  * @returns {Promise} la promesse qui se resoudra avec un tableau 2D [num voyage][AddressFeature]
  */
-function greedyChunk(addressesGeoJson, nbTrips, durationsTable) {
+function greedyChunk(addressesGeoJson, nbTrips, durationsTable, partitionNumber) {
 
   return new Promise((resolve, reject) => {
+
+    let addressesPerTrip = addressesGeoJson.features.length/nbTrips;
 
     // let bef = Date.now();
 
@@ -166,17 +169,19 @@ function greedyChunk(addressesGeoJson, nbTrips, durationsTable) {
 
       for (let i = 0; i < nbTrips && dur[firstId].length > 0; ++i) {
 
-        let lastDest = trips[i][trips[i].length - 1];
-        // on recupere la destination en fin de liste,
-        // qui devient la source pour al prochaine
+        for (let j = -1; j < (partitionNumber)%(addressesPerTrip) && dur[firstId].length > 0; ++j) {
+          let lastDest = trips[i][trips[i].length - 1];
+          // on recupere la destination en fin de liste,
+          // qui devient la source pour al prochaine
 
 
-        // plus une destionation est proche de notre source, plus elle a de chance d'etre choisie
-        let nextDest = osrm.pickDestination(dur[lastDest.id]);
+          // plus une destionation est proche de notre source, plus elle a de chance d'etre choisie
+          let nextDest = osrm.pickDestination(dur[lastDest.id]);
 
-        trips[i].push(nextDest.dest_feature);
+          trips[i].push(nextDest.dest_feature);
 
-        osrm.removeDestination(dur, nextDest.destination_id);
+          osrm.removeDestination(dur, nextDest.destination_id);
+        }
       }
     }
     console.log('partitioning done');
