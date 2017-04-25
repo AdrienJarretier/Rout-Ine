@@ -5,9 +5,11 @@ const db = require('./db.js');
 const osrm = require('./osrm.js');
 const utils = require('./utils.js');
 
-const POPULATION_SIZE = 1;
+const POPULATION_SIZE = 8;
 
 
+
+let nextPartitionId = 0;
 /** On represente un sous ensemble avec un tableau de valeurs booleenes
  *
  * avec le ieme element du tableau egal vrai
@@ -20,6 +22,8 @@ const POPULATION_SIZE = 1;
 class Partition {
 
   constructor(trips) {
+
+    this.id = nextPartitionId++;
 
     this.trips = trips;
 
@@ -39,7 +43,7 @@ class Partition {
 }
 
 
-firstPopulation(3);
+bestPartitionFromPop(7);
 
 
 function firstPopulation(nbTrips) {
@@ -86,10 +90,10 @@ function firstPopulation(nbTrips) {
               greedyChunk(addresses.albi, nbTrips - 1, table)
                 .then((partition) => {
 
-                  console.log('keys : ');
-                  for(let key in partition) {
-                    console.log(key);
-                  }
+                  // console.log('keys : ');
+                  // for(let key in partition) {
+                  //   console.log(key);
+                  // }
                   partition.push(addresses.outside.features);
                   return partition;
                 })
@@ -101,6 +105,8 @@ function firstPopulation(nbTrips) {
                   population.push(new Partition(trips));
 
                   if (population.length == POPULATION_SIZE) {
+
+                    // console.log(population);
 
                     console.log('sorting population');
                     population.sort((a, b) => {
@@ -197,7 +203,6 @@ function bestPartitionFromPop(nbTrips) {
     console.log("population generated in : " + totalTime / 1000 + " sec");
 
     console.log('average of ' + Math.ceil(avgTime) / 1000 + ' sec per partition');
-
 
     console.log('best partition : ');
     console.log(population[0]);
