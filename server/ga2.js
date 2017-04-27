@@ -5,7 +5,32 @@ const FeatureCollection = require('./FeatureCollection.js');
 const osrm = require('./osrm.js');
 const utils = require('./utils.js');
 
-const POPULATION_SIZE = 7;
+const POPULATION_SIZE = 22;
+const ELITISM_PERCENT = 7 / 100;
+
+const ELECTED_COUNT = Math.round(POPULATION_SIZE * ELITISM_PERCENT);
+
+/**
+ * en fonction du pourcentage d'elitisme,
+ * retourne une liste des partitions
+ * qui se retrouveront automatiquement dans la generation suivante
+ */
+function elect(population) {
+
+  return population.slice(0, ELECTED_COUNT);
+
+}
+
+firstPopulation(6)
+  .then((pop) => {
+
+    console.log(pop);
+
+    console.log("elected count : " + ELECTED_COUNT);
+
+    console.log(elect(pop));
+
+  });
 
 
 
@@ -159,8 +184,6 @@ class Subset {
   }
 
 }
-
-firstPopulation(6).then((pop) => { console.log(pop); });
 
 function firstPopulation(nbTrips) {
 
