@@ -58,6 +58,8 @@ class Subset {
     this.distance = 0.0;
     this.duration = 0.0;
 
+    this.lastAddressId;
+
   }
 
   /**
@@ -68,15 +70,21 @@ class Subset {
    */
   addAddress(addrId) {
 
+    // console.log('add : ' + addrId);
+
     for (let i in this.addressesGeoJson.features) {
 
       if (this.addressesGeoJson.features[i].id == addrId) {
 
-        this.chrom[0] = true;
+        // console.log('found at : ' + i);
+        this.chrom[i] = true;
+        break;
 
       }
 
     }
+
+    this.lastAddressId = addrId;
 
   }
 
@@ -162,12 +170,14 @@ function firstPopulation(nbTrips) {
               greedyChunk(addresses.albi, nbTrips - 1, table, i)
                 .then((partition) => {
 
+                  // console.log(partition.subsets);
+
                   // console.log('keys : ');
                   // for(let key in partition) {
                   //   console.log(key);
                   // }
-                  partition.push(addresses.outside.features);
-                  return partition;
+                  // partition.push(addresses.outside.features);
+                  // return partition;
                 })
                 .then(osrm.computeAllTrips)
                 .then((trips) => {
@@ -226,6 +236,7 @@ function greedyChunk(addressesGeoJson, nbTrips, durationsTable, partitionNumber)
     // let trips = [];
 
     let startAddress = addressesGeoJson.features[0];
+    let firstId = startAddress.id;
 
     // console.log(startAddress);
     console.log('-------------------------------------------------------');
@@ -233,42 +244,38 @@ function greedyChunk(addressesGeoJson, nbTrips, durationsTable, partitionNumber)
     // // toujours commencer par la premiere adresse, le depot
     for (let i = 0; i < nbTrips; ++i) {
       let sub = new Subset(addressesGeoJson);
-      sub.addAddress(startAddress.id);
+      sub.addAddress(firstId);
       partition.push(sub);
     }
 
-    // console.log(partition);
+    osrm.removeDestination(dur, firstId);
 
 
-    // let firstId = startAddress.id;
+    // chaque "ligne" de durationsTable est de meme taille
+    // et removeDestination enleve un element de chaque "ligne"
+    console.log('picking destinations');
+    while (dur[firstId].length > 0) {
 
-    // osrm.removeDestination(dur, firstId);
+      for (let i = 0; i < nbTrips && dur[firstId].length > 0; ++i) {
 
-    // // chaque "ligne" de durationsTable est de meme taille
-    // // et removeDestination enleve un element de chaque "ligne"
-    // console.log('picking destinations');
-    // while (dur[firstId].length > 0) {
+        for (let j = -1; j < (partitionNumber) % (addressesPerTrip) && dur[firstId].length > 0; ++j) {
 
-    //   for (let i = 0; i < nbTrips && dur[firstId].length > 0; ++i) {
+          let sourceId = partition.subsets[i].lastAddressId;
+          // on recupere l'id de la derniere adresse ajoutee,
+          // qui devient la source pour la prochaine
 
-    //     for (let j = -1; j < (partitionNumber) % (addressesPerTrip) && dur[firstId].length > 0; ++j) {
-    //       let lastDest = trips[i][trips[i].length - 1];
-    //       // on recupere la destination en fin de liste,
-    //       // qui devient la source pour al prochaine
+          // plus une destionation est proche de notre source, plus elle a de chance d'etre choisie
+          let nextDest = osrm.pickDestination(dur[sourceId]);
 
+          partition.subsets[i].addAddress(nextDest.destination_id);
 
-    //       // plus une destionation est proche de notre source, plus elle a de chance d'etre choisie
-    //       let nextDest = osrm.pickDestination(dur[lastDest.id]);
-
-    //       trips[i].push(nextDest.dest_feature);
-
-    //       osrm.removeDestination(dur, nextDest.destination_id);
-    //     }
-    //   }
-    // }
-    // console.log('partitioning done');
-    // // console.log(trips);
-    // resolve(trips);
+          osrm.removeDestination(dur, nextDest.destination_id);
+        }
+      }
+    }
+    console.log('partitioning done');
+    // console.log(trips);
+    resolve(partition);
 
   });
 
