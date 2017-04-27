@@ -60,6 +60,26 @@ class Subset {
 
   }
 
+  /**
+   * recherche dans this.addressesGeoJson l'adresse portant l'id donne en parametre
+   * recupere la position dans le tableau et cette meme position dans this.chrom est mise a vrai
+   *
+   * @param {Integer} addrId l'id de l'adresse a ajouter a ce sous ensemble
+   */
+  addAddress(addrId) {
+
+    for (let i in this.addressesGeoJson.features) {
+
+      if (this.addressesGeoJson.features[i].id == addrId) {
+
+        this.chrom[0] = true;
+
+      }
+
+    }
+
+  }
+
   computeTrip() {
 
     return new Promise((resolve, reject) => {
@@ -207,17 +227,17 @@ function greedyChunk(addressesGeoJson, nbTrips, durationsTable, partitionNumber)
 
     let startAddress = addressesGeoJson.features[0];
 
-    console.log(startAddress);
+    // console.log(startAddress);
     console.log('-------------------------------------------------------');
 
     // // toujours commencer par la premiere adresse, le depot
     for (let i = 0; i < nbTrips; ++i) {
       let sub = new Subset(addressesGeoJson);
-      sub.chrom[0] = true;
+      sub.addAddress(startAddress.id);
       partition.push(sub);
     }
 
-    console.log(partition);
+    // console.log(partition);
 
 
     // let firstId = startAddress.id;
