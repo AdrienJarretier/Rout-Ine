@@ -1,4 +1,5 @@
 enregistrer un planning, pour un jour donné, quelles adresses doivent etre livrées
+Il faut savoir pour une date donnée, quelles beneficiaires à livrer, avec éventuellement des annotaiton si celles ci ne peuvent pas etre fixé d'une semaine à l'autre
 
 l'algo génétique doit travailler sur des objets (classe Subset) de valeurs booleenes :
   dans firstPopulation() on recupere les adresses de la bdd
