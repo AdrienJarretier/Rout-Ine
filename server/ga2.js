@@ -5,7 +5,7 @@ const FeatureCollection = require('./FeatureCollection.js');
 const osrm = require('./osrm.js');
 const utils = require('./utils.js');
 
-const POPULATION_SIZE = 1;
+const POPULATION_SIZE = 7;
 
 
 
@@ -39,8 +39,30 @@ class Partition {
 
     this.subsets.push(subset);
 
-    this.totalDistance += subset.distance;
-    this.totalDuration += subset.duration;
+  }
+
+  computeAllTrips() {
+
+    return new Promise((resolve, reject) => {
+
+      let tripsComputed = 0;
+
+      for (let subset of this.subsets) {
+
+        subset.computeTrip()
+          .then(() => {
+
+            this.totalDistance += subset.distance;
+            this.totalDuration += subset.duration;
+
+            if (++tripsComputed == this.subsets.length)
+              resolve(this);
+
+          });
+
+      }
+
+    });
 
   }
 
@@ -122,7 +144,7 @@ class Subset {
 
 }
 
-firstPopulation(7);
+firstPopulation(6).then((pop) => { console.log(pop); });
 
 function firstPopulation(nbTrips) {
 
@@ -167,24 +189,19 @@ function firstPopulation(nbTrips) {
 
               console.log('partitioning #' + i);
 
-              greedyChunk(addresses.albi, nbTrips - 1, table, i)
+              greedyChunk(addresses.albi, nbTrips, table, i)
                 .then((partition) => {
 
-                  // console.log(partition.subsets);
+                  return partition.computeAllTrips();
 
-                  // console.log('keys : ');
-                  // for(let key in partition) {
-                  //   console.log(key);
-                  // }
-                  // partition.push(addresses.outside.features);
-                  // return partition;
                 })
-                .then(osrm.computeAllTrips)
-                .then((trips) => {
+                .then((partition) => {
 
-                  console.log('computed trip #' + i);
+                  console.log('partitioning #' + i + ' trip computed, done');
 
-                  population.push(new Partition(trips));
+                  // console.log(partition);
+
+                  population.push(partition);
 
                   if (population.length == POPULATION_SIZE) {
 
