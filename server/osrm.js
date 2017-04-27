@@ -460,6 +460,7 @@ function getHalfTrip(nbTrips) {
 
 exports.getTrips = getHalfTrip;
 exports.getTableFromAddresses = getTableFromAddresses;
+exports.getTripFromAddresses = getTripFromAddresses;
 exports.computeAllTrips = computeAllTrips;
 exports.pickDestination = pickDestination;
 exports.removeDestination = removeDestination;
