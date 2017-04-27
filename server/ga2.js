@@ -180,11 +180,6 @@ function firstPopulation(nbTrips) {
 
             let population = [];
 
-
-
-
-
-
             for (let i = 0; i < POPULATION_SIZE; ++i) {
 
               console.log('partitioning #' + i);
