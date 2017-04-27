@@ -55,8 +55,24 @@ class Partition {
             this.totalDistance += subset.distance;
             this.totalDuration += subset.duration;
 
-            if (++tripsComputed == this.subsets.length)
+            if (++tripsComputed == this.subsets.length) {
+
+              // si tous les trajets ont ete calcules
+              // on peut trier la partition pour avoir les meilleurs sous ensembles en premier
+              // avant de resoudre la promesse
+
+              this.subsets.sort((a, b) => {
+                return a.duration - b.duration
+              });
+
+              // console.log('****************** subsets durations ********************');
+
+              // for(let sub of this.subsets)
+              //   console.log(sub.duration);
+
               resolve(this);
+            }
+
 
           });
 
