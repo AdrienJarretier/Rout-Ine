@@ -28,6 +28,8 @@ let notFound = 0;
 
 let addresses = [];
 
+console.log(dataArray.length + ' beneficiaries');
+
 for (let i in dataArray) {
 
   let line = dataArray[i];
