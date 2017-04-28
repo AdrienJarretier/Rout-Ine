@@ -77,7 +77,7 @@ function get() {
 
                   testTrips.original = parsedBody;
 
-                  if(++filled == 2)
+                  if(++testTrips.filled == 2)
                     resolve(testTrips);
 
                   console.log('** Route service **');
@@ -118,7 +118,7 @@ function get() {
 
                   testTrips.osrmTrip = parsedBody;
 
-                  if(++filled == 2)
+                  if(++testTrips.filled == 2)
                     resolve(testTrips);
 
                   console.log('** Trip service **');
