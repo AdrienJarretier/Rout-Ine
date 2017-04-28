@@ -22,9 +22,13 @@ const sql = ' SELECT distinct a.id, a.label, a.town, a.additional, a.lat, a.lng,
 let dbCon = mysql.createConnection(config.db);
 
 let queriesDone = 0;
+let notFound = 0;
 
-for (let line of dataArray) {
+let addresses = [];
 
+for (let i in dataArray) {
+
+  let line = dataArray[i];
   let name = line[0];
 
   const select = mysql.format(sql, [name]);
@@ -33,14 +37,21 @@ for (let line of dataArray) {
     select,
     (err, rows, fields) => {
 
-      if (err) throw err
-
-      if (++queriesDone == dataArray.length)
+      if (++queriesDone == dataArray.length) {
         dbCon.end();
+
+        if (notFound == 0) {
+          console.log(addresses);
+        }
+      }
+
+      if (err) throw err
 
       if (rows.length == 0) {
         console.log('name not found : ' + name);
-      }
+        ++notFound;
+      } else
+        addresses[i] = rows;
 
     });
 
