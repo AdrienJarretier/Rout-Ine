@@ -64,7 +64,11 @@ for (let i in dataArray) {
               let parsedBody = JSON.parse(body);
 
 
-              console.log(parsedBody);
+              console.log('distance : ' + Math.ceil(parsedBody.routes[0].distance / 10) / 100);
+
+              let h = Math.floor(parsedBody.routes[0].duration / 3600);
+              let m = Math.ceil((parsedBody.routes[0].duration % 3600) / 60);
+              console.log('duration : ' + h + 'h ' + m);
 
             }
           });
