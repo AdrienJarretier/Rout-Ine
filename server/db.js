@@ -15,6 +15,7 @@ const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 // chargement de la classe AddressFeature
 // AddressFeature.js est un module qui exporte la definition de la classe
 const AddressFeature = require('./AddressFeature.js');
+const FeatureCollection = require('./FeatureCollection.js');
 
 /**
  * Retourne une promesse qui
@@ -25,7 +26,7 @@ const AddressFeature = require('./AddressFeature.js');
  */
 function getAddresses() {
 
-  const sqlSelectAddresses = ' SELECT distinct a.id, a.label, a.town, a.additional, a.lat, a.lng \n' +
+  const sqlSelectAddresses = ' SELECT distinct a.id, a.label, a.town, a.lat, a.lng \n' +
     ' FROM address a \n' +
     ' RIGHT JOIN beneficiary ON a.id=beneficiary.address_id \n' +
     ' WHERE a.id IS NOT NULL;';
@@ -60,9 +61,9 @@ function getAddresses() {
  */
 function ccasAddress() {
 
-  const sqlSelectCcasAddress = ' SELECT distinct a.id, a.label, a.town, a.additional, a.lat, a.lng \n' +
+  const sqlSelectCcasAddress = ' SELECT distinct a.id, a.label, a.town, a.lat, a.lng, a.special \n' +
     ' FROM address a \n' +
-    ' WHERE a.additional = ?';
+    ' WHERE a.special = ?';
 
   const selectCcasAddress = mysql.format(sqlSelectCcasAddress, ["Centre Communal d'Action Sociale"]);
 
@@ -95,8 +96,7 @@ function ccasAddress() {
  */
 function getBenefs(address, dbCon) {
 
-
-  const sqlSelectBenef = ' SELECT id, name, birthdate \n' +
+  const sqlSelectBenef = ' SELECT id, name, birthdate, address_additional \n' +
     ' FROM beneficiary \n' +
     ' WHERE address_id = ?';
 
@@ -157,6 +157,8 @@ function getPhones(benefRows, dbCon) {
   });
 }
 
+getFullAddressesData();
+
 /**
  * Retourne une promesse qui
  * lorsqu'elle est resolue retourne le GeoJson des adresses
@@ -169,10 +171,7 @@ function getFullAddressesData() {
   return new Promise((resolve, reject) => {
 
     // objet GeoJson
-    let addresses = {
-      type: 'FeatureCollection',
-      features: []
-    };
+    let addresses = new FeatureCollection([]);
 
     let queriesDone = 0;
 
@@ -189,12 +188,15 @@ function getFullAddressesData() {
 
         let addrFeat = new AddressFeature(address);
 
+        // console.log(addrFeat);
 
         // recuperons les beneficiares a cette adresse
         // quand on a la reponse alors on peut recuperer les numeros de telephone
         getBenefs(address, dbCon).then((benefsRows) => {
 
             addrFeat.addBeneficiaries(benefsRows);
+
+            // console.log(addrFeat.properties.beneficiaries);
 
             // on a les beneficiares on va alors recuperer les numeros de telephone
             return getPhones(benefsRows, dbCon);
@@ -205,8 +207,9 @@ function getFullAddressesData() {
           .then((phoneRows) => {
 
             addrFeat.addPhones(phoneRows);
+            console.log(addrFeat.properties);
 
-            addresses.features.push(addrFeat);
+            addresses.push(addrFeat);
 
             // compter ici le nombre de requetes traitees
             // si on a tout traiter on peut remplir notre promesse avec le GeoJson

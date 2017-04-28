@@ -7,6 +7,8 @@ const request = require('request');
 
 const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 
+// get();
+
 function get() {
 
   return new Promise((resolve, reject) => {

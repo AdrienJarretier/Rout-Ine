@@ -1,5 +1,6 @@
 class AddressFeature {
   constructor(address) {
+
     this.type = 'Feature';
     this.geometry = {
       type: 'Point',
@@ -7,16 +8,22 @@ class AddressFeature {
     };
     this.properties = {
       label: address.label,
-      additional: address.additional,
       town: address.town,
       beneficiaries: [],
       phones: [],
       waypoint_index: 0 // index de cette adresse dans le trajet, obtenu par osrm
     };
+
+    if(address.special != undefined)
+      this.properties.special = address.special;
+
     this.id = address.id;
   }
 
   addBeneficiaries(ben) {
+
+    // console.log('** ben **');
+    // console.log(ben);
 
     this.properties.beneficiaries = ben;
   }
