@@ -1,6 +1,7 @@
+const csvParse = require('csv-parse/lib/sync');
 const fs = require('fs');
 const mysql = require('mysql');
-const parse = require('csv-parse/lib/sync');
+const osrm = require('./osrm.js');
 
 
 const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
@@ -11,7 +12,7 @@ const csvContent = fs.readFileSync(csvFile);
 
 fs.closeSync(csvFile);
 
-var dataArray = parse(csvContent, { delimiter: "," });
+var dataArray = csvParse(csvContent, { delimiter: "," });
 
 const sql = ' SELECT distinct a.id, a.label, a.town, a.additional, a.lat, a.lng, beneficiary.*  \n' +
   ' FROM address a \n' +
@@ -42,8 +43,15 @@ for (let i in dataArray) {
 
         if (notFound == 0) {
           console.log(addresses);
+
+          let oReq = new osrm.OsrmRequest('route', false);
+
           for (let adr of addresses)
-            console.log(adr.lng + ',' + adr.lat + ';');
+            oReq.addCoords(adr.lat, adr.lng);
+
+          let madeUrl = oReq.makeUrl();
+          console.log(madeUrl);
+
         }
       }
 
