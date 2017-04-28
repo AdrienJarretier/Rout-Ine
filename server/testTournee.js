@@ -42,6 +42,8 @@ for (let i in dataArray) {
 
         if (notFound == 0) {
           console.log(addresses);
+          for (let adr of addresses)
+            console.log(adr.lng + ',' + adr.lat + ';');
         }
       }
 
