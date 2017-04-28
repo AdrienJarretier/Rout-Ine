@@ -46,6 +46,7 @@ class OsrmRequest {
     switch (service) {
 
       case 'trip':
+      case 'route':
 
         if (requestOverview == undefined)
           requestOverview = false;
