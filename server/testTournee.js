@@ -72,6 +72,12 @@ for (let i in dataArray) {
               let m = Math.ceil((parsedBody.routes[0].duration % 3600) / 60);
               console.log('duration : ' + h + 'h ' + m);
 
+
+              m += 3*dataArray.length;
+              h += Math.floor(m/60);
+              m %= 60;
+              console.log('duration (3 min / benef) : ' + h + 'h ' + m);
+
             }
           });
 
@@ -100,6 +106,11 @@ for (let i in dataArray) {
               let h = Math.floor(parsedBody.trips[0].duration / 3600);
               let m = Math.ceil((parsedBody.trips[0].duration % 3600) / 60);
               console.log('duration : ' + h + 'h ' + m);
+
+              m += 3*dataArray.length;
+              h += Math.floor(m/60);
+              m %= 60;
+              console.log('duration (3 min / benef) : ' + h + 'h ' + m);
 
             }
           });
