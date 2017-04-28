@@ -189,19 +189,19 @@
           };
         });
 
-        let group = L.layerGroup([
+        let groupOsrmTrip = L.layerGroup([
           osrmTripLayer
         ]);
 
-        let seconds = osrmTrip.duration;
+        seconds = osrmTrip.duration;
 
-        let meters = osrmTrip.distance;
+        meters = osrmTrip.distance;
 
-        let tripName = 'trajet par osrm trip (' + s2hours(seconds) + ') ' + m2km(meters);
+        tripName = 'trajet par osrm trip (' + s2hours(seconds) + ') ' + m2km(meters);
 
         tripNames.push(tripName);
 
-        overlayMaps.trips[tripName] = group;
+        overlayMaps.trips[tripName] = groupOsrmTrip;
 
 
 
