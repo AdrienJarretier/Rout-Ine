@@ -17,7 +17,7 @@ const sql = ' SELECT distinct a.id, a.label, a.town, a.additional, a.lat, a.lng,
   ' FROM address a \n' +
   ' RIGHT JOIN beneficiary ON a.id=beneficiary.address_id \n' +
   ' WHERE a.id IS NOT NULL \n' +
-  ' AND beneficiary.name = ?;';
+  ' AND beneficiary.name like ?;';
 
 let dbCon = mysql.createConnection(config.db);
 
@@ -38,11 +38,9 @@ for (let line of dataArray) {
       if (++queriesDone == dataArray.length)
         dbCon.end();
 
-      console.log(select);
-
-      console.log(rows);
-
-      console.log();
+      if (rows.length == 0) {
+        console.log('name not found : ' + name);
+      }
 
     });
 
