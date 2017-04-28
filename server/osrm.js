@@ -458,9 +458,10 @@ function getHalfTrip(nbTrips) {
 }
 
 
+exports.computeAllTrips = computeAllTrips;
 exports.getTrips = getHalfTrip;
 exports.getTableFromAddresses = getTableFromAddresses;
 exports.getTripFromAddresses = getTripFromAddresses;
-exports.computeAllTrips = computeAllTrips;
+exports.OsrmRequest = OsrmRequest;
 exports.pickDestination = pickDestination;
 exports.removeDestination = removeDestination;
