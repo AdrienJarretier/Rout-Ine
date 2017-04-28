@@ -51,6 +51,12 @@ function get() {
             if (notFound == 0) {
               // console.log(addresses);
 
+              let testTrips = {
+                original: {},
+                osrmTrip: {},
+                filled: 0
+              };
+
               let oReq = new osrm.OsrmRequest('route', false);
 
               for (let adr of addresses)
@@ -69,7 +75,10 @@ function get() {
                   // console.log('response from ' + task.oReq.service + ' service');
                   let parsedBody = JSON.parse(body);
 
-                  resolve(parsedBody);
+                  testTrips.original = parsedBody;
+
+                  if(++filled == 2)
+                    resolve(testTrips);
 
                   console.log('** Route service **');
                   console.log('distance : ' + Math.ceil(parsedBody.routes[0].distance / 10) / 100 +
@@ -106,6 +115,11 @@ function get() {
 
                   // console.log('response from ' + task.oReq.service + ' service');
                   let parsedBody = JSON.parse(body);
+
+                  testTrips.osrmTrip = parsedBody;
+
+                  if(++filled == 2)
+                    resolve(testTrips);
 
                   console.log('** Trip service **');
                   console.log('distance : ' + Math.ceil(parsedBody.trips[0].distance / 10) / 100 +
