@@ -2,6 +2,7 @@ const csvParse = require('csv-parse/lib/sync');
 const fs = require('fs');
 const mysql = require('mysql');
 const osrm = require('./osrm.js');
+const request = require('request');
 
 
 const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
@@ -50,7 +51,25 @@ for (let i in dataArray) {
             oReq.addCoords(adr.lat, adr.lng);
 
           let madeUrl = oReq.makeUrl();
-          console.log(madeUrl);
+
+
+          request(madeUrl, (error, response, body) => {
+
+            if (error) {
+              console.log('error:', error); // Print the error if one occurred
+              console.log('statusCode:', response.statusCode); // Print the response status code if a response was received
+            } else {
+
+              // console.log('response from ' + task.oReq.service + ' service');
+              let parsedBody = JSON.parse(body);
+
+
+              console.log(parsedBody);
+
+            }
+          });
+
+
 
         }
       }
