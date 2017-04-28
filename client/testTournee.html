@@ -151,15 +151,6 @@
 
         console.log(data);
 
-        // let totalSeconds = 0;
-        // let maxSeconds = 0;
-        // let maxTripNum = 0;
-        // let totalMeters = 0;
-
-        // for (let i = 0; i < data.length; ++i) {
-
-        // let trip = data[i];
-
         let originalRoute = data.original.routes[0];
 
         let originalRouteLayer = L.geoJSON(originalRoute.geometry);
@@ -173,10 +164,6 @@
           originalRouteLayer
         ]);
 
-        // let group = layerGroup(trip, utils.randomColor());
-
-        // console.log(trip);
-
         let seconds = originalRoute.duration;
 
         let meters = originalRoute.distance;
@@ -186,12 +173,6 @@
         tripNames.push(tripName);
 
         overlayMaps.trips[tripName] = group;
-        // }
-
-        // $('#totalTime').text(s2hours(totalSeconds));
-        // $('#maxTime').text(s2hours(maxSeconds));
-        // $('#maxTripNum').text(maxTripNum);
-        // $('#totalDistance').text(m2km(totalMeters));
 
         var options = {
           // Make the "trips" group exclusive (use radio inputs)
