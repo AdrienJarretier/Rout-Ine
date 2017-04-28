@@ -178,9 +178,6 @@
         // console.log(trip);
 
         let seconds = originalRoute.duration;
-        if (i < data.length - 1) {
-          seconds += 180 * (originalRoute.legs.length+2);
-        }
 
         if (seconds > maxSeconds) {
           maxSeconds = seconds;
