@@ -53,7 +53,7 @@ for (let i in dataArray) {
         console.log('name not found : ' + name);
         ++notFound;
       } else
-        addresses[i] = rows;
+        addresses[i] = rows[0];
 
     });
 
