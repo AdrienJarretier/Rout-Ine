@@ -43,7 +43,7 @@ for (let i in dataArray) {
         dbCon.end();
 
         if (notFound == 0) {
-          console.log(addresses);
+          // console.log(addresses);
 
           let oReq = new osrm.OsrmRequest('route', false);
 
@@ -63,8 +63,37 @@ for (let i in dataArray) {
               // console.log('response from ' + task.oReq.service + ' service');
               let parsedBody = JSON.parse(body);
 
+              console.log('** Route service **');
+              console.log('distance : ' + Math.ceil(parsedBody.routes[0].distance / 10) / 100 + ' km');
 
-              console.log('distance : ' + Math.ceil(parsedBody.routes[0].distance / 10) / 100);
+              let h = Math.floor(parsedBody.routes[0].duration / 3600);
+              let m = Math.ceil((parsedBody.routes[0].duration % 3600) / 60);
+              console.log('duration : ' + h + 'h ' + m);
+
+            }
+          });
+
+
+          oReq = new osrm.OsrmRequest('trip', false);
+
+          for (let adr of addresses)
+            oReq.addCoords(adr.lat, adr.lng);
+
+          madeUrl = oReq.makeUrl();
+
+
+          request(madeUrl, (error, response, body) => {
+
+            if (error) {
+              console.log('error:', error); // Print the error if one occurred
+              console.log('statusCode:', response.statusCode); // Print the response status code if a response was received
+            } else {
+
+              // console.log('response from ' + task.oReq.service + ' service');
+              let parsedBody = JSON.parse(body);
+
+              console.log('** Trip service **');
+              console.log('distance : ' + Math.ceil(parsedBody.routes[0].distance / 10) / 100 + ' km');
 
               let h = Math.floor(parsedBody.routes[0].duration / 3600);
               let m = Math.ceil((parsedBody.routes[0].duration % 3600) / 60);
