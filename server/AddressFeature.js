@@ -10,7 +10,6 @@ class AddressFeature {
       label: address.label,
       town: address.town,
       beneficiaries: [],
-      phones: [],
       waypoint_index: 0 // index de cette adresse dans le trajet, obtenu par osrm
     };
 

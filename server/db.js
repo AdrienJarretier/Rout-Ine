@@ -157,7 +157,11 @@ function getPhones(benefRows, dbCon) {
   });
 }
 
-getFullAddressesData();
+getFullAddressesData()
+  .then((addresses) => {
+    for (let feat of addresses.features)
+      console.log(feat.properties.beneficiaries);
+  });
 
 /**
  * Retourne une promesse qui
@@ -192,32 +196,40 @@ function getFullAddressesData() {
 
         // recuperons les beneficiares a cette adresse
         // quand on a la reponse alors on peut recuperer les numeros de telephone
-        getBenefs(address, dbCon).then((benefsRows) => {
+        getBenefs(address, dbCon)
+          .then((benefsRows) => {
 
             addrFeat.addBeneficiaries(benefsRows);
 
             // console.log(addrFeat.properties.beneficiaries);
 
-            // on a les beneficiares on va alors recuperer les numeros de telephone
-            return getPhones(benefsRows, dbCon);
-          })
-          // on a les numeros de telephones on peut alors terminer notre enchainement de .then()
-          // et si le compte est bon on resoud la promesse
-          //    sinon il reste des donnees a recuperer on ne fait rien
-          .then((phoneRows) => {
-
-            addrFeat.addPhones(phoneRows);
-            console.log(addrFeat.properties);
-
             addresses.push(addrFeat);
 
-            // compter ici le nombre de requetes traitees
-            // si on a tout traiter on peut remplir notre promesse avec le GeoJson
             if (++queriesDone == rowsLength) {
               dbCon.end();
               resolve(addresses);
             }
+
+            // on a les beneficiares on va alors recuperer les numeros de telephone
+            // return getPhones(benefsRows, dbCon);
           });
+        // // on a les numeros de telephones on peut alors terminer notre enchainement de .then()
+        // // et si le compte est bon on resoud la promesse
+        // //    sinon il reste des donnees a recuperer on ne fait rien
+        // .then((phoneRows) => {
+
+        //   addrFeat.addPhones(phoneRows);
+        //   console.log(addrFeat.properties);
+
+        //   addresses.push(addrFeat);
+
+        //   // compter ici le nombre de requetes traitees
+        //   // si on a tout traiter on peut remplir notre promesse avec le GeoJson
+        //   if (++queriesDone == rowsLength) {
+        //     dbCon.end();
+        //     resolve(addresses);
+        //   }
+        // });
 
       }
 
