@@ -160,24 +160,26 @@
 
         // let trip = data[i];
 
-        let oringalRouteLayer = L.geoJSON(data.original.routes[0].geometry);
-        oringalRouteLayer.setStyle(function(feature) {
+        let originalRoute = data.original.routes[0];
+
+        let originalRouteLayer = L.geoJSON(originalRoute.geometry);
+        originalRouteLayer.setStyle(function(feature) {
           return {
             color: utils.randomColor()
           };
         });
 
         let group = L.layerGroup([
-          oringalRouteLayer
+          originalRouteLayer
         ]);
 
         // let group = layerGroup(trip, utils.randomColor());
 
         // console.log(trip);
 
-        let seconds = trip.route.duration;
+        let seconds = originalRoute.duration;
         if (i < data.length - 1) {
-          seconds += 180 * trip.addresses.features.length;
+          seconds += 180 * (originalRoute.legs.length+2);
         }
 
         if (seconds > maxSeconds) {
@@ -187,7 +189,7 @@
 
         totalSeconds += seconds;
 
-        let meters = trip.route.distance;
+        let meters = originalRoute.distance;
         totalMeters += meters;
 
         let tripName = 'trajet original (' + s2hours(seconds) + ') ' + m2km(meters);
