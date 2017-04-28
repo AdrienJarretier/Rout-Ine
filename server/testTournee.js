@@ -57,7 +57,7 @@ function get() {
                 filled: 0
               };
 
-              let oReq = new osrm.OsrmRequest('route', false);
+              let oReq = new osrm.OsrmRequest('route', true);
 
               for (let adr of addresses)
                 oReq.addCoords(adr.lat, adr.lng);
@@ -98,7 +98,7 @@ function get() {
               });
 
 
-              oReq = new osrm.OsrmRequest('trip', false);
+              oReq = new osrm.OsrmRequest('trip', true);
 
               for (let adr of addresses)
                 oReq.addCoords(adr.lat, adr.lng);
