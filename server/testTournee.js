@@ -97,8 +97,8 @@ for (let i in dataArray) {
               console.log('** Trip service **');
               console.log('distance : ' + Math.ceil(parsedBody.routes[0].distance / 10) / 100 + ' km');
 
-              let h = Math.floor(parsedBody.routes[0].duration / 3600);
-              let m = Math.ceil((parsedBody.routes[0].duration % 3600) / 60);
+              let h = Math.floor(parsedBody.trips[0].duration / 3600);
+              let m = Math.ceil((parsedBody.trips[0].duration % 3600) / 60);
               console.log('duration : ' + h + 'h ' + m);
 
             }
