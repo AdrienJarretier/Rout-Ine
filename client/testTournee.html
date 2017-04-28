@@ -179,16 +179,6 @@
 
         let seconds = originalRoute.duration;
 
-        if (seconds > maxSeconds) {
-          maxSeconds = seconds;
-          maxTripNum = i + 1;
-        }
-
-        totalSeconds += seconds;
-
-        let meters = originalRoute.distance;
-        totalMeters += meters;
-
         let tripName = 'trajet original (' + s2hours(seconds) + ') ' + m2km(meters);
 
         tripNames.push(tripName);
