@@ -1,3 +1,11 @@
+
+
+ajouter le fichier xls des benef au projet
+
+
+
+
+
 enregistrer un planning, pour un jour donné, quelles adresses doivent etre livrées
 Il faut savoir pour une date donnée, quelles beneficiaires à livrer, avec éventuellement des annotaiton si celles ci ne peuvent pas etre fixé d'une semaine à l'autre
 
