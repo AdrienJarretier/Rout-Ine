@@ -62,11 +62,11 @@
         });
 
         let p = feature.properties;
-        let popContent = p.label /*+ (p.additional.length > 0 ? ', ' + p.additional : '')*/;
+        let popContent = p.label /*+ (p.additional.length > 0 ? ', ' + p.additional : '')*/ ;
 
         for (let b of p.beneficiaries) {
 
-          popContent = addLine(popContent, b.name);
+          let line = b.name;
 
           if (b.birthdate != null) {
 
@@ -78,7 +78,16 @@
 
             let years = age / 31557600000
 
-            popContent += ', ' + Math.floor(years) + ' ans';
+            line += ', ' + Math.floor(years) + ' ans - ';
+
+            for (let phone of b.phones) {
+              line += phone + ' / ';
+            }
+
+            line = line.slice(0, -2);
+
+            popContent = addLine(popContent, line);
+
             if (now.getDate() == birthdate.getDate() && now.getMonth() == birthdate.getMonth()) {
 
               popContent = addLine(popContent, '<img src="cake-with-2-candles-md.png">');
@@ -86,9 +95,6 @@
           }
         }
 
-        for (let phone of p.phones) {
-          popContent = addLine(popContent, phone);
-        }
         marker.bindPopup(popContent);
 
         return marker;
