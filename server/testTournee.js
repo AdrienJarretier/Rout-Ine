@@ -7,7 +7,7 @@ const request = require('request');
 
 const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 
-// get();
+get();
 
 function get() {
 
@@ -21,7 +21,7 @@ function get() {
 
     var dataArray = csvParse(csvContent, { delimiter: "," });
 
-    const sql = ' SELECT distinct a.id, a.label, a.town, a.additional, a.lat, a.lng, beneficiary.*  \n' +
+    const sql = ' SELECT distinct a.id, a.label, a.town, a.lat, a.lng, beneficiary.*  \n' +
       ' FROM address a \n' +
       ' RIGHT JOIN beneficiary ON a.id=beneficiary.address_id \n' +
       ' WHERE a.id IS NOT NULL \n' +
