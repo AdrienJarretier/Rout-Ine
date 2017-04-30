@@ -86,7 +86,6 @@ function ccasAddress() {
 
 }
 
-
 /**
  * Retourne une promesse qui
  * lorsqu'elle est resolue retourne le tableau des beneficiaires
@@ -98,19 +97,41 @@ function getBenefs(address, dbCon) {
 
   const sqlSelectBenef = ' SELECT id, name, birthdate, address_additional \n' +
     ' FROM beneficiary \n' +
-    ' WHERE address_id = ?';
+    ' WHERE address_id = ?;';
 
   const selectBenef = mysql.format(sqlSelectBenef, [address.id]);
 
   return new Promise((resolve, reject) => {
-
     dbCon.query(
       selectBenef,
       (err, rows, fields) => {
 
         if (err) throw err
 
-        resolve(rows);
+        let phonesRequests = 0;
+
+        // si il n'y a aucun beneficiaire a cette adresses on renvoie la liste vide
+        if (rows.length == 0) {
+          resolve(rows);
+        }
+
+        // pour chaque beneficiaire on ajoute la liste de leurs num de telephone
+        for (let benefRow of rows) {
+
+          getPhones(benefRow, dbCon).then((phones) => {
+
+            benefRow.phones = [];
+
+            // on ajoute chaque numero a la list des numero du beneficiaire
+            for (let phone of phones) {
+              benefRow.phones.push(phone.phone_number)
+            }
+
+            if (++phonesRequests == rows.length)
+              resolve(rows);
+
+          });
+        }
 
       });
 
@@ -119,28 +140,21 @@ function getBenefs(address, dbCon) {
 }
 
 
+
 /**
  * Retourne une promesse qui
  * lorsqu'elle est resolue retourne le tableau des numero de telephone
- * d'un groupe de beneficiaires
+ * d'un beneficiaire
  *
  * @returns {Promise} la promesse de retourner le tableau contenant les numeros de telephone.
  */
-function getPhones(benefRows, dbCon) {
+function getPhones(benefRow, dbCon) {
 
-  const sqlSelectPhones = ' SELECT DISTINCT phone_number \n' +
+  const sqlSelectPhones = ' SELECT phone_number \n' +
     ' FROM beneficiary_phone \n' +
-    ' WHERE beneficiary_id IN (?)';
+    ' WHERE beneficiary_id = ?;';
 
-  // recuperons la liste des ids beneficiaires
-  let ids = '';
-  for (let b of benefRows) {
-    ids += b.id + ',';
-  }
-  ids = ids.slice(0, -1);
-  // enlever la dernire virgule
-
-  const selectPhones = mysql.format(sqlSelectPhones, [ids]);
+  const selectPhones = mysql.format(sqlSelectPhones, [benefRow.id]);
 
   return new Promise((resolve, reject) => {
 
@@ -156,12 +170,6 @@ function getPhones(benefRows, dbCon) {
 
   });
 }
-
-getFullAddressesData()
-  .then((addresses) => {
-    for (let feat of addresses.features)
-      console.log(feat.properties.beneficiaries);
-  });
 
 /**
  * Retourne une promesse qui
@@ -188,22 +196,27 @@ function getFullAddressesData() {
       let rowsLength = rows.length; // cette ligne est utilisee pour compter le nombre de requetes traitees
       // extremement utile puisque dans un fonctionnement asynchrone
       // impossible de savoir quelle sera la derniere requete traitee
+      // console.log(rows);
       for (let address of rows) {
 
         let addrFeat = new AddressFeature(address);
 
-        // console.log(addrFeat);
+        // console.log(address);
 
         // recuperons les beneficiares a cette adresse
         // quand on a la reponse alors on peut recuperer les numeros de telephone
         getBenefs(address, dbCon)
           .then((benefsRows) => {
 
+            // console.log(benefsRows);
+
             addrFeat.addBeneficiaries(benefsRows);
 
             // console.log(addrFeat.properties.beneficiaries);
 
             addresses.push(addrFeat);
+
+            // console.log(address);
 
             if (++queriesDone == rowsLength) {
               dbCon.end();

@@ -27,14 +27,6 @@ class AddressFeature {
     this.properties.beneficiaries = ben;
   }
 
-  addPhones(phones) {
-
-    for (let phone of phones) {
-
-      this.properties.phones.push(phone.phone_number);
-    }
-  }
-
   get coordinates() {
     return this.geometry.coordinates;
   }
