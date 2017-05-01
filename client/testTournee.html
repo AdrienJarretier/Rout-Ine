@@ -50,56 +50,68 @@
       return string + '<br>' + line;
     }
 
-    // function addressesMarkers(resultTrip) {
+    function addressesMarkers(waypoints) {
 
-    //   function markerMaker(feature, latlng) {
+      function markerMaker(waypoint) {
 
-    //     let marker = L.marker(latlng, {
-    //       icon: new L.AwesomeNumberMarkers({
-    //         number: feature.properties.waypoint_index,
-    //         markerColor: "darkred"
-    //       })
-    //     });
+        let lat = waypoint.location[1];
+        let lng = waypoint.location[0];
 
-    //     let p = feature.properties;
-    //     let popContent = p.label + (p.additional.length > 0 ? ', ' + p.additional : '');
+        let marker = L.marker([lat, lng], {
+          icon: new L.AwesomeNumberMarkers({
+            number: waypoint.waypoint_index,
+            markerColor: "darkred"
+          })
+        });
 
-    //     for (let b of p.beneficiaries) {
+        // let p = feature.properties;
+        // let popContent = p.label + (p.additional.length > 0 ? ', ' + p.additional : '');
 
-    //       popContent = addLine(popContent, b.name);
+        // for (let b of p.beneficiaries) {
 
-    //       if (b.birthdate != null) {
+        //   popContent = addLine(popContent, b.name);
 
-    //         let now = new Date(Date.now());
-    //         let birthdate = new Date(b.birthdate);
+        //   if (b.birthdate != null) {
 
-    //         // l'age de la personne en millisecondes
-    //         let age = now - birthdate;
+        //     let now = new Date(Date.now());
+        //     let birthdate = new Date(b.birthdate);
 
-    //         let years = age / 31557600000
+        //     // l'age de la personne en millisecondes
+        //     let age = now - birthdate;
 
-    //         popContent += ', ' + Math.floor(years) + ' ans';
-    //         if (now.getDate() == birthdate.getDate() && now.getMonth() == birthdate.getMonth()) {
+        //     let years = age / 31557600000
 
-    //           popContent = addLine(popContent, '<img src="cake-with-2-candles-md.png">');
-    //         }
-    //       }
-    //     }
+        //     popContent += ', ' + Math.floor(years) + ' ans';
+        //     if (now.getDate() == birthdate.getDate() && now.getMonth() == birthdate.getMonth()) {
 
-    //     for (let phone of p.phones) {
-    //       popContent = addLine(popContent, phone);
-    //     }
-    //     marker.bindPopup(popContent);
+        //       popContent = addLine(popContent, '<img src="cake-with-2-candles-md.png">');
+        //     }
+        //   }
+        // }
 
-    //     return marker;
-    //   }
+        // for (let phone of p.phones) {
+        //   popContent = addLine(popContent, phone);
+        // }
+        // marker.bindPopup(popContent);
 
-    //   let markersLayer = L.geoJSON(resultTrip.addresses, {
-    //     pointToLayer: markerMaker
-    //   });
+        return marker;
+      }
 
-    //   return markersLayer;
-    // }
+
+      let markersLayer = L.layerGroup();
+
+      let index = 0;
+
+      for (let w of waypoints) {
+
+        if (w.waypoint_index == undefined)
+          w.waypoint_index = index++;
+
+        markersLayer.addLayer(markerMaker(w));
+      }
+
+      return markersLayer;
+    }
 
 
     // function tripLayer(geometry, color) {
@@ -120,8 +132,6 @@
     //     addressesMarkers(resultTrip)
     //   ]);
     // }
-
-    const NUMBER_OF_TRIPS = 7;
 
     function s2hours(seconds) {
 
@@ -164,7 +174,8 @@
         });
 
         let group = L.layerGroup([
-          originalRouteLayer
+          originalRouteLayer,
+          addressesMarkers(data.original.waypoints)
         ]);
 
         let seconds = originalRoute.duration;
@@ -190,7 +201,8 @@
         });
 
         let groupOsrmTrip = L.layerGroup([
-          osrmTripLayer
+          osrmTripLayer,
+          addressesMarkers(data.osrmTrip.waypoints)
         ]);
 
         seconds = osrmTrip.duration;

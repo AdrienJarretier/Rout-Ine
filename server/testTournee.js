@@ -21,6 +21,25 @@ function get() {
 
     var dataArray = csvParse(csvContent, { delimiter: "," });
 
+    // let namesPlaceholder = '';
+    // let names = [];
+
+    // for (let line of dataArray) {
+    //   namesPlaceholder += '?,';
+    //   names.push(line[0]);
+    // }
+
+    // namesPlaceholder = namesPlaceholder.slice(0, -1);
+
+    // const sql = ' SELECT distinct a.id, a.label, a.town, a.lat, a.lng \n' +
+    //   ' FROM address a \n' +
+    //   ' RIGHT JOIN beneficiary ON a.id=beneficiary.address_id \n' +
+    //   ' WHERE a.id IS NOT NULL \n' +
+    //   ' AND beneficiary.name in (' + namesPlaceholder + ');';
+
+    // const select = mysql.format(sql, names);
+
+
     const sql = ' SELECT distinct a.id, a.label, a.town, a.lat, a.lng, beneficiary.*  \n' +
       ' FROM address a \n' +
       ' RIGHT JOIN beneficiary ON a.id=beneficiary.address_id \n' +
