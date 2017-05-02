@@ -12,13 +12,44 @@ const request = require('request');
 
 const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 
-// get();
-
-function get() {
+function getAll() {
 
   return new Promise((resolve, reject) => {
 
-    const csvFile = fs.openSync('tournee_prest_T2.csv', 'r');
+    const files = [
+      'tournee_prest2.csv',
+      'tournee_prest_T2.csv'
+    ];
+
+    let tripsDone = 0;
+
+    let tours = [];
+
+    for (let i in files) {
+
+      let filename = files[i];
+
+      get(filename)
+        .then((testTrips) => {
+
+          tours[i] = testTrips;
+
+          if (++tripsDone == files.length) {
+            resolve(tours);
+          }
+
+        });
+    }
+
+  });
+
+}
+
+function get(tourFile) {
+
+  return new Promise((resolve, reject) => {
+
+    const csvFile = fs.openSync(tourFile, 'r');
 
     const csvContent = fs.readFileSync(csvFile);
 
@@ -218,4 +249,4 @@ function get() {
   });
 }
 
-exports.get = get;
+exports.getAll = getAll;
