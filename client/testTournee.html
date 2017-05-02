@@ -162,81 +162,89 @@
       type: "GET",
       dataType: "json",
       url: "testTournee",
-      success: function(data, textStatus, jqXHR) {
+      success: function(tours, textStatus, jqXHR) {
 
-        let overlayMaps = {
-          "trips": {}
-        };
+        for (let i in tours) {
 
-        let tripNames = [];
+          let data = tours[i];
 
-        console.log(data);
+          let groupName = 'Tournée ' + i;
 
-
-
-
-        let originalRoute = data.original.routes[0];
-
-        let originalRouteLayer = L.geoJSON(originalRoute.geometry);
-        originalRouteLayer.setStyle(function(feature) {
-          return {
-            color: utils.randomColor()
+          let overlayMaps = {
+            [groupName]: {}
           };
-        });
 
-        let group = L.layerGroup([
-          originalRouteLayer,
-          addressesMarkers(data.original.waypoints, data.addresses)
-        ]);
+          let tripNames = [];
 
-        let seconds = originalRoute.duration;
-
-        let meters = originalRoute.distance;
-
-        let tripName = 'trajet original (' + s2hours(seconds) + ') ' + m2km(meters);
-
-        tripNames.push(tripName);
-
-        overlayMaps.trips[tripName] = group;
+          console.log(data);
 
 
 
 
-        let osrmTrip = data.osrmTrip.trips[0];
+          let originalRoute = data.original.routes[0];
 
-        let osrmTripLayer = L.geoJSON(osrmTrip.geometry);
-        osrmTripLayer.setStyle(function(feature) {
-          return {
-            color: utils.randomColor()
+          let originalRouteLayer = L.geoJSON(originalRoute.geometry);
+          originalRouteLayer.setStyle(function(feature) {
+            return {
+              color: utils.randomColor()
+            };
+          });
+
+          let group = L.layerGroup([
+            originalRouteLayer,
+            addressesMarkers(data.original.waypoints, data.addresses)
+          ]);
+
+          let seconds = originalRoute.duration;
+
+          let meters = originalRoute.distance;
+
+          let tripName = 'trajet original (' + s2hours(seconds) + ') ' + m2km(meters);
+
+          tripNames.push(tripName);
+
+          overlayMaps[groupName][tripName] = group;
+
+
+
+
+          let osrmTrip = data.osrmTrip.trips[0];
+
+          let osrmTripLayer = L.geoJSON(osrmTrip.geometry);
+          osrmTripLayer.setStyle(function(feature) {
+            return {
+              color: utils.randomColor()
+            };
+          });
+
+          let groupOsrmTrip = L.layerGroup([
+            osrmTripLayer,
+            addressesMarkers(data.osrmTrip.waypoints, data.addresses)
+          ]);
+
+          seconds = osrmTrip.duration;
+
+          meters = osrmTrip.distance;
+
+          tripName = 'trajet par osrm trip (' + s2hours(seconds) + ') ' + m2km(meters);
+
+          tripNames.push(tripName);
+
+          overlayMaps[groupName][tripName] = groupOsrmTrip;
+
+
+
+
+          var options = {
+            // Make the "trips" group exclusive (use radio inputs)
+            exclusiveGroups: [groupName]
           };
-        });
 
-        let groupOsrmTrip = L.layerGroup([
-          osrmTripLayer,
-          addressesMarkers(data.osrmTrip.waypoints, data.addresses)
-        ]);
+          overlayMaps[groupName][tripNames[0]].addTo(mymap);
 
-        seconds = osrmTrip.duration;
+          L.control.groupedLayers(null, overlayMaps, options).addTo(mymap);
 
-        meters = osrmTrip.distance;
-
-        tripName = 'trajet par osrm trip (' + s2hours(seconds) + ') ' + m2km(meters);
-
-        tripNames.push(tripName);
-
-        overlayMaps.trips[tripName] = groupOsrmTrip;
-
-
-
-
-        var options = {
-          // Make the "trips" group exclusive (use radio inputs)
-          exclusiveGroups: ["trips"]
-        };
-
-        overlayMaps.trips[tripNames[0]].addTo(mymap);
-
-        L.control.groupedLayers(null, overlayMaps, options).addTo(mymap);
+        }
 
       },
       error: function(jqXHR, textStatus, errorThrown) {

@@ -61,7 +61,7 @@ app.get('/testTournee', function(req, res) {
 
   // quand la Promise retournee par getTrip est realisee
   // on peut envoyer le tableau de donnees au client{
-  testTournee.get().then((trips) => {
+  testTournee.getAll().then((trips) => {
 
     console.log('sending trips to client');
     res.send(trips);
