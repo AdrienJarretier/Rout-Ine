@@ -111,9 +111,15 @@ function get() {
                       route = parsedBody.trips[0];
                     }
 
-                    if (++testTrips.filled == 2)
-                      resolve(testTrips);
+                    if (++testTrips.filled == 2) {
 
+                      console.log('');
+                      console.log(addresses.length + ' addresses');
+
+                      resolve(testTrips);
+                    }
+
+                    console.log('');
                     console.log('** Route service **');
                     console.log('distance : ' + Math.ceil(route.distance / 10) / 100 +
                       ' km');
