@@ -118,7 +118,9 @@ class OsrmRequest {
 
   setFromAddresses(addresses) {
 
+    // coordinates est un getter dans AddresseFeature pour acceder directement a geometry.coordinates
     for (let c of addresses.features) {
+      // console.log(c);
       this.addCoords(c.coordinates[1], c.coordinates[0]);
     }
 

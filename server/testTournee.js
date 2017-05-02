@@ -1,6 +1,8 @@
 'use strict';
 
+const AddressFeature = require('./AddressFeature.js');
 const csvParse = require('csv-parse/lib/sync');
+const FeatureCollection = require('./FeatureCollection.js');
 const fs = require('fs');
 const mysql = require('mysql');
 const osrm = require('./osrm.js');
@@ -42,7 +44,7 @@ function get() {
     // const select = mysql.format(sql, names);
 
 
-    const sql = ' SELECT distinct a.id, a.label, a.town, a.lat, a.lng, beneficiary.*  \n' +
+    const sql = ' SELECT distinct a.id, a.label, a.town, a.lat, a.lng, beneficiary.id as beneficiary_id, name, birthdate, address_additional  \n' +
       ' FROM address a \n' +
       ' RIGHT JOIN beneficiary ON a.id=beneficiary.address_id \n' +
       ' WHERE a.id IS NOT NULL \n' +
@@ -71,11 +73,62 @@ function get() {
         select,
         (err, rows, fields) => {
 
+          // console.log(rows);
+
+          if (err) throw err
+
+          if (rows.length == 0) {
+            console.log('name not found : ' + name);
+            ++notFound;
+          } else {
+
+            let notInArray = true;
+
+            // console.log('rows[0]');
+            // console.log(rows[0]);
+
+            for (let ad of addresses) {
+              // console.log('ad');
+              // console.log(ad);
+
+              if (ad.id == rows[0].id) {
+
+                ad.addBeneficiary({
+                  name: rows[0].name,
+                  birthdate: rows[0].birthdate,
+                  address_additional: rows[0].address_additional
+                });
+
+                notInArray = false;
+                ++addressesOffset;
+                break;
+              }
+            }
+
+            if (notInArray)
+              addresses[i - addressesOffset] = new AddressFeature(rows[0]);
+
+            addresses[i - addressesOffset].addBeneficiary({
+              name: rows[0].name,
+              birthdate: rows[0].birthdate,
+              address_additional: rows[0].address_additional
+            });
+          }
+
           if (++queriesDone == dataArray.length) {
             dbCon.end();
 
+
+            console.log('');
+            console.log(addresses.length + ' addresses');
+            // console.log(addresses);
+
+            addresses = new FeatureCollection(addresses);
+
+            // for(let adF of addresses.features)
+            //   console.log(adF.properties);
+
             if (notFound == 0) {
-              // console.log(addresses);
 
               let testTrips = {
                 original: {},
@@ -86,9 +139,7 @@ function get() {
               function requestToOsrm(service) {
                 let oReq = new osrm.OsrmRequest(service, true);
 
-
-                for (let adr of addresses)
-                  oReq.addCoords(adr.lat, adr.lng);
+                oReq.setFromAddresses(addresses);
 
                 let madeUrl = oReq.makeUrl();
 
@@ -118,10 +169,6 @@ function get() {
 
                     if (++testTrips.filled == 2) {
 
-                      console.log('');
-                      console.log(addresses.length + ' addresses');
-                      console.log(addresses);
-
                       resolve(testTrips);
                     }
 
@@ -149,34 +196,6 @@ function get() {
 
 
             }
-          }
-
-          if (err) throw err
-
-          if (rows.length == 0) {
-            console.log('name not found : ' + name);
-            ++notFound;
-          } else {
-
-            let notInArray = true;
-
-            // console.log('rows[0]');
-            // console.log(rows[0]);
-
-            for (let ad of addresses) {
-              // console.log('ad');
-              // console.log(ad);
-
-              if (ad.address_id == rows[0].address_id) {
-
-                notInArray = false;
-                ++addressesOffset;
-                break;
-              }
-            }
-
-            if (notInArray)
-              addresses[i-addressesOffset] = rows[0];
           }
 
         });

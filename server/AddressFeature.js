@@ -13,7 +13,7 @@ class AddressFeature {
       waypoint_index: 0 // index de cette adresse dans le trajet, obtenu par osrm
     };
 
-    if(address.special != undefined)
+    if (address.special != undefined)
       this.properties.special = address.special;
 
     this.id = address.id;
@@ -25,6 +25,10 @@ class AddressFeature {
     // console.log(ben);
 
     this.properties.beneficiaries = ben;
+  }
+
+  addBeneficiary(ben) {
+    this.properties.beneficiaries.push(ben);
   }
 
   get coordinates() {
