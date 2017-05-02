@@ -81,7 +81,7 @@ function get() {
           if (rows.length == 0) {
             console.log('name not found : ' + name);
             ++notFound;
-          } else {
+          } else if(notFound == 0) {
 
             let notInArray = true;
 
@@ -90,7 +90,7 @@ function get() {
 
             for (let ad of addresses) {
               // console.log('ad');
-              // console.log(ad);
+              // console.log(addresses);
 
               if (ad.id == rows[0].id) {
 
