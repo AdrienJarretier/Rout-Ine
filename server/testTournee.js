@@ -11,7 +11,7 @@ const request = require('request');
 
 const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 
-get();
+// get();
 
 function get() {
 
@@ -106,14 +106,15 @@ function get() {
               }
             }
 
-            if (notInArray)
+            if (notInArray) {
               addresses[i - addressesOffset] = new AddressFeature(rows[0]);
 
-            addresses[i - addressesOffset].addBeneficiary({
-              name: rows[0].name,
-              birthdate: rows[0].birthdate,
-              address_additional: rows[0].address_additional
-            });
+              addresses[i - addressesOffset].addBeneficiary({
+                name: rows[0].name,
+                birthdate: rows[0].birthdate,
+                address_additional: rows[0].address_additional
+              });
+            }
           }
 
           if (++queriesDone == dataArray.length) {
