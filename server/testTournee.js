@@ -11,13 +11,13 @@ const request = require('request');
 
 const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 
-// get();
+get();
 
 function get() {
 
   return new Promise((resolve, reject) => {
 
-    const csvFile = fs.openSync('tournee_prest2.csv', 'r');
+    const csvFile = fs.openSync('tournee_prest_T2.csv', 'r');
 
     const csvContent = fs.readFileSync(csvFile);
 
