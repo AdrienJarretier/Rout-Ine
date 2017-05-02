@@ -1,9 +1,5 @@
 
 
-ajouter le fichier xls des benef au projet
-
-
-
 
 
 enregistrer un planning, pour un jour donné, quelles adresses doivent etre livrées
