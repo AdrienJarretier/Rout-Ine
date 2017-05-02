@@ -42,27 +42,48 @@ class OsrmRequest {
 
         overview : Add overview geometry either `full`, `simplified` according to highest zoom level it could be display on, or not at all (`false`).
     */
+    this.options = {};
 
-    switch (service) {
+    if (service == 'route' || service == 'trip') {
 
-      case 'trip':
-      case 'route':
+      if (requestOverview == undefined)
+        requestOverview = false;
 
-        if (requestOverview == undefined)
-          requestOverview = false;
-
-        this.options = {
-          steps: false,
-          geometries: "geojson", // Returned route geometry in Geojson for Leaflet
-          overview: (requestOverview ? 'full' : 'false') // overview geometry
-        };
-        break;
-
-      default:
-        this.options = {};
-        break;
+      this.options = {
+        steps: false,
+        geometries: "geojson", // Returned route geometry in Geojson for Leaflet
+        overview: (requestOverview ? 'full' : 'false') // overview geometry
+      };
 
     }
+    if (service == 'route') {
+      this.options['continue_straight'] = false;
+    }
+
+    // switch (service) {
+
+    //   case 'trip':
+    //   case 'route':
+
+    //     if (requestOverview == undefined)
+    //       requestOverview = false;
+
+    //     this.options = {
+    //       steps: false,
+    //       geometries: "geojson", // Returned route geometry in Geojson for Leaflet
+    //       overview: (requestOverview ? 'full' : 'false') // overview geometry
+    //     };
+    //     break;
+
+    //   case 'route':
+    //     this.options['continue_straight'] = false;
+    //     break
+
+    //   default:
+    //     this.options = {};
+    //     break;
+
+    // }
   }
 
   /**
@@ -97,6 +118,10 @@ class OsrmRequest {
       // removing the last '&'
       requestUrl = requestUrl.slice(0, -1);
     }
+
+
+    console.log(' **requestUrl** ');
+    console.log(requestUrl);
 
     return requestUrl;
   }
@@ -365,7 +390,7 @@ function greedyChunk(addressesGeoJson, nbTrips, durationsTable) {
     console.log('picking destinations');
     while (dur[firstId].length > 0) {
 
-      for (let i = 0; i < nbTrips-1 && dur[firstId].length > 0; ++i) {
+      for (let i = 0; i < nbTrips - 1 && dur[firstId].length > 0; ++i) {
 
         let lastDest = trips[i][trips[i].length - 1];
         // on recupere la destination en fin de liste,
@@ -375,12 +400,11 @@ function greedyChunk(addressesGeoJson, nbTrips, durationsTable) {
         // plus une destionation est proche de notre source, plus elle a de chance d'etre choisie
         let nextDest = pickDestination(dur[lastDest.id]);
 
-        if(nextDest.dest_feature.properties.town == '81000 ALBI') {
+        if (nextDest.dest_feature.properties.town == '81000 ALBI') {
           trips[i].push(nextDest.dest_feature);
           // console.log('aaaaaa');
-        }
-        else {
-          trips[nbTrips-1].push(nextDest.dest_feature);
+        } else {
+          trips[nbTrips - 1].push(nextDest.dest_feature);
           // console.log('fqsf');
         }
 
@@ -413,7 +437,7 @@ function computeAllTrips(addressesChunks, fullOverview) {
 
     for (let j in addressesChunks) {
       let chunk = addressesChunks[j];
-    // for (let chunk of addressesChunks) {
+      // for (let chunk of addressesChunks) {
 
       let result = new ResultTrip();
 
