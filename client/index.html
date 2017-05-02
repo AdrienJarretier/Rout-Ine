@@ -177,9 +177,9 @@
           console.log(trip);
 
           let seconds = trip.route.duration;
-          if (i < data.length - 1) {
-            seconds += 180 * trip.addresses.features.length;
-          }
+          // if (i < data.length - 1) {
+          //   seconds += 180 * trip.addresses.features.length;
+          // }
 
           if (seconds > maxSeconds) {
             maxSeconds = seconds;
