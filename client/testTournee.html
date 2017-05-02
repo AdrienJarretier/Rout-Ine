@@ -50,7 +50,7 @@
       return string + '<br>' + line;
     }
 
-    function addressesMarkers(waypoints, addresses) {
+    function addressesMarkers(waypoints, addresses, color) {
 
       function markerMaker(waypoint, address_index) {
 
@@ -60,7 +60,7 @@
         let marker = L.marker([lat, lng], {
           icon: new L.AwesomeNumberMarkers({
             number: waypoint.waypoint_index,
-            markerColor: "darkred"
+            markerColor: color
           })
         });
 
@@ -164,6 +164,8 @@
       url: "testTournee",
       success: function(tours, textStatus, jqXHR) {
 
+        let markersColors = ["darkred", "blue"];
+
         for (let i in tours) {
 
           let data = tours[i];
@@ -186,13 +188,13 @@
           let originalRouteLayer = L.geoJSON(originalRoute.geometry);
           originalRouteLayer.setStyle(function(feature) {
             return {
-              color: utils.randomColor()
+              color: markersColors[i]
             };
           });
 
           let group = L.layerGroup([
             originalRouteLayer,
-            addressesMarkers(data.original.waypoints, data.addresses)
+            addressesMarkers(data.original.waypoints, data.addresses, markersColors[i])
           ]);
 
           let seconds = originalRoute.duration;
@@ -213,13 +215,13 @@
           let osrmTripLayer = L.geoJSON(osrmTrip.geometry);
           osrmTripLayer.setStyle(function(feature) {
             return {
-              color: utils.randomColor()
+              color: markersColors[i]
             };
           });
 
           let groupOsrmTrip = L.layerGroup([
             osrmTripLayer,
-            addressesMarkers(data.osrmTrip.waypoints, data.addresses)
+            addressesMarkers(data.osrmTrip.waypoints, data.addresses, markersColors[i])
           ]);
 
           seconds = osrmTrip.duration;
