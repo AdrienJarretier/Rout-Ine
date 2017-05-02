@@ -44,7 +44,8 @@ function get() {
     // const select = mysql.format(sql, names);
 
 
-    const sql = ' SELECT distinct a.id, a.label, a.town, a.lat, a.lng, beneficiary.id as beneficiary_id, name, birthdate, address_additional  \n' +
+    const sql =
+      ' SELECT distinct a.id, a.label, a.town, a.lat, a.lng, beneficiary.id as beneficiary_id, name, birthdate, address_additional  \n' +
       ' FROM address a \n' +
       ' RIGHT JOIN beneficiary ON a.id=beneficiary.address_id \n' +
       ' WHERE a.id IS NOT NULL \n' +
@@ -133,7 +134,8 @@ function get() {
               let testTrips = {
                 original: {},
                 osrmTrip: {},
-                filled: 0
+                filled: 0,
+                addresses: addresses
               };
 
               function requestToOsrm(service) {
