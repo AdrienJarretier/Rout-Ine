@@ -120,8 +120,8 @@ class OsrmRequest {
     }
 
 
-    console.log(' **requestUrl** ');
-    console.log(requestUrl);
+    // console.log(' **requestUrl** ');
+    // console.log(requestUrl);
 
     return requestUrl;
   }
