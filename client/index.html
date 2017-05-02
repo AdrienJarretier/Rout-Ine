@@ -62,16 +62,20 @@
         });
 
         let p = feature.properties;
-        let popContent = p.label /*+ (p.additional.length > 0 ? ', ' + p.additional : '')*/ ;
+        let popContent = p.label + (p.special != undefined ? ', ' + p.special : '');
 
         for (let b of p.beneficiaries) {
 
           let line = b.name;
 
+          let isAnniversary = false;
+
           if (b.birthdate != null) {
 
             let now = new Date(Date.now());
             let birthdate = new Date(b.birthdate);
+
+            isAnniversary = now.getDate() == birthdate.getDate() && now.getMonth() == birthdate.getMonth();
 
             // l'age de la personne en millisecondes
             let age = now - birthdate;
@@ -79,22 +83,23 @@
             let years = age / 31557600000
 
             line += ', ' + Math.floor(years) + ' ans - ';
-
-            line += b.address_additional + ' - ';
-
-            for (let phone of b.phones) {
-              line += phone + ' / ';
-            }
-
-            line = line.slice(0, -2);
-
-            popContent = addLine(popContent, line);
-
-            if (now.getDate() == birthdate.getDate() && now.getMonth() == birthdate.getMonth()) {
-
-              popContent = addLine(popContent, '<img src="cake-with-2-candles-md.png">');
-            }
           }
+
+          line += b.address_additional + ' - ';
+
+          for (let phone of b.phones) {
+            line += phone + ' / ';
+          }
+
+          line = line.slice(0, -2);
+
+          popContent = addLine(popContent, line);
+
+          if (isAnniversary) {
+
+            popContent = addLine(popContent, '<img src="cake-with-2-candles-md.png">');
+          }
+
         }
 
         marker.bindPopup(popContent);
