@@ -78,86 +78,62 @@ function get() {
                 filled: 0
               };
 
-              let oReq = new osrm.OsrmRequest('route', true);
-
-              for (let adr of addresses)
-                oReq.addCoords(adr.lat, adr.lng);
-
-              let madeUrl = oReq.makeUrl();
+              function requestToOsrm(service) {
+                let oReq = new osrm.OsrmRequest(service, true);
 
 
-              request(madeUrl, (error, response, body) => {
+                for (let adr of addresses)
+                  oReq.addCoords(adr.lat, adr.lng);
 
-                if (error) {
-                  console.log('error:', error); // Print the error if one occurred
-                  console.log('statusCode:', response.statusCode); // Print the response status code if a response was received
-                } else {
-
-                  // console.log('response from ' + task.oReq.service + ' service');
-                  let parsedBody = JSON.parse(body);
-
-                  testTrips.original = parsedBody;
-
-                  if (++testTrips.filled == 2)
-                    resolve(testTrips);
-
-                  console.log('** Route service **');
-                  console.log('distance : ' + Math.ceil(parsedBody.routes[0].distance / 10) / 100 +
-                    ' km');
-
-                  let h = Math.floor(parsedBody.routes[0].duration / 3600);
-                  let m = Math.ceil((parsedBody.routes[0].duration % 3600) / 60);
-                  console.log('duration : ' + h + 'h ' + m);
+                let madeUrl = oReq.makeUrl();
 
 
-                  m += 3 * dataArray.length;
-                  h += Math.floor(m / 60);
-                  m %= 60;
-                  console.log('duration (3 min / benef) : ' + h + 'h ' + m);
+                request(madeUrl, (error, response, body) => {
 
-                }
-              });
+                  if (error) {
+                    console.log('error:', error); // Print the error if one occurred
+                    console.log('statusCode:', response.statusCode); // Print the response status code if a response was received
+                  } else {
+
+                    // console.log('response from ' + service + ' service');
+                    let parsedBody = JSON.parse(body);
+
+                    // l'objet route retourne par osrm, nom different selon le service
+                    let route = {};
+
+                    if (service == 'route') {
+                      testTrips.original = parsedBody;
+                      route = parsedBody.routes[0];
+
+                    } else if (service == 'trip') {
+
+                      testTrips.osrmTrip = parsedBody;
+                      route = parsedBody.trips[0];
+                    }
+
+                    if (++testTrips.filled == 2)
+                      resolve(testTrips);
+
+                    console.log('** Route service **');
+                    console.log('distance : ' + Math.ceil(route.distance / 10) / 100 +
+                      ' km');
+
+                    let h = Math.floor(route.duration / 3600);
+                    let m = Math.ceil((route.duration % 3600) / 60);
+                    console.log('duration : ' + h + 'h ' + m);
 
 
-              oReq = new osrm.OsrmRequest('trip', true);
+                    m += 3 * dataArray.length;
+                    h += Math.floor(m / 60);
+                    m %= 60;
+                    console.log('duration (3 min / benef) : ' + h + 'h ' + m);
 
-              for (let adr of addresses)
-                oReq.addCoords(adr.lat, adr.lng);
+                  }
+                });
+              }
 
-              madeUrl = oReq.makeUrl();
-
-
-              request(madeUrl, (error, response, body) => {
-
-                if (error) {
-                  console.log('error:', error); // Print the error if one occurred
-                  console.log('statusCode:', response.statusCode); // Print the response status code if a response was received
-                } else {
-
-                  // console.log('response from ' + task.oReq.service + ' service');
-                  let parsedBody = JSON.parse(body);
-
-                  testTrips.osrmTrip = parsedBody;
-
-                  if (++testTrips.filled == 2)
-                    resolve(testTrips);
-
-                  console.log('** Trip service **');
-                  console.log('distance : ' + Math.ceil(parsedBody.trips[0].distance / 10) / 100 +
-                    ' km');
-
-                  let h = Math.floor(parsedBody.trips[0].duration / 3600);
-                  let m = Math.ceil((parsedBody.trips[0].duration % 3600) / 60);
-                  console.log('duration : ' + h + 'h ' + m);
-
-                  m += 3 * dataArray.length;
-                  h += Math.floor(m / 60);
-                  m %= 60;
-                  console.log('duration (3 min / benef) : ' + h + 'h ' + m);
-
-                }
-              });
-
+              requestToOsrm('route');
+              requestToOsrm('trip');
 
 
             }
