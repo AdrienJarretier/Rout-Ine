@@ -1,3 +1,5 @@
+'use strict';
+
 const csvParse = require('csv-parse/lib/sync');
 const fs = require('fs');
 const mysql = require('mysql');
@@ -55,6 +57,9 @@ function get() {
 
     console.log(dataArray.length + ' beneficiaries');
 
+    // la variable i est simplement utilisee pour garantir le maintient de lo'rdre initial des adresses
+    // on utilise alors une variable 'offset' pour eviter les cases vides quand l'adresses est deja dans notre tableau
+    let addressesOffset = 0;
     for (let i in dataArray) {
 
       let line = dataArray[i];
@@ -115,6 +120,7 @@ function get() {
 
                       console.log('');
                       console.log(addresses.length + ' addresses');
+                      console.log(addresses);
 
                       resolve(testTrips);
                     }
@@ -150,8 +156,28 @@ function get() {
           if (rows.length == 0) {
             console.log('name not found : ' + name);
             ++notFound;
-          } else
-            addresses[i] = rows[0];
+          } else {
+
+            let notInArray = true;
+
+            // console.log('rows[0]');
+            // console.log(rows[0]);
+
+            for (let ad of addresses) {
+              // console.log('ad');
+              // console.log(ad);
+
+              if (ad.address_id == rows[0].address_id) {
+
+                notInArray = false;
+                ++addressesOffset;
+                break;
+              }
+            }
+
+            if (notInArray)
+              addresses[i-addressesOffset] = rows[0];
+          }
 
         });
 
