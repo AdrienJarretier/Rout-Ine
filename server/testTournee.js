@@ -2,6 +2,7 @@
 
 const AddressFeature = require('./AddressFeature.js');
 const csvParse = require('csv-parse/lib/sync');
+const db = require('./db.js');
 const FeatureCollection = require('./FeatureCollection.js');
 const fs = require('fs');
 const mysql = require('mysql');
@@ -11,7 +12,7 @@ const request = require('request');
 
 const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 
-get();
+// get();
 
 function get() {
 
@@ -81,7 +82,7 @@ function get() {
           if (rows.length == 0) {
             console.log('name not found : ' + name);
             ++notFound;
-          } else if(notFound == 0) {
+          } else if (notFound == 0) {
 
             let notInArray = true;
 
@@ -120,85 +121,92 @@ function get() {
           if (++queriesDone == dataArray.length) {
             dbCon.end();
 
+            db.ccasAddress()
+              .then((ccasAddress) => {
 
-            console.log('');
-            console.log(addresses.length + ' addresses');
-            // console.log(addresses);
+                addresses.unshift(new AddressFeature(ccasAddress));
 
-            addresses = new FeatureCollection(addresses);
+                console.log('');
+                console.log(addresses.length + ' addresses');
+                // console.log(addresses);
 
-            // for(let adF of addresses.features)
-            //   console.log(adF.properties);
+                addresses = new FeatureCollection(addresses);
 
-            if (notFound == 0) {
+                // for(let adF of addresses.features)
+                //   console.log(adF.properties);
 
-              let testTrips = {
-                original: {},
-                osrmTrip: {},
-                filled: 0,
-                addresses: addresses
-              };
+                if (notFound == 0) {
 
-              function requestToOsrm(service) {
-                let oReq = new osrm.OsrmRequest(service, true);
+                  let testTrips = {
+                    original: {},
+                    osrmTrip: {},
+                    filled: 0,
+                    addresses: addresses
+                  };
 
-                oReq.setFromAddresses(addresses);
+                  function requestToOsrm(service) {
+                    let oReq = new osrm.OsrmRequest(service, true);
 
-                let madeUrl = oReq.makeUrl();
+                    oReq.setFromAddresses(addresses);
 
-
-                request(madeUrl, (error, response, body) => {
-
-                  if (error) {
-                    console.log('error:', error); // Print the error if one occurred
-                    console.log('statusCode:', response.statusCode); // Print the response status code if a response was received
-                  } else {
-
-                    // console.log('response from ' + service + ' service');
-                    let parsedBody = JSON.parse(body);
-
-                    // l'objet route retourne par osrm, nom different selon le service
-                    let route = {};
-
-                    if (service == 'route') {
-                      testTrips.original = parsedBody;
-                      route = parsedBody.routes[0];
-
-                    } else if (service == 'trip') {
-
-                      testTrips.osrmTrip = parsedBody;
-                      route = parsedBody.trips[0];
-                    }
-
-                    if (++testTrips.filled == 2) {
-
-                      resolve(testTrips);
-                    }
-
-                    console.log('');
-                    console.log('** Route service **');
-                    console.log('distance : ' + Math.ceil(route.distance / 10) / 100 +
-                      ' km');
-
-                    let h = Math.floor(route.duration / 3600);
-                    let m = Math.ceil((route.duration % 3600) / 60);
-                    console.log('duration : ' + h + 'h ' + m);
+                    let madeUrl = oReq.makeUrl();
 
 
-                    m += 3 * dataArray.length;
-                    h += Math.floor(m / 60);
-                    m %= 60;
-                    console.log('duration (3 min / benef) : ' + h + 'h ' + m);
+                    request(madeUrl, (error, response, body) => {
 
+                      if (error) {
+                        console.log('error:', error); // Print the error if one occurred
+                        console.log('statusCode:', response.statusCode); // Print the response status code if a response was received
+                      } else {
+
+                        // console.log('response from ' + service + ' service');
+                        let parsedBody = JSON.parse(body);
+
+                        // l'objet route retourne par osrm, nom different selon le service
+                        let route = {};
+
+                        if (service == 'route') {
+                          testTrips.original = parsedBody;
+                          route = parsedBody.routes[0];
+
+                        } else if (service == 'trip') {
+
+                          testTrips.osrmTrip = parsedBody;
+                          route = parsedBody.trips[0];
+                        }
+
+                        if (++testTrips.filled == 2) {
+
+                          resolve(testTrips);
+                        }
+
+                        console.log('');
+                        console.log('** ' + service + ' service **');
+                        console.log('distance : ' + Math.ceil(route.distance / 10) / 100 +
+                          ' km');
+
+                        let h = Math.floor(route.duration / 3600);
+                        let m = Math.ceil((route.duration % 3600) / 60);
+                        console.log('duration : ' + h + 'h ' + m);
+
+
+                        m += 3 * dataArray.length;
+                        h += Math.floor(m / 60);
+                        m %= 60;
+                        console.log('duration (3 min / benef) : ' + h + 'h ' + m);
+
+                      }
+                    });
                   }
-                });
-              }
 
-              requestToOsrm('route');
-              requestToOsrm('trip');
+                  requestToOsrm('route');
+                  requestToOsrm('trip');
 
 
-            }
+                }
+
+
+              });
           }
 
         });

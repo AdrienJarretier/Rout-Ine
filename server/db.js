@@ -251,5 +251,6 @@ function getFullAddressesData() {
 
 }
 
+exports.ccasAddress = ccasAddress;
 exports.getAddresses = getAddresses;
 exports.getFullAddressesData = getFullAddressesData;
