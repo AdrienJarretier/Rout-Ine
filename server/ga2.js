@@ -24,11 +24,10 @@ function elect(population) {
 firstPopulation(6)
   .then((pop) => {
 
-    console.log(pop);
-
     console.log("elected count : " + ELECTED_COUNT);
 
-    console.log(elect(pop));
+    for(let part of elect(pop))
+      console.log(part.subsets);
 
   });
 
@@ -189,7 +188,8 @@ function firstPopulation(nbTrips) {
 
   return new Promise((resolve, reject) => {
 
-    db.getFullAddressesData()
+    db.extractNamesList('tour1and2.csv')
+      .then(db.getFullAddressesData)
       .then((addressesGeoJson) => {
 
         // la premiere adresse est le depart, c'est l'adresse du ccas,
