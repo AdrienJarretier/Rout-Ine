@@ -189,13 +189,20 @@ function ccasAddress() {
  *
  * @returns {Promise} la promesse de retourner le tableau contenant les beneficiaires.
  */
-function getBenefs(address, dbCon) {
+function getBenefs(address, dbCon, names) {
 
   const sqlSelectBenef = ' SELECT id, name, birthdate, address_additional \n' +
     ' FROM beneficiary \n' +
-    ' WHERE address_id = ?;';
+    ' WHERE address_id = ? ';
 
-  const selectBenef = mysql.format(sqlSelectBenef, [address.id]);
+  let selectBenef;
+
+  if (names == undefined)
+    selectBenef = mysql.format(sqlSelectBenef + ';', [address.id]);
+  else
+    selectBenef = mysql.format(sqlSelectBenef + ' AND name in (?);', [address.id, names]);
+
+  // console.log(selectBenef);
 
   return new Promise((resolve, reject) => {
     dbCon.query(
@@ -270,8 +277,11 @@ function getPhones(benefRow, dbCon) {
 
 getFullAddressesData(['BOUSQUET ALPHONSE', 'DUBECQ GUY'])
   .then((featColl) => {
-    for (let feat of featColl.features)
+    for (let feat of featColl.features) {
+      console.log('---------------------------------------------------');
+      console.log(feat);
       console.log(feat.properties.beneficiaries);
+    }
   });
 
 /**
@@ -317,7 +327,7 @@ function getFullAddressesData(namesList) {
 
         // recuperons les beneficiares a cette adresse
         // quand on a la reponse alors on peut recuperer les numeros de telephone
-        getBenefs(address, dbCon)
+        getBenefs(address, dbCon, namesList)
           .then((benefsRows) => {
 
             // console.log(benefsRows);
