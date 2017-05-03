@@ -302,15 +302,15 @@ function getPhones(benefRow, dbCon) {
   });
 }
 
-extractNamesList('tour1and2.csv')
-  .then(getFullAddressesData)
-  .then((featColl) => {
-    for (let feat of featColl.features) {
-      console.log('---------------------------------------------------');
-      console.log(feat);
-      console.log(feat.properties.beneficiaries);
-    }
-  });
+// extractNamesList('tour1and2.csv')
+//   .then(getFullAddressesData)
+//   .then((featColl) => {
+//     for (let feat of featColl.features) {
+//       console.log('---------------------------------------------------');
+//       console.log(feat);
+//       console.log(feat.properties.beneficiaries);
+//     }
+//   });
 
 /**
  * Retourne une promesse qui
