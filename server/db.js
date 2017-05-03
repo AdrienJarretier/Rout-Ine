@@ -7,6 +7,7 @@ strict mode code can sometimes be made to run faster than identical code that's 
 Third, strict mode prohibits some syntax likely to be defined in future versions of ECMAScript.
 */
 
+const csvParse = require('csv-parse');
 const fs = require('fs');
 const mysql = require('mysql');
 
@@ -16,6 +17,31 @@ const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 // AddressFeature.js est un module qui exporte la definition de la classe
 const AddressFeature = require('./AddressFeature.js');
 const FeatureCollection = require('./FeatureCollection.js');
+
+
+
+function extractNamesList(csvFile) {
+
+  return new Promise((resolve, reject) => {
+
+    fs.open(csvFile, 'r', (err, fd) => {
+      fs.readFile(fd, (err, data) => {
+
+        fs.close(fd);
+
+        csvParse(data, { delimiter: "," }, function(err, output) {
+          let names = [];
+
+          for (let line of output)
+            names.push(line[0]);
+
+          resolve(names);
+        });
+
+      });
+    });
+  });
+}
 
 /**
  * Retourne une promesse qui
@@ -274,8 +300,8 @@ function getPhones(benefRow, dbCon) {
   });
 }
 
-
-getFullAddressesData(['BOUSQUET ALPHONSE', 'DUBECQ GUY'])
+extractNamesList('tour1and2.csv')
+  .then(getFullAddressesData)
   .then((featColl) => {
     for (let feat of featColl.features) {
       console.log('---------------------------------------------------');
