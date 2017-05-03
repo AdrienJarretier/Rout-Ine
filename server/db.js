@@ -165,6 +165,8 @@ function getAddressesFromNames(names) {
                 resolve(addresses);
 
               });
+            else
+              reject('names not found');
           }
 
         });
@@ -337,68 +339,73 @@ function getFullAddressesData(namesList) {
 
     // Lorsque l'on obtient les adresses alors on va pour chaque adresse
     // recuperer les details des beneficiaires du portage de repas y habitant
-    addressesFunction(namesList).then((rows) => {
+    addressesFunction(namesList)
+      .then((rows) => {
 
-      let dbCon = mysql.createConnection(config.db);
+        let dbCon = mysql.createConnection(config.db);
 
-      let rowsLength = rows.length; // cette ligne est utilisee pour compter le nombre de requetes traitees
-      // extremement utile puisque dans un fonctionnement asynchrone
-      // impossible de savoir quelle sera la derniere requete traitee
-      // console.log(rows);
-      for (let address of rows) {
+        let rowsLength = rows.length; // cette ligne est utilisee pour compter le nombre de requetes traitees
+        // extremement utile puisque dans un fonctionnement asynchrone
+        // impossible de savoir quelle sera la derniere requete traitee
+        // console.log(rows);
+        for (let address of rows) {
 
-        let addrFeat = new AddressFeature(address);
+          let addrFeat = new AddressFeature(address);
 
-        // console.log(address);
+          // console.log(address);
 
-        // recuperons les beneficiares a cette adresse
-        // quand on a la reponse alors on peut recuperer les numeros de telephone
-        getBenefs(address, dbCon, namesList)
-          .then((benefsRows) => {
+          // recuperons les beneficiares a cette adresse
+          // quand on a la reponse alors on peut recuperer les numeros de telephone
+          getBenefs(address, dbCon, namesList)
+            .then((benefsRows) => {
 
-            // console.log(benefsRows);
+              // console.log(benefsRows);
 
-            addrFeat.addBeneficiaries(benefsRows);
+              addrFeat.addBeneficiaries(benefsRows);
 
-            // console.log(addrFeat.properties.beneficiaries);
+              // console.log(addrFeat.properties.beneficiaries);
 
-            addresses.push(addrFeat);
+              addresses.push(addrFeat);
 
-            // console.log(address);
+              // console.log(address);
 
-            if (++queriesDone == rowsLength) {
-              dbCon.end();
-              resolve(addresses);
-            }
+              if (++queriesDone == rowsLength) {
+                dbCon.end();
+                resolve(addresses);
+              }
 
-            // on a les beneficiares on va alors recuperer les numeros de telephone
-            // return getPhones(benefsRows, dbCon);
-          });
-        // // on a les numeros de telephones on peut alors terminer notre enchainement de .then()
-        // // et si le compte est bon on resoud la promesse
-        // //    sinon il reste des donnees a recuperer on ne fait rien
-        // .then((phoneRows) => {
+              // on a les beneficiares on va alors recuperer les numeros de telephone
+              // return getPhones(benefsRows, dbCon);
+            });
+          // // on a les numeros de telephones on peut alors terminer notre enchainement de .then()
+          // // et si le compte est bon on resoud la promesse
+          // //    sinon il reste des donnees a recuperer on ne fait rien
+          // .then((phoneRows) => {
 
-        //   addrFeat.addPhones(phoneRows);
-        //   console.log(addrFeat.properties);
+          //   addrFeat.addPhones(phoneRows);
+          //   console.log(addrFeat.properties);
 
-        //   addresses.push(addrFeat);
+          //   addresses.push(addrFeat);
 
-        //   // compter ici le nombre de requetes traitees
-        //   // si on a tout traiter on peut remplir notre promesse avec le GeoJson
-        //   if (++queriesDone == rowsLength) {
-        //     dbCon.end();
-        //     resolve(addresses);
-        //   }
-        // });
+          //   // compter ici le nombre de requetes traitees
+          //   // si on a tout traiter on peut remplir notre promesse avec le GeoJson
+          //   if (++queriesDone == rowsLength) {
+          //     dbCon.end();
+          //     resolve(addresses);
+          //   }
+          // });
 
-      }
+        }
 
-    });
+      })
+      .catch((reason) => {
+        reject('error when retrieving addresses : ' + reason);
+      });
   });
 
 }
 
 exports.ccasAddress = ccasAddress;
+exports.extractNamesList = extractNamesList;
 exports.getAddresses = getAddresses;
 exports.getFullAddressesData = getFullAddressesData;
