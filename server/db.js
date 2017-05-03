@@ -56,6 +56,102 @@ function getAddresses() {
 
 }
 
+function getAddressesFromNames(names) {
+
+  return new Promise((resolve, reject) => {
+
+    const sql =
+      ' SELECT distinct a.id, a.label, a.town, a.lat, a.lng \n' +
+      ' FROM address a \n' +
+      ' RIGHT JOIN beneficiary ON a.id=beneficiary.address_id \n' +
+      ' WHERE a.id IS NOT NULL \n' +
+      ' AND beneficiary.name like ?;';
+
+    let queriesDone = 0;
+    let notFound = 0;
+
+    let addresses = [];
+
+    console.log(names.length + ' beneficiaries');
+
+    // la variable i est simplement utilisee pour garantir le maintient de lo'rdre initial des adresses
+    // on utilise alors une variable 'offset' pour eviter les cases vides quand l'adresses est deja dans notre tableau
+    let addressesOffset = 0;
+
+    // on ouvre une connection pour faire une succession de requetes sur la liste de noms
+    let dbCon = mysql.createConnection(config.db);
+    for (let i in names) {
+
+      let name = names[i];
+
+      const select = mysql.format(sql, [name]);
+
+      dbCon.query(
+        select,
+        (err, rows, fields) => {
+
+          if (err) throw err
+
+          if (rows.length == 0) {
+            console.log('name not found : ' + name);
+            ++notFound;
+          } else if (notFound == 0) {
+
+            let notInArray = true;
+
+            for (let ad of addresses) {
+
+              if (ad.id == rows[0].id) {
+
+                // ad.addBeneficiary({
+                //   name: rows[0].name,
+                //   birthdate: rows[0].birthdate,
+                //   address_additional: rows[0].address_additional
+                // });
+
+                notInArray = false;
+                ++addressesOffset;
+                break;
+              }
+            }
+
+            if (notInArray) {
+              addresses[i - addressesOffset] = rows[0];
+
+              // addresses[i - addressesOffset].addBeneficiary({
+              //   name: rows[0].name,
+              //   birthdate: rows[0].birthdate,
+              //   address_additional: rows[0].address_additional
+              // });
+            }
+          }
+
+          if (++queriesDone == names.length) {
+            dbCon.end();
+
+            if (notFound == 0)
+              ccasAddress()
+              .then((ccasAddress) => {
+
+                addresses.unshift(ccasAddress);
+
+                // addresses = new FeatureCollection(addresses);
+                resolve(addresses);
+
+              });
+          }
+
+        });
+
+    }
+
+
+
+
+  });
+
+}
+
 /**
  * Retourne une promesse qui est resolue avec l'adresse du ccas d'albi
  */
@@ -171,14 +267,23 @@ function getPhones(benefRow, dbCon) {
   });
 }
 
+
+getFullAddressesData(['BOUSQUET ALPHONSE', 'DUBECQ GUY'])
+  .then((featColl) => {
+    for (let feat of featColl.features)
+      console.log(feat.properties.beneficiaries);
+  });
+
 /**
  * Retourne une promesse qui
  * lorsqu'elle est resolue retourne le GeoJson des adresses
  * avec les details beneficiares et numeros de telephone
  *
- * @returns {Promise} la promesse de retourner le tableau contenant les numeros de telephone.
+ * @param {Array} une liste de noms , si != undefined alors seules les adresses correspondantes a ces noms seront retournees
+ *
+ * @returns {Promise} la promesse de retourner une FeatureCollection de AddressFeature.
  */
-function getFullAddressesData() {
+function getFullAddressesData(namesList) {
 
   return new Promise((resolve, reject) => {
 
@@ -187,9 +292,16 @@ function getFullAddressesData() {
 
     let queriesDone = 0;
 
+    let addressesFunction;
+
+    if (namesList == undefined)
+      addressesFunction = getAddresses;
+    else
+      addressesFunction = getAddressesFromNames;
+
     // Lorsque l'on obtient les adresses alors on va pour chaque adresse
     // recuperer les details des beneficiaires du portage de repas y habitant
-    getAddresses().then((rows) => {
+    addressesFunction(namesList).then((rows) => {
 
       let dbCon = mysql.createConnection(config.db);
 
