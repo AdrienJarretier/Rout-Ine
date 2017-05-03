@@ -1,15 +1,37 @@
 
 
+le planning de livraison peut se présenter simplement sous la forme d'une liste de noms
+avec
 
+    db.extractNamesList('listeDeNoms.csv')
+      .then(db.getFullAddressesData)
+
+on peut filtrer
 
 enregistrer un planning, pour un jour donné, quelles adresses doivent etre livrées
 Il faut savoir pour une date donnée, quelles beneficiaires à livrer, avec éventuellement des annotaiton si celles ci ne peuvent pas etre fixé d'une semaine à l'autre
 
-l'algo génétique doit travailler sur des objets (classe Subset) de valeurs booleenes :
-  dans firstPopulation() on recupere les adresses de la bdd
-  une fois les adress hors albi retirées on peut passer à un objet de booleens
-    dont les clés sont les ids des adresses pour chaque sous ensemble d'adresses
-  une Partition est alors une liste (tableau ou objet) de ces objets Subset
+
+
+
+
+    l'algo génétique doit travailler sur des objets (classe Subset) de valeurs booleenes :
+      dans firstPopulation() on recupere les adresses de la bdd
+      une fois les adress hors albi retirées on peut passer à un objet de booleens
+        dont les clés sont les ids des adresses pour chaque sous ensemble d'adresses
+      une Partition est alors une liste (tableau ou objet) de ces objets Subset
+
+cette partie est *** OK ***
+
+une reference vers le tableau d'adresses est enfait maintenue dans l'objet subset pour faire la correspondance avec le chromosome
+
+
+
+
+
+
+
+
 
 quand on lance ga.js, l'algorithme génétique doit faire son travail et à chaque fois qu'une meilleure partition est trouvée la sauvegarder,
   SQLite ?
