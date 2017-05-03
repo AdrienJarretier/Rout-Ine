@@ -5,7 +5,7 @@ const db = require('./db.js');
 const osrm = require('./osrm.js');
 const utils = require('./utils.js');
 
-const POPULATION_SIZE = 100;
+const POPULATION_SIZE = 300;
 
 
 
