@@ -274,22 +274,13 @@ function greedyChunk(addressesGeoJson, nbTrips, durationsTable, partitionNumber)
 
   return new Promise((resolve, reject) => {
 
-    let addressesPerTrip = addressesGeoJson.features.length / nbTrips;
-
-    // let bef = Date.now();
-
     let dur = utils.clone(durationsTable); // copie du tableau
 
-    // console.log("copié en : " + (Date.now()-bef) + " ms");
-
     let partition = new Partition();
-
-    // let trips = [];
 
     let startAddress = addressesGeoJson.features[0];
     let firstId = startAddress.id;
 
-    // console.log(startAddress);
     console.log('-------------------------------------------------------');
 
     // // toujours commencer par la premiere adresse, le depot
@@ -307,25 +298,21 @@ function greedyChunk(addressesGeoJson, nbTrips, durationsTable, partitionNumber)
     console.log('picking destinations');
     while (dur[firstId].length > 0) {
 
-      for (let i = 0; i < nbTrips && dur[firstId].length > 0; ++i) {
+      let i = osrm.Random.integer(0, nbTrips - 1)(osrm.mt);
 
-        for (let j = -1; j < (partitionNumber) % (addressesPerTrip) && dur[firstId].length > 0; ++j) {
+      let sourceId = partition.subsets[i].lastAddressId;
+      // on recupere l'id de la derniere adresse ajoutee,
+      // qui devient la source pour la prochaine
 
-          let sourceId = partition.subsets[i].lastAddressId;
-          // on recupere l'id de la derniere adresse ajoutee,
-          // qui devient la source pour la prochaine
+      // plus une destionation est proche de notre source, plus elle a de chance d'etre choisie
+      let nextDest = osrm.pickDestination(dur[sourceId]);
 
-          // plus une destionation est proche de notre source, plus elle a de chance d'etre choisie
-          let nextDest = osrm.pickDestination(dur[sourceId]);
+      partition.subsets[i].addAddress(nextDest.destination_id);
 
-          partition.subsets[i].addAddress(nextDest.destination_id);
+      osrm.removeDestination(dur, nextDest.destination_id);
 
-          osrm.removeDestination(dur, nextDest.destination_id);
-        }
-      }
     }
     console.log('partitioning done');
-    // console.log(trips);
     resolve(partition);
 
   });
