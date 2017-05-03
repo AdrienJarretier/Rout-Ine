@@ -57,6 +57,20 @@ app.get('/trip', function(req, res) {
 
 
 // repondre aux requetes get sur l'url /trip
+app.get('/simuData', function(req, res) {
+
+  // quand la Promise retournee par getTrip est realisee
+  // on peut envoyer le tableau de donnees au client{
+  ga.getTrips(2).then((trips) => {
+
+    console.log('sending trips to client');
+    res.send(trips);
+
+  });
+});
+
+
+// repondre aux requetes get sur l'url /trip
 app.get('/testTournee', function(req, res) {
 
   // quand la Promise retournee par getTrip est realisee

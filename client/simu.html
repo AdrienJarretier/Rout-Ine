@@ -134,8 +134,6 @@
       ]);
     }
 
-    const NUMBER_OF_TRIPS = 7;
-
     function s2hours(seconds) {
 
       let hours = Math.floor(seconds / 3600);
@@ -153,7 +151,7 @@
     $.ajax({
       type: "GET",
       dataType: "json",
-      url: "trip?nbTrips=" + NUMBER_OF_TRIPS,
+      url: "simuData",
       success: function(data, textStatus, jqXHR) {
 
         let overlayMaps = {
@@ -225,8 +223,7 @@
 <body>
   <h1>Localisation des bénéficiaires</h1>
   <p>
-    <a href="simu.html">simulation</a>
-    <br> <a href="testTournee.html">testTournee.html</a>
+    <a href="testTournee.html">testTournee.html</a>
     <br> temps total cumulé : <span id='totalTime'></span> (temps max : <span id='maxTime'></span>, trajet : <span id='maxTripNum'></span> )
     <br> distance totale : <span id='totalDistance'></span>
   </p>
