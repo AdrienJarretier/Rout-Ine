@@ -1,7 +1,7 @@
 'use strict';
 
 const AddressFeature = require('./AddressFeature.js');
-const csvParse = require('csv-parse/lib/sync');
+const csvParse = require('csv-parse');
 const db = require('./db.js');
 const FeatureCollection = require('./FeatureCollection.js');
 const fs = require('fs');
@@ -43,6 +43,36 @@ function getAll() {
 
   });
 
+}
+
+extractNamesList('tour1and2.csv')
+  .then((names) => {
+
+    console.log(names);
+
+  });
+
+function extractNamesList(csvFile) {
+
+  return new Promise((resolve, reject) => {
+
+    fs.open(csvFile, 'r', (err, fd) => {
+      fs.readFile(fd, (err, data) => {
+
+        fs.close(fd);
+
+        csvParse(data, { delimiter: "," }, function(err, output) {
+          let names = [];
+
+          for (let line of output)
+            names.push(line[0]);
+
+          resolve(names);
+        });
+
+      });
+    });
+  });
 }
 
 function get(tourFile) {
