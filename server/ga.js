@@ -50,7 +50,8 @@ function firstPopulation(nbTrips) {
 
   return new Promise((resolve, reject) => {
 
-    db.getFullAddressesData()
+    db.extractNamesList('tour1and2.csv')
+      .then(db.getFullAddressesData)
       .then((addressesGeoJson) => {
 
         let addresses = {
@@ -127,7 +128,7 @@ function greedyChunk(addressesGeoJson, nbTrips, durationsTable, partitionNumber)
 
   return new Promise((resolve, reject) => {
 
-    let addressesPerTrip = addressesGeoJson.features.length/nbTrips;
+    let addressesPerTrip = addressesGeoJson.features.length / nbTrips;
 
     // let bef = Date.now();
 
@@ -156,7 +157,7 @@ function greedyChunk(addressesGeoJson, nbTrips, durationsTable, partitionNumber)
 
       for (let i = 0; i < nbTrips && dur[firstId].length > 0; ++i) {
 
-        for (let j = -1; j < (partitionNumber)%(addressesPerTrip) && dur[firstId].length > 0; ++j) {
+        for (let j = -1; j < (partitionNumber) % (addressesPerTrip) && dur[firstId].length > 0; ++j) {
           let lastDest = trips[i][trips[i].length - 1];
           // on recupere la destination en fin de liste,
           // qui devient la source pour al prochaine
