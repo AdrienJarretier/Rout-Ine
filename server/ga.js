@@ -5,7 +5,7 @@ const db = require('./db.js');
 const osrm = require('./osrm.js');
 const utils = require('./utils.js');
 
-const POPULATION_SIZE = 1;
+const POPULATION_SIZE = 100;
 
 
 
@@ -124,7 +124,7 @@ function firstPopulation(nbTrips) {
  *
  * @returns {Promise} la promesse qui se resoudra avec un tableau 2D [num voyage][AddressFeature]
  */
-function greedyChunk(addressesGeoJson, nbTrips, durationsTable, partitionNumber) {
+function greedyChunkGrouping(addressesGeoJson, nbTrips, durationsTable, partitionNumber) {
 
   return new Promise((resolve, reject) => {
 
@@ -164,13 +164,72 @@ function greedyChunk(addressesGeoJson, nbTrips, durationsTable, partitionNumber)
 
 
           // plus une destionation est proche de notre source, plus elle a de chance d'etre choisie
-          let nextDest = osrm.pickDestination(dur[lastDest.id]);
+          let nextDest = osrm.pickDestinationFitness(dur[lastDest.id]);
 
           trips[i].push(nextDest.dest_feature);
 
           osrm.removeDestination(dur, nextDest.destination_id);
         }
       }
+    }
+    console.log('partitioning done');
+    // console.log(trips);
+    resolve(trips);
+
+  });
+
+}
+
+/**
+ * decoupe l'objet addressesGeoJson en <nbTrips> tableaux
+ * avec un algorithme glouton qui fait appel a la matrice de durees entre toutes les coordonnees
+ *
+ * @param {GeoJson FeatureCollection object} addressesGeoJson, l'objet geoJson correspondant a une collection de AddressFeature
+ * @param {Integer} nbTrips le nombre de sous tableaux demandes
+ * @param {2d array} durationsTable la matrice des durees de trajet entre les adresses
+ * @param {Integer} partitionNumber le numero de cette partition, utile dans l'algo pour savoir quand on reparti dans d'autres trajets
+ *
+ * @returns {Promise} la promesse qui se resoudra avec un tableau 2D [num voyage][AddressFeature]
+ */
+function greedyChunk(addressesGeoJson, nbTrips, durationsTable) {
+
+  return new Promise((resolve, reject) => {
+
+    let dur = utils.clone(durationsTable); // copie du tableau
+
+    let trips = [];
+
+    let startAddress = addressesGeoJson.features[0];
+
+    // toujours commencer par la premiere adresse, le depot
+    for (let i = 0; i < nbTrips; ++i) {
+      trips.push([startAddress]);
+    }
+
+
+    let firstId = startAddress.id;
+
+    osrm.removeDestination(dur, firstId);
+
+    // chaque "ligne" de durationsTable est de meme taille
+    // et removeDestination enleve un element de chaque "ligne"
+    console.log('picking destinations');
+    while (dur[firstId].length > 0) {
+
+      let i = osrm.Random.integer(0, nbTrips - 1)(osrm.mt);
+
+      let lastDest = trips[i][trips[i].length - 1];
+      // on recupere la destination en fin de liste,
+      // qui devient la source pour al prochaine
+
+
+      // plus une destionation est proche de notre source, plus elle a de chance d'etre choisie
+      let nextDest = osrm.pickDestinationFitness(dur[lastDest.id]);
+
+      trips[i].push(nextDest.dest_feature);
+
+      osrm.removeDestination(dur, nextDest.destination_id);
+
     }
     console.log('partitioning done');
     // console.log(trips);

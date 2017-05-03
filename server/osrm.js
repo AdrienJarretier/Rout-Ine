@@ -325,7 +325,7 @@ function removeDestination(durations, dest_id) {
  *
  * @return {object} l'objet durations tire au sort
  */
-function pickDestination(durationsLine) {
+function pickDestinationFitness(durationsLine) {
 
   if (durationsLine[0].dur == 0) {
 
@@ -348,6 +348,26 @@ function pickDestination(durationsLine) {
     }
 
     return durationsLine[j];
+  }
+}
+
+/**
+ * Pioche une destination parmis la liste de destinations recu
+ * tirage aleatoire
+ *
+ * @param durationsLine {array} une ligne de la matrice de durees resultantes de getTableFromAddresses
+ *
+ * @return {object} l'objet durations tire au sort
+ */
+function pickDestination(durationsLine) {
+
+  if (durationsLine[0].dur == 0) {
+
+    return durationsLine[0]
+
+  } else {
+
+    return durationsLine[Random.integer(0, durationsLine.length - 1)(mt)];
   }
 }
 
@@ -491,4 +511,7 @@ exports.getTableFromAddresses = getTableFromAddresses;
 exports.getTripFromAddresses = getTripFromAddresses;
 exports.OsrmRequest = OsrmRequest;
 exports.pickDestination = pickDestination;
+exports.pickDestinationFitness = pickDestinationFitness;
+exports.Random = Random;
+exports.mt = mt;
 exports.removeDestination = removeDestination;
