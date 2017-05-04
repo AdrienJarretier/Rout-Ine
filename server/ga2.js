@@ -24,21 +24,80 @@ function elect(population) {
 firstPopulation(6)
   .then((pop) => {
 
+    console.log('initial generation');
     console.log(pop);
 
-    let idsPickedCount = [0, 0, 0];
+    console.log('generation 2');
 
-    for (let i = 0; i < 1000000; ++i)
-      idsPickedCount[weightedRouletteWheel(pop).id]++;
-
-    console.log(idsPickedCount);
-
-    // console.log("elected count : " + ELECTED_COUNT);
-
-    // for (let part of elect(pop))
-    //   console.log(part);
+    let nextGen = nextGeneration(pop);
+    // console.log(nextGen);
 
   });
+
+function nextGeneration(currentPop) {
+
+  let pop = elect(currentPop);
+
+  while (pop.length < currentPop.length)
+    pop.push(mate(weightedRouletteWheel(currentPop), weightedRouletteWheel(currentPop)));
+
+  return pop;
+
+}
+
+function mate(parent1, parent2) {
+
+  // collecting best subsets
+
+  let subsets = parent1.subsets.concat(parent2.subsets);
+
+  subsets.sort((a, b) => {
+    return a.duration - b.duration
+  });
+
+  // console.log('sorted');
+  // for (let sub of subsets)
+  //   console.log(sub.duration);
+
+  subsets.length /= 2;
+
+  // console.log('culled');
+  // for (let sub of subsets)
+  //   console.log(sub.duration);
+
+
+  // reparing subsets
+
+  for (let i = 0; i < subsets[0].chrom.length; ++i) {
+
+    let alreadyFound = false
+
+    for (let sub of subsets) {
+
+      if (sub.chrom[i])
+      // this number belongs to 2 subsets
+        if (alreadyFound) {
+          // remove it from the more erroneous one
+
+          // c'est l'ensemble courant le plus mauvais, car ils sont tries du meilleur au pire apr leur duree
+          sub.chrom[i] = false;
+
+          break; // can't be in a third subset because they are disjoint
+        } else {
+
+          alreadyFound = true;
+        }
+
+    }
+  }
+
+  // for (let sub of subsets)
+  //   console.log(sub.chrom);
+  // for (let prop in sub)
+  //   if(prop != 'addressesGeoJson' && prop != 'chrom')
+  //   console.log(prop + ' : ' + sub[prop]);
+
+}
 
 
 
