@@ -5,10 +5,10 @@ const FeatureCollection = require('./FeatureCollection.js');
 const osrm = require('./osrm.js');
 const utils = require('./utils.js');
 
-const POPULATION_SIZE = 22;
+const POPULATION_SIZE = 3;
 const ELITISM_PERCENT = 7 / 100;
 
-const ELECTED_COUNT = Math.round(POPULATION_SIZE * ELITISM_PERCENT);
+const ELECTED_COUNT = Math.ceil(POPULATION_SIZE * ELITISM_PERCENT);
 
 /**
  * en fonction du pourcentage d'elitisme,
@@ -24,10 +24,12 @@ function elect(population) {
 firstPopulation(6)
   .then((pop) => {
 
-    console.log("elected count : " + ELECTED_COUNT);
+    console.log(pop);
 
-    for (let part of elect(pop))
-      console.log(part);
+    // console.log("elected count : " + ELECTED_COUNT);
+
+    // for (let part of elect(pop))
+    //   console.log(part);
 
   });
 
@@ -88,11 +90,6 @@ class Partition {
               this.subsets.sort((a, b) => {
                 return a.duration - b.duration
               });
-
-              // console.log('****************** subsets durations ********************');
-
-              // for(let sub of this.subsets)
-              //   console.log(sub.duration);
 
               resolve(this);
             }
