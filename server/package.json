@@ -10,10 +10,12 @@
   "license": "ISC",
   "dependencies": {
     "async": "^2.3.0",
+    "csv-parse": "^1.2.0",
     "express": "^4.15.2",
     "mysql": "^2.13.0",
     "random-js": "^1.0.8",
     "request": "^2.81.0",
-    "shuffle-array": "^1.0.1"
+    "shuffle-array": "^1.0.1",
+    "togpx": "^0.5.4"
   }
 }
