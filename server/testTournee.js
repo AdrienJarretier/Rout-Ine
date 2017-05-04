@@ -7,6 +7,7 @@ const fs = require('fs');
 const mysql = require('mysql');
 const osrm = require('./osrm.js');
 const request = require('request');
+const togpx = require('togpx');
 
 
 const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
@@ -48,6 +49,21 @@ function getAll() {
     }
 
   });
+
+}
+
+function saveTourToGpx(tourFile, targetFile) {
+
+  get(tourFile)
+    .then((data) => {
+
+      let geoJson = data.osrmTrip.trips[0].geometry;
+
+      fs.writeFile(targetFile, togpx(geoJson), (err) => {
+        if (err) throw err;
+      });
+
+    });
 
 }
 
