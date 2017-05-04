@@ -66,7 +66,7 @@ function mate(parent1, parent2) {
   //   console.log(sub.duration);
 
 
-  // reparing subsets
+  // repairing subsets
 
   for (let i = 0; i < subsets[0].chrom.length; ++i) {
 
@@ -79,7 +79,7 @@ function mate(parent1, parent2) {
         if (alreadyFound) {
           // remove it from the more erroneous one
 
-          // c'est l'ensemble courant le plus mauvais, car ils sont tries du meilleur au pire apr leur duree
+          // c'est l'ensemble courant le plus mauvais, car ils sont tries du meilleur au pire par leur duree
           sub.chrom[i] = false;
 
           break; // can't be in a third subset because they are disjoint
