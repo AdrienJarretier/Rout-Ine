@@ -26,6 +26,13 @@ firstPopulation(6)
 
     console.log(pop);
 
+    let idsPickedCount = [0, 0, 0];
+
+    for (let i = 0; i < 1000000; ++i)
+      idsPickedCount[weightedRouletteWheel(pop).id]++;
+
+    console.log(idsPickedCount);
+
     // console.log("elected count : " + ELECTED_COUNT);
 
     // for (let part of elect(pop))
@@ -58,6 +65,9 @@ class Partition {
 
     // les distances additionnees des trajets en metres
     this.totalDistance = 0.0;
+
+    this.fitness = 0.0;
+    this.cumulatedFitness = 0.0;
 
   }
 
@@ -242,6 +252,8 @@ function firstPopulation(nbTrips) {
                     population.sort((a, b) => {
                       return a.totalDuration - b.totalDuration
                     });
+
+                    applyPartitionsFitness(population);
                     resolve(population);
                   }
 
@@ -253,6 +265,43 @@ function firstPopulation(nbTrips) {
       });
 
   });
+}
+
+function applyPartitionsFitness(population) {
+
+  let maxTotalDuration = population[population.length - 1].totalDuration;
+
+  let cumulatedFitness = 0.0;
+
+  for (let part of population) {
+
+    part.fitness = maxTotalDuration / part.totalDuration;
+
+    cumulatedFitness += part.fitness;
+
+    part.cumulatedFitness = cumulatedFitness;
+
+  }
+
+}
+
+function weightedRouletteWheel(population) {
+
+  let maxCumulatedFitness = population[population.length - 1].cumulatedFitness;
+
+  let pickedFit = osrm.Random.real(0, maxCumulatedFitness, true)(osrm.mt);
+
+  let j = 0;
+
+  let currentCumulFit = population[j].cumulatedFitness;
+
+  while (pickedFit > currentCumulFit) {
+
+    currentCumulFit = population[++j].cumulatedFitness;
+  }
+
+  return population[j];
+
 }
 
 
