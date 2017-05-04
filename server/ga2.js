@@ -26,8 +26,8 @@ firstPopulation(6)
 
     console.log("elected count : " + ELECTED_COUNT);
 
-    for(let part of elect(pop))
-      console.log(part.subsets);
+    for (let part of elect(pop))
+      console.log(part);
 
   });
 
@@ -120,7 +120,7 @@ class Subset {
     this.distance = 0.0;
     this.duration = 0.0;
 
-    this.lastAddressId;
+    this.lastAddressId; // utilise par greedyChunk
 
   }
 
@@ -305,7 +305,7 @@ function greedyChunk(addressesGeoJson, nbTrips, durationsTable, partitionNumber)
       // qui devient la source pour la prochaine
 
       // plus une destionation est proche de notre source, plus elle a de chance d'etre choisie
-      let nextDest = osrm.pickDestination(dur[sourceId]);
+      let nextDest = osrm.pickDestinationFitness(dur[sourceId]);
 
       partition.subsets[i].addAddress(nextDest.destination_id);
 
