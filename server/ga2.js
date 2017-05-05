@@ -5,7 +5,7 @@ const FeatureCollection = require('./FeatureCollection.js');
 const osrm = require('./osrm.js');
 const utils = require('./utils.js');
 
-const POPULATION_SIZE = 2;
+const POPULATION_SIZE = 5;
 const ELITISM_PERCENT = 7 / 100;
 
 const ELECTED_COUNT = Math.ceil(POPULATION_SIZE * ELITISM_PERCENT);
@@ -21,27 +21,59 @@ function elect(population) {
 
 }
 
-firstPopulation(2)
+function reproduceForever(initialPop) {
+  nextGeneration(initialPop)
+    .then((nextGen) => {
+
+      console.log('**************************************************');
+      console.log(' **************** nextGeneration **************** ');
+      console.log(nextGen);
+      reproduceForever(nextGen);
+    });
+}
+
+firstPopulation(7)
   .then((pop) => {
 
     console.log('initial generation');
     console.log(pop);
 
-    console.log('generation 2');
-
-    let nextGen = nextGeneration(pop);
-    // console.log(nextGen);
+    reproduceForever(pop);
 
   });
 
 function nextGeneration(currentPop) {
 
-  let pop = elect(currentPop);
+  return new Promise((resolve, reject) => {
 
-  while (pop.length < currentPop.length)
-    pop.push(mate(weightedRouletteWheel(currentPop), weightedRouletteWheel(currentPop)));
+    let pop = elect(currentPop);
 
-  return pop;
+    while (pop.length < currentPop.length)
+      pop.push(mate(weightedRouletteWheel(currentPop), weightedRouletteWheel(currentPop)));
+
+    let computationsDone = ELECTED_COUNT;
+    for (let i = ELECTED_COUNT; i < pop.length; ++i) {
+
+      pop[i].computeAllTrips()
+        .then(() => {
+
+          if (++computationsDone == pop.length) {
+
+            console.log('sorting population');
+            pop.sort((a, b) => {
+              return a.totalDuration - b.totalDuration
+            });
+
+            applyPartitionsFitness(pop);
+
+            resolve(pop);
+          }
+
+        });
+
+    }
+
+  });
 
 }
 
@@ -144,6 +176,12 @@ function mate(parent1, parent2) {
     subsets[distancesWithMedian[0].k].chrom[j] = true;
 
   }
+
+  let part = new Partition();
+
+  part.subsets = subsets;
+
+  return part;
 
 }
 
