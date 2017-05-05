@@ -30,13 +30,12 @@ process.on('SIGINT', function() {
   forever = false;
 });
 
+let genCount = 1;
+
 function reproduceForever(initialPop) {
 
   nextGeneration(initialPop)
     .then((nextGen) => {
-
-      console.log('**************************************************');
-      console.log(' **************** nextGeneration **************** ');
 
       for (let part of nextGen) {
         console.log('Partition');
@@ -56,14 +55,17 @@ function reproduceForever(initialPop) {
         }
       }
 
+      console.log(' ************** generation ' + (++genCount) + ' Born ************** ');
+      console.log('**************************************************');
+
       if (forever)
         reproduceForever(nextGen);
       else
-        console.log('interrupt received');
+        console.log('terminating');
     });
 }
 
-firstPopulation(3)
+firstPopulation(10)
   .then((pop) => {
 
     console.log('initial generation');
@@ -73,14 +75,54 @@ firstPopulation(3)
 
   });
 
+function acceptChild(partition) {
+
+  let notOneEmpty = true;
+
+  // le nombre minimal d'elements dans un sous ensemble pour qu'il soit accepté
+  const MIN_ELEMENTS = 2;
+
+  for (let sub of partition.subsets) {
+
+    let empty = true;
+
+    let count = 0;
+
+    let c = sub.chrom;
+    for (let i = 0; i < c.length; ++i) {
+
+      if (c[i] && ++count == MIN_ELEMENTS) {
+        empty = false;
+        break;
+      }
+    }
+    if (empty) {
+      notOneEmpty = false;
+      break;
+    }
+
+  }
+
+  return notOneEmpty;
+
+}
+
 function nextGeneration(currentPop) {
 
   return new Promise((resolve, reject) => {
 
+    console.log('**************************************************');
+    console.log(' **************** nextGeneration **************** ');
+
     let pop = elect(currentPop);
 
-    while (pop.length < currentPop.length)
-      pop.push(mate(weightedRouletteWheel(currentPop), weightedRouletteWheel(currentPop)));
+    while (pop.length < currentPop.length) {
+      let child = mate(weightedRouletteWheel(currentPop), weightedRouletteWheel(currentPop));
+      if (acceptChild(child))
+        pop.push(child);
+      else
+        forever = false;
+    }
 
     let computationsDone = ELECTED_COUNT;
     for (let i = ELECTED_COUNT; i < pop.length; ++i) {
