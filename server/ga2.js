@@ -5,7 +5,7 @@ const FeatureCollection = require('./FeatureCollection.js');
 const osrm = require('./osrm.js');
 const utils = require('./utils.js');
 
-const POPULATION_SIZE = 5;
+const POPULATION_SIZE = 100;
 const ELITISM_PERCENT = 7 / 100;
 
 const ELECTED_COUNT = Math.ceil(POPULATION_SIZE * ELITISM_PERCENT);
@@ -21,7 +21,17 @@ function elect(population) {
 
 }
 
+let forever = true;
+
+process.on('SIGINT', function() {
+
+  console.log('terminating');
+
+  forever = false;
+});
+
 function reproduceForever(initialPop) {
+
   nextGeneration(initialPop)
     .then((nextGen) => {
 
@@ -46,11 +56,14 @@ function reproduceForever(initialPop) {
         }
       }
 
-      reproduceForever(nextGen);
+      if (forever)
+        reproduceForever(nextGen);
+      else
+        console.log('interrupt received');
     });
 }
 
-firstPopulation(2)
+firstPopulation(3)
   .then((pop) => {
 
     console.log('initial generation');
