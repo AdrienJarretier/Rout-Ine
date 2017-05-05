@@ -114,6 +114,8 @@ function mate(parent1, parent2) {
       foundNowhere.push(i);
   }
 
+  subsets[0].medianCoord();
+
   // for (let sub of subsets)
   //   console.log(sub.chrom);
   // for (let prop in sub)
@@ -163,15 +165,11 @@ class Partition {
 
     let copyPart = new Partition();
 
-    console.log('185');
-
     for (let sub of this.subsets) {
 
       copyPart.subsets.push(sub.copy());
 
     }
-
-    console.log('192');
 
     // les durees additionnees des trajets en secondes
     copyPart.totalDuration = this.totalDuration;
@@ -181,8 +179,6 @@ class Partition {
 
     copyPart.fitness = this.fitness;
     copyPart.cumulatedFitness = this.cumulatedFitness;
-
-    console.log('204');
 
     return copyPart;
 
@@ -254,6 +250,66 @@ class Subset {
     copySub.lastAddressId = this.lastAddressId; // utilise par greedyChunk
 
     return copySub;
+
+  }
+
+  /**
+   * calcule et retourne la coordonnee mediane des adresses inclues dans ce sous ensemble
+   *
+   * @return {Array} la coordonne mediane [lng, lat]
+   */
+  medianCoord() {
+
+    let lngs = [];
+    let lats = [];
+
+    for (let j = 0; j < this.chrom.length; ++j) {
+
+      if (this.chrom[j]) {
+
+        lngs.push(this.addressesGeoJson.features[j].coordinates[0]);
+        lats.push(this.addressesGeoJson.features[j].coordinates[1]);
+      }
+
+    }
+
+    lngs.sort();
+    lats.sort();
+
+    let medianLngIndex = lngs.length / 2;
+    let medianLatIndex = medianLngIndex;
+
+    // si il y a un nombre impair de coordonnees on utilise la moyenne pour savoir quelle valeur mediane choisir
+    if (lngs.length % 2 == 1) {
+
+      let avgLng = lngs.reduce(
+        (acc, cur) => acc + cur,
+        0
+      ) / lngs.length;
+
+      let avgLat = lats.reduce(
+        (acc, cur) => acc + cur,
+        0
+      ) / lats.length;
+
+      medianLngIndex =
+        (lngs[medianLngIndex] < avgLng ?
+          Math.ceil(medianLngIndex) :
+          Math.floor(medianLngIndex));
+
+      medianLatIndex =
+        (lngs[medianLatIndex] < avgLat ?
+          Math.ceil(medianLatIndex) :
+          Math.floor(medianLatIndex));
+    }
+
+    let medianCoord = [lngs[medianLngIndex], lats[medianLatIndex]];
+
+    // console.log(lngs);
+    // console.log(lats);
+    // console.log(medianCoord);
+
+    return medianCoord;
 
   }
 
