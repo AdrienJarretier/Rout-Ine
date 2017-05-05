@@ -5,7 +5,7 @@ const FeatureCollection = require('./FeatureCollection.js');
 const osrm = require('./osrm.js');
 const utils = require('./utils.js');
 
-const POPULATION_SIZE = 3;
+const POPULATION_SIZE = 6;
 const ELITISM_PERCENT = 7 / 100;
 
 const ELECTED_COUNT = Math.ceil(POPULATION_SIZE * ELITISM_PERCENT);
@@ -70,23 +70,37 @@ function mate(parent1, parent2) {
 
   for (let i = 0; i < subsets[0].chrom.length; ++i) {
 
-    let alreadyFound = false
+    let alreadyFound = false;
+    let foundAt;
 
-    for (let sub of subsets) {
+    for (let j = 0; j < subsets.length; ++j) {
+
+      let sub = subsets[j];
 
       if (sub.chrom[i])
-      // this number belongs to 2 subsets
-        if (alreadyFound) {
-          // remove it from the more erroneous one
+      // this element belongs to 2 subsets
+        if (alreadyFound && sub.duration != subsets[foundAt].duration) {
+        // remove it from the more erroneous one
 
-          // c'est l'ensemble courant le plus mauvais, car ils sont tries du meilleur au pire par leur duree
-          sub.chrom[i] = false;
+        // c'est l'ensemble courant le plus mauvais, car ils sont tries du meilleur au pire par leur duree
+        sub.chrom[i] = false;
 
-          break; // can't be in a third subset because they are disjoint
-        } else {
+        break; // can't be in a third subset because they are disjoint
 
-          alreadyFound = true;
-        }
+        // this element belong to 2 subsets with equal duration, lets flip a coin
+      } else if (alreadyFound) {
+
+        let indexes = [j, foundAt];
+
+        let indexPicked = osrm.Random.pick(osrm.mt, indexes);
+
+        subsets[indexPicked].chrom[i] = false;
+
+      } else {
+
+        alreadyFound = true;
+        foundAt = j;
+      }
 
     }
   }
