@@ -27,12 +27,30 @@ function reproduceForever(initialPop) {
 
       console.log('**************************************************');
       console.log(' **************** nextGeneration **************** ');
-      console.log(nextGen);
+
+      for (let part of nextGen) {
+        console.log('Partition');
+        for (let sub of part.subsets) {
+
+          var countElementsInSubset = sub.chrom.reduce(
+            (acc, cur) => {
+
+              if (cur)
+                acc++;
+
+              return acc;
+
+            }, 0);
+
+          console.log(countElementsInSubset);
+        }
+      }
+
       reproduceForever(nextGen);
     });
 }
 
-firstPopulation(7)
+firstPopulation(2)
   .then((pop) => {
 
     console.log('initial generation');
