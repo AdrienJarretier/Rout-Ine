@@ -114,13 +114,36 @@ function mate(parent1, parent2) {
       foundNowhere.push(i);
   }
 
+  // on calule les adresses medianes
+
   let medians = [];
 
   for (let sub of subsets) {
     medians.push(sub.medianCoord());
   }
 
-  console.log(medians);
+  // on va maintenant placer tous les elements qui ne sont dans aucun sous ensemble
+  // dans le sous ensemble dont l'adresse mediane est la plus proche
+
+  for (let j of foundNowhere) {
+
+    let jCoord = subsets[0].addressesGeoJson.features[j].coordinates;
+
+    let distancesWithMedian = [];
+
+    for (let k = 0; k < medians.length; ++k) {
+
+      let dist = utils.distanceBetween(medians[k], jCoord);
+      distancesWithMedian.push({ k: k, dist: dist });
+    }
+
+    distancesWithMedian.sort((a, b) => {
+      return a.dist - b.dist
+    });
+
+    subsets[distancesWithMedian[0].k].chrom[j] = true;
+
+  }
 
 }
 
