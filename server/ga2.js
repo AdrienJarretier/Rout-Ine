@@ -114,13 +114,13 @@ function mate(parent1, parent2) {
       foundNowhere.push(i);
   }
 
-  subsets[0].medianCoord();
+  let medians = [];
 
-  // for (let sub of subsets)
-  //   console.log(sub.chrom);
-  // for (let prop in sub)
-  //   if(prop != 'addressesGeoJson' && prop != 'chrom')
-  //   console.log(prop + ' : ' + sub[prop]);
+  for (let sub of subsets) {
+    medians.push(sub.medianCoord());
+  }
+
+  console.log(medians);
 
 }
 
