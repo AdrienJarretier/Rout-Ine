@@ -5,7 +5,7 @@ const FeatureCollection = require('./FeatureCollection.js');
 const osrm = require('./osrm.js');
 const utils = require('./utils.js');
 
-const POPULATION_SIZE = 6;
+const POPULATION_SIZE = 2;
 const ELITISM_PERCENT = 7 / 100;
 
 const ELECTED_COUNT = Math.ceil(POPULATION_SIZE * ELITISM_PERCENT);
@@ -21,7 +21,7 @@ function elect(population) {
 
 }
 
-firstPopulation(6)
+firstPopulation(2)
   .then((pop) => {
 
     console.log('initial generation');
@@ -51,6 +51,7 @@ function mate(parent1, parent2) {
 
   let subsets = parent1.subsets.concat(parent2.subsets);
 
+
   subsets.sort((a, b) => {
     return a.duration - b.duration
   });
@@ -67,6 +68,8 @@ function mate(parent1, parent2) {
 
 
   // repairing subsets
+
+  let foundNowhere = [];
 
   for (let i = 0; i < subsets[0].chrom.length; ++i) {
 
@@ -96,6 +99,9 @@ function mate(parent1, parent2) {
 
         subsets[indexPicked].chrom[i] = false;
 
+        // console.log(i);
+        break; // can't be in a third subset because they are disjoint
+
       } else {
 
         alreadyFound = true;
@@ -103,6 +109,9 @@ function mate(parent1, parent2) {
       }
 
     }
+
+    if (!alreadyFound)
+      foundNowhere.push(i);
   }
 
   // for (let sub of subsets)
@@ -147,6 +156,35 @@ class Partition {
   push(subset) {
 
     this.subsets.push(subset);
+
+  }
+
+  copy() {
+
+    let copyPart = new Partition();
+
+    console.log('185');
+
+    for (let sub of this.subsets) {
+
+      copyPart.subsets.push(sub.copy());
+
+    }
+
+    console.log('192');
+
+    // les durees additionnees des trajets en secondes
+    copyPart.totalDuration = this.totalDuration;
+
+    // les distances additionnees des trajets en metres
+    copyPart.totalDistance = this.totalDistance;
+
+    copyPart.fitness = this.fitness;
+    copyPart.cumulatedFitness = this.cumulatedFitness;
+
+    console.log('204');
+
+    return copyPart;
 
   }
 
@@ -201,6 +239,21 @@ class Subset {
     this.duration = 0.0;
 
     this.lastAddressId; // utilise par greedyChunk
+
+  }
+
+  copy() {
+
+    let copySub = new Subset(this.addressesGeoJson);
+
+    copySub.chrom = this.chrom.slice();
+
+    copySub.distance = this.distance;
+    copySub.duration = this.duration;
+
+    copySub.lastAddressId = this.lastAddressId; // utilise par greedyChunk
+
+    return copySub;
 
   }
 
@@ -373,7 +426,7 @@ function weightedRouletteWheel(population) {
     currentCumulFit = population[++j].cumulatedFitness;
   }
 
-  return population[j];
+  return population[0].copy();
 
 }
 
