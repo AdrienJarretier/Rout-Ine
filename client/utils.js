@@ -74,5 +74,23 @@ function clone(matrix) {
 }
 exports.clone = clone;
 
+/**
+ * Calcule la distance entre les 2 coordonnees
+ *
+ * @param {Array} c1, 2 cases
+ * @param {Array} c2, 2 cases
+ *
+ * @returns {Number} la distance entre les 2
+ */
+function distanceBetween(c1, c2) {
+
+  let x = Math.abs(c2[0] - c1[0]);
+  let y = Math.abs(c2[1] - c1[1]);
+
+  return Math.sqrt(x * x + y * y);
+
+}
+exports.distanceBetween = distanceBetween;
+
 },{}]},{},[1])(1)
 });
