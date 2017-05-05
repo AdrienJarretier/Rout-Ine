@@ -8,6 +8,7 @@ const mysql = require('mysql');
 const osrm = require('./osrm.js');
 const request = require('request');
 const togpx = require('togpx');
+const tokml = require('tokml');
 
 
 const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
@@ -60,6 +61,27 @@ function saveTourToGpx(tourFile, targetFile) {
       let geoJson = data.osrmTrip.trips[0].geometry;
 
       fs.writeFile(targetFile, togpx(geoJson), (err) => {
+        if (err) throw err;
+      });
+
+    });
+
+}
+
+saveTourToKML('tournee_prest2.csv', 'testTour');
+
+function saveTourToKML(tourFile, targetFile) {
+
+  get(tourFile)
+    .then((data) => {
+
+      let geoJson = data.osrmTrip.trips[0].geometry;
+
+      fs.writeFile(targetFile + 'Trip.kml', tokml(geoJson), (err) => {
+        if (err) throw err;
+      });
+
+      fs.writeFile(targetFile + 'Points.kml', tokml(data.addresses), (err) => {
         if (err) throw err;
       });
 
