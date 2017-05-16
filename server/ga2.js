@@ -5,7 +5,7 @@ const FeatureCollection = require('./FeatureCollection.js');
 const osrm = require('./osrm.js');
 const utils = require('./utils.js');
 
-const POPULATION_SIZE = 24;
+const POPULATION_SIZE = 16;
 const ELITISM_PERCENT = 1 / 100;
 
 const ELECTED_COUNT = Math.ceil(POPULATION_SIZE * ELITISM_PERCENT);
@@ -31,6 +31,18 @@ process.on('SIGINT', function() {
 
   forever = false;
 });
+
+let lastIdSent = 0;
+
+function sendToClient(partition) {
+
+  if (partition.id > lastIdSent) {
+
+    lastIdSent = partition.id;
+    console.log(partition);
+  }
+
+}
 
 let genCount = 1;
 
@@ -58,8 +70,8 @@ function reproduceForever(initialPop) {
       // }
 
       console.log('bests : ');
-      console.log(nextGen[0]);
-      console.log(nextGen[1]);
+      sendToClient(nextGen[0]);
+
       for (let sub of nextGen[0].subsets) {
 
         let countElementsInSubset = sub.chrom.reduce(
@@ -95,7 +107,7 @@ firstPopulation(2)
 
   });
 
-function acceptChild(partition) {
+/*function acceptChild(partition) {
 
   let notOneEmpty = true;
 
@@ -125,7 +137,7 @@ function acceptChild(partition) {
 
   return notOneEmpty;
 
-}
+}*/
 
 function nextGeneration(currentPop) {
 
@@ -141,10 +153,13 @@ function nextGeneration(currentPop) {
     let rejectedCount = 0;
     while (pop.length < POPULATION_SIZE) {
       let child = mate(weightedRouletteWheel(currentPop), weightedRouletteWheel(currentPop));
-      if (acceptChild(child))
-        pop.push(child);
-      else if (++rejectedCount >= MAX_REJECT)
-        forever = false;
+
+      pop.push(child);
+
+      // if (acceptChild(child))
+      //   pop.push(child);
+      // else if (++rejectedCount >= MAX_REJECT)
+      //   forever = false;
     }
 
     let computationsDone = ELECTED_COUNT;
@@ -607,7 +622,6 @@ function firstPopulation(nbTrips) {
 
 function applyPartitionsFitness(population) {
 
-  console.log('sorting population by increasing order of max duration of his subsets');
   population.sort((a, b) => {
     return a.subsets[a.subsets.length - 1].duration - b.subsets[a.subsets.length - 1].duration
   });
