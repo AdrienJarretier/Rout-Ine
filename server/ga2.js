@@ -5,7 +5,7 @@ const FeatureCollection = require('./FeatureCollection.js');
 const osrm = require('./osrm.js');
 const utils = require('./utils.js');
 
-const POPULATION_SIZE = 16;
+const POPULATION_SIZE = 32;
 const ELITISM_PERCENT = 1 / 100;
 
 const ELECTED_COUNT = Math.ceil(POPULATION_SIZE * ELITISM_PERCENT);
@@ -32,14 +32,35 @@ process.on('SIGINT', function() {
   forever = false;
 });
 
-let lastIdSent = 0;
+let lastTotalDuration = Infinity;
+let bestPartition;
 
 function sendToClient(partition) {
 
-  if (partition.id > lastIdSent) {
+  if (partition.totalDuration < lastTotalDuration) {
 
-    lastIdSent = partition.id;
+    lastTotalDuration = partition.totalDuration;
+
+    bestPartition = partition;
+
+    console.log('best : ');
     console.log(partition);
+
+    for (let sub of partition.subsets) {
+
+      let countElementsInSubset = sub.chrom.reduce(
+        (acc, cur) => {
+
+          if (cur)
+            acc++;
+
+          return acc;
+
+        }, 0);
+
+      console.log(countElementsInSubset);
+    }
+
   }
 
 }
@@ -69,31 +90,17 @@ function reproduceForever(initialPop) {
       //   }
       // }
 
-      console.log('bests : ');
       sendToClient(nextGen[0]);
 
-      for (let sub of nextGen[0].subsets) {
-
-        let countElementsInSubset = sub.chrom.reduce(
-          (acc, cur) => {
-
-            if (cur)
-              acc++;
-
-            return acc;
-
-          }, 0);
-
-        console.log(countElementsInSubset);
-      }
-
       console.log(' ************** generation ' + (++genCount) + ' Born ************** ');
-      console.log('**************************************************');
+      console.log('');
 
       if (forever)
         reproduceForever(nextGen);
-      else
-        console.log('terminating');
+      else {
+        console.log('best partition found : ');
+        console.log(bestPartition);
+      }
     });
 }
 
@@ -145,7 +152,7 @@ function nextGeneration(currentPop) {
 
   return new Promise((resolve, reject) => {
 
-    console.log('**************************************************');
+    console.log('');
     console.log(' **************** nextGeneration **************** ');
 
     let pop = elect(currentPop);
