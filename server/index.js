@@ -23,7 +23,7 @@ const testTournee = require('./testTournee.js');
 
 
 
-var app = express();
+let app = express();
 // The app object conventionally denotes the Express application
 
 const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
@@ -83,7 +83,18 @@ app.get('/testTournee', function(req, res) {
   });
 });
 
+
+let server = require('http').Server(app);
+let io = require('socket.io')(server);
+
 // le serveur attend les connexions sur le port 'config.port'
-app.listen(config.port, function() {
+server.listen(config.port, function() {
   console.log('listening on *:' + config.port);
+});
+
+io.on('connection', function(socket) {
+  socket.emit('news', { hello: 'world' });
+  socket.on('my other event', function(data) {
+    console.log(data);
+  });
 });
