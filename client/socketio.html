@@ -5,19 +5,49 @@
   <meta charset="UTF-8">
   <title>socket.io</title>
   <script src="/socket.io/socket.io.js"></script>
+  <script type="text/javascript" src="jquery-latest.min.js"></script>
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="leaflet/leaflet.css">
+  <script src="leaflet/leaflet.js"></script>
+  <!-- -->
+  <!-- awesome-numbered-marker -->
+  <link rel="stylesheet" href="Leaflet.awesome-numbered-marker-master/src/leaflet_awesome_number_markers.css" />
+  <script src="Leaflet.awesome-numbered-marker-master/src/leaflet_awesome_number_markers.js"></script>
+  <!--  -->
+  <style>
+  #map {
+    height: 720px;
+  }
+  </style>
   <script>
-  var socket = io.connect();
+  'use strict';
 
-  socket.on('news', function(data) {
+  const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoibXJmcmVlemUiLCJhIjoiY2owNWg2a2kyMDA2cjMycGZndzA2ZzZneCJ9.-wsVwihnGBO41Z9FvV_UAQ';
 
-    console.log(data);
+  $(document).ready(function() {
 
-    socket.emit('my other event', {
+    let map = L.map('map').setView([43.93002883039214, 2.1581183602941194], 13);
 
-      my: 'data'
+    L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+      attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+      maxZoom: 18,
+      id: 'mapbox.streets',
+      accessToken: MAPBOX_ACCESS_TOKEN
+    }).addTo(map);
+
+    let socket = io.connect();
+
+    socket.on('news', function(data) {
+
+      console.log(data);
+
+      socket.emit('my other event', {
+
+        my: 'data'
+
+      });
 
     });
-
   });
   </script>
 </head>
@@ -30,6 +60,7 @@
       <li><a href="testTournee.html">testTournee.html</a></li>
     </ul>
   </nav>
+  <div id="map"></div>
 </body>
 
 </html>
