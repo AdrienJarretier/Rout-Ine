@@ -5,7 +5,7 @@ const FeatureCollection = require('./FeatureCollection.js');
 const osrm = require('./osrm.js');
 const utils = require('./utils.js');
 
-const POPULATION_SIZE = 100;
+const POPULATION_SIZE = 10;
 const ELITISM_PERCENT = 7 / 100;
 
 const ELECTED_COUNT = Math.ceil(POPULATION_SIZE * ELITISM_PERCENT);
@@ -37,22 +37,39 @@ function reproduceForever(initialPop) {
   nextGeneration(initialPop)
     .then((nextGen) => {
 
-      for (let part of nextGen) {
-        console.log('Partition');
-        for (let sub of part.subsets) {
+      // for (let part of nextGen) {
+      //   console.log(part);
+      //   for (let sub of part.subsets) {
 
-          var countElementsInSubset = sub.chrom.reduce(
-            (acc, cur) => {
+      //     var countElementsInSubset = sub.chrom.reduce(
+      //       (acc, cur) => {
 
-              if (cur)
-                acc++;
+      //         if (cur)
+      //           acc++;
 
-              return acc;
+      //         return acc;
 
-            }, 0);
+      //       }, 0);
 
-          console.log(countElementsInSubset);
-        }
+      //     console.log(countElementsInSubset);
+      //   }
+      // }
+
+      console.log('best : ');
+      console.log(nextGen[0]);
+      for (let sub of nextGen[0].subsets) {
+
+        var countElementsInSubset = sub.chrom.reduce(
+          (acc, cur) => {
+
+            if (cur)
+              acc++;
+
+            return acc;
+
+          }, 0);
+
+        console.log(countElementsInSubset);
       }
 
       console.log(' ************** generation ' + (++genCount) + ' Born ************** ');
@@ -65,7 +82,7 @@ function reproduceForever(initialPop) {
     });
 }
 
-firstPopulation(10)
+firstPopulation(2)
   .then((pop) => {
 
     console.log('initial generation');
@@ -80,7 +97,7 @@ function acceptChild(partition) {
   let notOneEmpty = true;
 
   // le nombre minimal d'elements dans un sous ensemble pour qu'il soit accepté
-  const MIN_ELEMENTS = 2;
+  const MIN_ELEMENTS = 10;
 
   for (let sub of partition.subsets) {
 
@@ -109,6 +126,8 @@ function acceptChild(partition) {
 
 function nextGeneration(currentPop) {
 
+  const MAX_REJECT = 4;
+
   return new Promise((resolve, reject) => {
 
     console.log('**************************************************');
@@ -116,11 +135,12 @@ function nextGeneration(currentPop) {
 
     let pop = elect(currentPop);
 
-    while (pop.length < currentPop.length) {
+    let rejectedCount = 0;
+    while (pop.length < POPULATION_SIZE) {
       let child = mate(weightedRouletteWheel(currentPop), weightedRouletteWheel(currentPop));
       if (acceptChild(child))
         pop.push(child);
-      else
+      else if (++rejectedCount >= MAX_REJECT)
         forever = false;
     }
 
