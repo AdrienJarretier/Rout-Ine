@@ -5,8 +5,8 @@ const FeatureCollection = require('./FeatureCollection.js');
 const osrm = require('./osrm.js');
 const utils = require('./utils.js');
 
-const POPULATION_SIZE = 30;
-const ELITISM_PERCENT = 7 / 100;
+const POPULATION_SIZE = 24;
+const ELITISM_PERCENT = 1 / 100;
 
 const ELECTED_COUNT = Math.ceil(POPULATION_SIZE * ELITISM_PERCENT);
 
@@ -57,8 +57,9 @@ function reproduceForever(initialPop) {
       //   }
       // }
 
-      console.log('best : ');
+      console.log('bests : ');
       console.log(nextGen[0]);
+      console.log(nextGen[1]);
       for (let sub of nextGen[0].subsets) {
 
         let countElementsInSubset = sub.chrom.reduce(
@@ -606,70 +607,83 @@ function firstPopulation(nbTrips) {
 
 function applyPartitionsFitness(population) {
 
-  console.log('sorting population by increasing totalDuration');
+  console.log('sorting population by increasing order of max duration of his subsets');
   population.sort((a, b) => {
-    return a.totalDuration - b.totalDuration
+    return a.subsets[a.subsets.length - 1].duration - b.subsets[a.subsets.length - 1].duration
   });
 
-
-
-  let maxTotalDuration = population[population.length - 1].totalDuration;
+  let HIGH = population[population.length - 1].subsets[population[population.length - 1].subsets.length - 1].duration;
 
   let cumulatedFitness = 0.0;
 
-
-
-  let maxPartError = 0.0;
-
   for (let part of population) {
 
-    let partError = 0.0;
-    for (let sub of part.subsets) {
-      let countElementsInSubset = sub.chrom.reduce(
-        (acc, cur) => {
-
-          if (cur)
-            acc++;
-
-          return acc;
-
-        }, 0);
-
-      sub.error = Math.abs(idealNbElementsInSubset - countElementsInSubset);
-
-      partError += Math.pow(sub.error, 2);
-    }
-    part.error = Math.sqrt(partError);
-
-    if (part.error > maxPartError)
-      maxPartError = part.error;
-
-  }
-
-  for (let part of population) {
-
-    // let durationFitness = (maxTotalDuration + 1 - part.totalDuration)/maxTotalDuration;
-    // let errorFitness = (maxPartError + 1 - part.error)/maxPartError;
-
-    let durationFitness = maxTotalDuration/(maxTotalDuration + 1 - part.totalDuration);
-    let errorFitness = Math.pow(maxPartError,2)/Math.pow((maxPartError + 1 - part.error),2);
-
-    part.fitness = durationFitness * errorFitness;
-
-  }
-
-  console.log('sorting population by decreasing fitness');
-  population.sort((a, b) => {
-    return b.fitness - a.fitness
-  });
-
-
-  for (let part of population) {
+    part.fitness = HIGH / part.subsets[part.subsets.length - 1].duration;
+    // part.fitness = HIGH + 1 - part.subsets[part.subsets.length - 1].duration;
 
     cumulatedFitness += part.fitness;
 
     part.cumulatedFitness = cumulatedFitness;
   }
+
+
+  // let maxTotalDuration = population[population.length - 1].totalDuration;
+
+  // let cumulatedFitness = 0.0;
+
+
+
+  // let maxPartError = 0.0;
+
+  // for (let part of population) {
+
+  //   let partError = 0.0;
+  //   for (let sub of part.subsets) {
+  //     let countElementsInSubset = sub.chrom.reduce(
+  //       (acc, cur) => {
+
+  //         if (cur)
+  //           acc++;
+
+  //         return acc;
+
+  //       }, 0);
+
+  //     sub.error = Math.abs(idealNbElementsInSubset - countElementsInSubset);
+
+  //     partError += Math.pow(sub.error, 2);
+  //   }
+  //   part.error = Math.sqrt(partError);
+
+  //   if (part.error > maxPartError)
+  //     maxPartError = part.error;
+
+  // }
+
+  // for (let part of population) {
+
+  //   // let durationFitness = (maxTotalDuration + 1 - part.totalDuration)/maxTotalDuration;
+  //   // let errorFitness = (maxPartError + 1 - part.error)/maxPartError;
+
+  //   let durationFitness = maxTotalDuration/(maxTotalDuration + 1 - part.totalDuration);
+  //   let errorFitness = Math.pow(maxPartError,2)/Math.pow((maxPartError + 1 - part.error),2);
+
+  //   part.fitness = durationFitness * errorFitness;
+
+  // }
+
+  // console.log('sorting population by decreasing fitness');
+  // population.sort((a, b) => {
+  //   return b.fitness - a.fitness
+  // });
+
+
+  // for (let part of population) {
+
+  //   cumulatedFitness += part.fitness;
+
+  //   part.cumulatedFitness = cumulatedFitness;
+  // }
 
 }
 
