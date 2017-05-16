@@ -7,6 +7,10 @@ class FeatureCollection {
   push(feature) {
     this.features.push(feature);
   }
+
+  get length() {
+    return this.features.length;
+  }
 }
 
 module.exports = FeatureCollection;

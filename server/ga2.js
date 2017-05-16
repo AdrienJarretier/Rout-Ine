@@ -10,6 +10,8 @@ const ELITISM_PERCENT = 7 / 100;
 
 const ELECTED_COUNT = Math.ceil(POPULATION_SIZE * ELITISM_PERCENT);
 
+let idealNbElementsInSubset; // calcule dans firtPopuplation apres avoir pris connaissance du nombre d'adresses et du nbTrips demande
+
 /**
  * en fonction du pourcentage d'elitisme,
  * retourne une liste des partitions
@@ -59,7 +61,7 @@ function reproduceForever(initialPop) {
       console.log(nextGen[0]);
       for (let sub of nextGen[0].subsets) {
 
-        var countElementsInSubset = sub.chrom.reduce(
+        let countElementsInSubset = sub.chrom.reduce(
           (acc, cur) => {
 
             if (cur)
@@ -388,6 +390,8 @@ class Subset {
     this.distance = 0.0;
     this.duration = 0.0;
 
+    this.error = 0.0;
+
     this.lastAddressId; // utilise par greedyChunk
 
   }
@@ -400,6 +404,8 @@ class Subset {
 
     copySub.distance = this.distance;
     copySub.duration = this.duration;
+
+    copySub.error = this.error;
 
     copySub.lastAddressId = this.lastAddressId; // utilise par greedyChunk
 
@@ -552,6 +558,9 @@ function firstPopulation(nbTrips) {
           }
         }
 
+        let totalAddresses = addresses.albi.length;
+        idealNbElementsInSubset = totalAddresses / nbTrips;
+
         return addresses;
 
       })
@@ -611,7 +620,22 @@ function applyPartitionsFitness(population) {
 
   for (let part of population) {
 
+    for (let sub of part.subsets) {
+      let countElementsInSubset = sub.chrom.reduce(
+        (acc, cur) => {
+
+          if (cur)
+            acc++;
+
+          return acc;
+
+        }, 0);
+
+      sub.error = Math.abs(idealNbElementsInSubset - countElementsInSubset);
+    }
+
     part.fitness = maxTotalDuration / part.totalDuration;
+    // part.fitness = maxTotalDuration / part.totalDuration;
 
     cumulatedFitness += part.fitness;
 
