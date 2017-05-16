@@ -13,6 +13,8 @@ const tokml = require('tokml');
 
 const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 
+// saveTourToKML('tournee_prest2.csv', 'testTour');
+
 // getAll()
 //   .then((dfqsf) => { console.log('ok'); })
 //   .catch((df) => { console.log('error when getting all tours : ' + df); });
@@ -67,8 +69,6 @@ function saveTourToGpx(tourFile, targetFile) {
     });
 
 }
-
-saveTourToKML('tournee_prest2.csv', 'testTour');
 
 function saveTourToKML(tourFile, targetFile) {
 

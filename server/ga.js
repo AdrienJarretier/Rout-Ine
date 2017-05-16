@@ -8,13 +8,13 @@ const utils = require('./utils.js');
 const POPULATION_SIZE = 22;
 
 
-bestPartitionFromPop(6)
-  .then((tours) => {
+// bestPartitionFromPop(6)
+//   .then((tours) => {
 
-    console.log('tours');
-    console.log(tours);
+//     console.log('tours');
+//     console.log(tours);
 
-  });
+//   });
 
 let nextPartitionId = 0;
 /** On represente un sous ensemble avec un tableau de valeurs booleenes
