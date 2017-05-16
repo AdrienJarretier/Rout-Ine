@@ -309,6 +309,8 @@ class Partition {
     this.fitness = 0.0;
     this.cumulatedFitness = 0.0;
 
+    this.error = 0.0;
+
   }
 
   push(subset) {
@@ -335,6 +337,8 @@ class Partition {
 
     copyPart.fitness = this.fitness;
     copyPart.cumulatedFitness = this.cumulatedFitness;
+
+    copyPart.error = this.error;
 
     return copyPart;
 
@@ -620,6 +624,7 @@ function applyPartitionsFitness(population) {
 
   for (let part of population) {
 
+    let partError = 0.0;
     for (let sub of part.subsets) {
       let countElementsInSubset = sub.chrom.reduce(
         (acc, cur) => {
@@ -632,7 +637,10 @@ function applyPartitionsFitness(population) {
         }, 0);
 
       sub.error = Math.abs(idealNbElementsInSubset - countElementsInSubset);
+
+      partError += Math.pow(sub.error, 2);
     }
+    part.error = Math.sqrt(partError);
 
     part.fitness = maxTotalDuration / part.totalDuration;
     // part.fitness = maxTotalDuration / part.totalDuration;
