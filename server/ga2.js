@@ -5,7 +5,7 @@ const FeatureCollection = require('./FeatureCollection.js');
 const osrm = require('./osrm.js');
 const utils = require('./utils.js');
 
-const POPULATION_SIZE = 10;
+const POPULATION_SIZE = 30;
 const ELITISM_PERCENT = 7 / 100;
 
 const ELECTED_COUNT = Math.ceil(POPULATION_SIZE * ELITISM_PERCENT);
@@ -153,11 +153,6 @@ function nextGeneration(currentPop) {
         .then(() => {
 
           if (++computationsDone == pop.length) {
-
-            console.log('sorting population');
-            pop.sort((a, b) => {
-              return a.totalDuration - b.totalDuration
-            });
 
             applyPartitionsFitness(pop);
 
@@ -595,13 +590,6 @@ function firstPopulation(nbTrips) {
 
                   if (population.length == POPULATION_SIZE) {
 
-                    // console.log(population);
-
-                    console.log('sorting population');
-                    population.sort((a, b) => {
-                      return a.totalDuration - b.totalDuration
-                    });
-
                     applyPartitionsFitness(population);
                     resolve(population);
                   }
@@ -618,9 +606,20 @@ function firstPopulation(nbTrips) {
 
 function applyPartitionsFitness(population) {
 
+  console.log('sorting population by increasing totalDuration');
+  population.sort((a, b) => {
+    return a.totalDuration - b.totalDuration
+  });
+
+
+
   let maxTotalDuration = population[population.length - 1].totalDuration;
 
   let cumulatedFitness = 0.0;
+
+
+
+  let maxPartError = 0.0;
 
   for (let part of population) {
 
@@ -642,13 +641,34 @@ function applyPartitionsFitness(population) {
     }
     part.error = Math.sqrt(partError);
 
-    part.fitness = maxTotalDuration / part.totalDuration;
-    // part.fitness = maxTotalDuration / part.totalDuration;
+    if (part.error > maxPartError)
+      maxPartError = part.error;
+
+  }
+
+  for (let part of population) {
+
+    // let durationFitness = (maxTotalDuration + 1 - part.totalDuration)/maxTotalDuration;
+    // let errorFitness = (maxPartError + 1 - part.error)/maxPartError;
+
+    let durationFitness = maxTotalDuration/(maxTotalDuration + 1 - part.totalDuration);
+    let errorFitness = Math.pow(maxPartError,2)/Math.pow((maxPartError + 1 - part.error),2);
+
+    part.fitness = durationFitness * errorFitness;
+
+  }
+
+  console.log('sorting population by decreasing fitness');
+  population.sort((a, b) => {
+    return b.fitness - a.fitness
+  });
+
+
+  for (let part of population) {
 
     cumulatedFitness += part.fitness;
 
     part.cumulatedFitness = cumulatedFitness;
-
   }
 
 }
