@@ -3,7 +3,8 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>socket.io</title>
+  <title>bestFromGa</title>
+  <script type="text/javascript" src="utils.js"></script>
   <script src="/socket.io/socket.io.js"></script>
   <script type="text/javascript" src="jquery-latest.min.js"></script>
   <!-- Leaflet -->
@@ -17,6 +18,11 @@
   <style>
   #map {
     height: 720px;
+  }
+  
+  #infos {
+    float: right;
+    margin-right: 100px;
   }
   </style>
   <script>
@@ -37,29 +43,54 @@
 
     let socket = io.connect();
 
-    socket.on('news', function(data) {
+    socket.on('bestResult', function(bestResult) {
 
-      console.log(data);
+      console.log(bestResult);
 
-      socket.emit('my other event', {
+      let markersColors = ["darkred", "blue"];
 
-        my: 'data'
+      let tours = bestResult.trips;
 
-      });
+      for (let i in tours) {
+
+        let tour = tours[i];
+
+        let routeLayer = L.geoJSON(tour.trip.trips[0].geometry).addTo(map);
+        routeLayer.setStyle(function(feature) {
+          return {
+            color: markersColors[i]
+          };
+        });
+
+        // L.geoJSON(tour.addresses).addTo(map);
+
+      }
+
+      let infosList = $('#infos ul');
+
+      infosList.append($('<li>').html(bestResult.genNumber + "<sup>ème</sup> génération"));
+      infosList.append($('<li>').text('id partition : ' + bestResult.partitionId));
+      infosList.append($('<li>').text('obtenu en : ' + utils.s2hours(bestResult.totalTime / 1000, true)));
 
     });
+
   });
   </script>
 </head>
 
 <body>
-  <h1>socket.io</h1>
+  <h1>bestFromGa</h1>
   <nav>
     <ul>
       <li><a href="simu.html">simulation</a></li>
       <li><a href="testTournee.html">testTournee.html</a></li>
+      <li><a href="bestFromGa.html">Voir le meilleur resultat obtenu avec l'algorithme</a></li>
     </ul>
   </nav>
+  <div id="infos">
+    <ul>
+    </ul>
+  </div>
   <div id="map"></div>
 </body>
 
