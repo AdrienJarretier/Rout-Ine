@@ -42,14 +42,20 @@ function writeFile(file, content) {
   });
 }
 
+function writeJson(file, object) {
+
+  return writeFile(file, JSON.stringify(object, null, 2));
+}
+
 exports.readFile = readFile;
 exports.serverConfig = serverConfig;
 exports.writeFile = writeFile;
+exports.writeJson = writeJson;
 
 
 // const FeatureCollection = require('./FeatureCollection');
 
-// let testO = new FeatureCollection();
+// let testO = new FeatureCollection(['ljkljop']);
 
-// writeFile('testWrite.json', JSON.stringify(testO, null, 2))
+// writeJson('testWrite.json', testO)
 //   .then(() => { console.log('fiel written'); });
