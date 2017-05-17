@@ -96,6 +96,16 @@ app.get('/testTournee', function(req, res) {
   });
 });
 
+app.get('/bestFromGa', function(req, res) {
+
+  common.readFile('bestTours.json')
+    .then((fileContent) => {
+
+      res.send(JSON.parse(fileContent));
+    });
+
+});
+
 
 let server = require('http').Server(app);
 let io = require('socket.io')(server);
