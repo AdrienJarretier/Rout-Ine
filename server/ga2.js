@@ -1,11 +1,12 @@
 'use strict';
 
+const common = require('./common.js');
 const db = require('./db.js');
 const FeatureCollection = require('./FeatureCollection.js');
 const osrm = require('./osrm.js');
 const utils = require('./utils.js');
 
-const POPULATION_SIZE = 32;
+const POPULATION_SIZE = 2;
 const ELITISM_PERCENT = 0 / 100;
 
 const ELECTED_COUNT = Math.ceil(POPULATION_SIZE * ELITISM_PERCENT);
@@ -32,8 +33,10 @@ process.on('SIGINT', function() {
   forever = false;
 });
 
+let genCount = 1;
 let lastTotalDuration = Infinity;
 let bestPartition;
+let bestPartitionGenerationNumber = genCount;
 
 function sendToClient(partition) {
 
@@ -42,6 +45,7 @@ function sendToClient(partition) {
     lastTotalDuration = partition.totalDuration;
 
     bestPartition = partition;
+    bestPartitionGenerationNumber = genCount;
 
     console.log('best : ');
     console.log(partition);
@@ -64,8 +68,6 @@ function sendToClient(partition) {
   }
 
 }
-
-let genCount = 1;
 
 function reproduceForever(initialPop) {
 
@@ -95,11 +97,14 @@ function reproduceForever(initialPop) {
       console.log(' ************** generation ' + (++genCount) + ' Born ************** ');
       console.log('');
 
-      if (forever)
+      if (forever && bestPartitionGenerationNumber + 100 > genCount)
         reproduceForever(nextGen);
       else {
         console.log('best partition found : ');
         console.log(bestPartition);
+
+
+        common.writeJson("bestTours.json", bestPartition.trips);
       }
     });
 }
@@ -329,6 +334,8 @@ class Partition {
 
     this.error = 0.0;
 
+    this.trips = [];
+
   }
 
   push(subset) {
@@ -371,7 +378,9 @@ class Partition {
       for (let subset of this.subsets) {
 
         subset.computeTrip()
-          .then(() => {
+          .then((tripAndAddresses) => {
+
+            this.trips.push(tripAndAddresses);
 
             this.totalDistance += subset.distance;
             this.totalDuration += subset.duration;
@@ -539,13 +548,18 @@ class Subset {
 
       // console.log(featColl);
 
-      osrm.getTripFromAddresses(featColl, false)
+      osrm.getTripFromAddresses(featColl, true)
         .then((trip) => {
 
           this.distance = trip.trips[0].distance;
           this.duration = trip.trips[0].duration;
 
-          resolve();
+          let tripAndAddresses = {
+            trip: trip,
+            addresses: featColl
+          }
+
+          resolve(tripAndAddresses);
 
         });
 
