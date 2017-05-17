@@ -49,6 +49,8 @@
 
     });
 
+    let routes = [];
+
     socket.on('bestResult', function(bestResult) {
 
       console.log(bestResult);
@@ -57,16 +59,23 @@
 
       let tours = bestResult.trips;
 
+        routes.forEach(function(layer) {
+          map.removeLayer(layer);
+        });
+
       for (let i in tours) {
 
         let tour = tours[i];
 
         let routeLayer = L.geoJSON(tour.trip.trips[0].geometry).addTo(map);
+
         routeLayer.setStyle(function(feature) {
           return {
             color: markersColors[i]
           };
         });
+
+        routes.push(routeLayer);
 
         // L.geoJSON(tour.addresses).addTo(map);
 

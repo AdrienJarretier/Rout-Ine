@@ -122,11 +122,9 @@ io.on('connection', function(socket) {
 
     console.log('starting ga');
 
-    ga2.start(2);
+    ga2.start(2, socket);
 
   });
-
-  socket.emit('bestResult', { hello: 'world' });
 
 
   socket.on('disconnect', function() {

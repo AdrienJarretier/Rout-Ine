@@ -21,19 +21,20 @@ else
   });
 */
 
-exports.start = function(nbTrips) {
+exports.start = function(nbTrips, socket) {
 
   console.log('initial generation');
   firstPopulation(nbTrips)
     .then((pop) => {
 
-      console.log(pop);
+      console.log(pop[0]);
+      sendToClient(pop[0], (Date.now() - timeStart));
 
       reproduceForever(pop);
 
     });
 
-  const POPULATION_SIZE = 3;
+  const POPULATION_SIZE = 1000;
   const ELITISM_PERCENT = 0 / 100;
 
   const ELECTED_COUNT = Math.ceil(POPULATION_SIZE * ELITISM_PERCENT);
@@ -88,6 +89,8 @@ exports.start = function(nbTrips) {
       bestResult.partitionId = partition.id;
       bestResult.totalTime = totalTime;
       bestResult.trips = partition.trips;
+
+      socket.emit('bestResult', bestResult);
 
       console.log('best : ');
       console.log(partition);
