@@ -6,10 +6,18 @@ const FeatureCollection = require('./FeatureCollection.js');
 const osrm = require('./osrm.js');
 const utils = require('./utils.js');
 
-console.log(process.argv);
-
 if (!process.argv[2])
   console.log("provide population size");
+else
+  firstPopulation(2)
+  .then((pop) => {
+
+    console.log('initial generation');
+    console.log(pop);
+
+    reproduceForever(pop);
+
+  });
 
 const POPULATION_SIZE = process.argv[2];
 const ELITISM_PERCENT = 0 / 100;
@@ -135,16 +143,6 @@ function reproduceForever(initialPop) {
       }
     });
 }
-
-firstPopulation(2)
-  .then((pop) => {
-
-    console.log('initial generation');
-    console.log(pop);
-
-    reproduceForever(pop);
-
-  });
 
 /*function acceptChild(partition) {
 
