@@ -98,7 +98,7 @@ app.get('/testTournee', function(req, res) {
 
 app.get('/bestFromGa', function(req, res) {
 
-  common.readFile('bestTours.json')
+  common.readFile(config.resultsFolder + '/bestTours.json')
     .then((fileContent) => {
 
       res.send(JSON.parse(fileContent));

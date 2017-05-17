@@ -6,7 +6,12 @@ const FeatureCollection = require('./FeatureCollection.js');
 const osrm = require('./osrm.js');
 const utils = require('./utils.js');
 
-const POPULATION_SIZE = 2;
+console.log(process.argv);
+
+if (!process.argv[2])
+  console.log("provide population size");
+
+const POPULATION_SIZE = process.argv[2];
 const ELITISM_PERCENT = 0 / 100;
 
 const ELECTED_COUNT = Math.ceil(POPULATION_SIZE * ELITISM_PERCENT);

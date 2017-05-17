@@ -34,9 +34,11 @@
       accessToken: MAPBOX_ACCESS_TOKEN
     }).addTo(map);
 
-    $.get("bestFromGa", function(tours) {
+    $.get("bestFromGa", function(bestResult) {
 
       let markersColors = ["darkred", "blue"];
+
+      let tours = bestResult.trips;
 
       for (let i in tours) {
 
