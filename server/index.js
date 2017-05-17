@@ -19,6 +19,7 @@ const mysql = require('mysql');
 const db = require('./db.js');
 const osrm = require('./osrm.js');
 const ga = require('./ga.js');
+const ga2 = require('./ga2.js');
 const testTournee = require('./testTournee.js');
 
 
@@ -116,8 +117,19 @@ server.listen(config.port, function() {
 });
 
 io.on('connection', function(socket) {
-  socket.emit('news', { hello: 'world' });
-  socket.on('my other event', function(data) {
-    console.log(data);
+
+  socket.on('start', function() {
+
+    console.log('starting ga');
+
+    ga2.start(2);
+
+  });
+
+  socket.emit('bestResult', { hello: 'world' });
+
+
+  socket.on('disconnect', function() {
+    console.log('disconnected');
   });
 });
