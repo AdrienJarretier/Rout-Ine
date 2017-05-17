@@ -6,7 +6,7 @@ const osrm = require('./osrm.js');
 const utils = require('./utils.js');
 
 const POPULATION_SIZE = 32;
-const ELITISM_PERCENT = 1 / 100;
+const ELITISM_PERCENT = 0 / 100;
 
 const ELECTED_COUNT = Math.ceil(POPULATION_SIZE * ELITISM_PERCENT);
 
