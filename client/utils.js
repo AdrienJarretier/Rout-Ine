@@ -92,5 +92,21 @@ function distanceBetween(c1, c2) {
 }
 exports.distanceBetween = distanceBetween;
 
+
+function s2hours(seconds, appendSeconds) {
+
+  let hours = Math.floor(seconds / 3600);
+  let minutes = Math.ceil((seconds % 3600) / 60);
+
+  let textTime = hours + ' h ' + minutes + ' min';
+
+  if (appendSeconds)
+    textTime += ' ' + Math.floor(seconds) % 60 + ' s';
+
+
+  return textTime;
+}
+exports.s2hours = s2hours;
+
 },{}]},{},[1])(1)
 });

@@ -4,6 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <title>bestFromGa</title>
+  <script type="text/javascript" src="utils.js"></script>
   <script type="text/javascript" src="jquery-latest.min.js"></script>
   <!-- Leaflet -->
   <link rel="stylesheet" href="leaflet/leaflet.css">
@@ -16,6 +17,11 @@
   <style>
   #map {
     height: 720px;
+  }
+  
+  #infos {
+    float: right;
+    margin-right: 100px;
   }
   </style>
   <script>
@@ -55,6 +61,12 @@
 
       }
 
+      let infosList = $('#infos ul');
+
+      infosList.append($('<li>').html(bestResult.genNumber + "<sup>ème</sup> génération"));
+      infosList.append($('<li>').text('id partition : ' + bestResult.partitionId));
+      infosList.append($('<li>').text('obtenu en : ' + utils.s2hours(bestResult.totalTime / 1000, true)));
+
     });
 
   });
@@ -70,6 +82,10 @@
       <li><a href="socketio.html">socketio.html</a></li>
     </ul>
   </nav>
+  <div id="infos">
+    <ul>
+    </ul>
+  </div>
   <div id="map"></div>
 </body>
 
