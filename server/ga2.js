@@ -6,7 +6,7 @@ const FeatureCollection = require('./FeatureCollection.js');
 const osrm = require('./osrm.js');
 const utils = require('./utils.js');
 
-const POPULATION_SIZE = 40;
+const POPULATION_SIZE = 8;
 const ELITISM_PERCENT = 0 / 100;
 
 const ELECTED_COUNT = Math.ceil(POPULATION_SIZE * ELITISM_PERCENT);
@@ -116,7 +116,7 @@ function reproduceForever(initialPop) {
         console.log(timeSinceBest / 1000 + ' sec without better result');
         console.log(totalTime / 1000 + ' sec total');
 
-        common.writeJson("bestTours.json", bestPartition.trips);
+        common.writeJson("gaResults/bestTours.json", bestPartition.trips);
       }
     });
 }
