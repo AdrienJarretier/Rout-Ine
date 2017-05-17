@@ -6,7 +6,7 @@ const FeatureCollection = require('./FeatureCollection.js');
 const osrm = require('./osrm.js');
 const utils = require('./utils.js');
 
-const POPULATION_SIZE = 2;
+const POPULATION_SIZE = 8;
 const ELITISM_PERCENT = 0 / 100;
 
 const ELECTED_COUNT = Math.ceil(POPULATION_SIZE * ELITISM_PERCENT);
@@ -39,6 +39,7 @@ let genCount = 1;
 let lastTotalDuration = Infinity;
 let bestPartition;
 let bestPartitionGenerationNumber = genCount;
+let timeLastBest = Date.now();
 
 function sendToClient(partition) {
 
@@ -64,6 +65,7 @@ function sendToClient(partition) {
 
         }, 0);
 
+      console.log('');
       console.log(countElementsInSubset);
     }
 
@@ -105,6 +107,9 @@ function reproduceForever(initialPop) {
         console.log('best partition found : ');
         console.log(bestPartition);
 
+        let totalTime = (Date.now() - timeLastBest);
+
+        console.log(totalTime / 1000 + ' sec without better result');
 
         common.writeJson("bestTours.json", bestPartition.trips);
       }
