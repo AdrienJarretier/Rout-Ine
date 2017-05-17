@@ -10,5 +10,6 @@
     "protocol": "http",
     "ip": "10.1.0.205",
     "port": 5000
-  }
+  },
+  "resultsFolder": "gaResults"
 }

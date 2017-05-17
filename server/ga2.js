@@ -6,7 +6,7 @@ const FeatureCollection = require('./FeatureCollection.js');
 const osrm = require('./osrm.js');
 const utils = require('./utils.js');
 
-const POPULATION_SIZE = 8;
+const POPULATION_SIZE = 2;
 const ELITISM_PERCENT = 0 / 100;
 
 const ELECTED_COUNT = Math.ceil(POPULATION_SIZE * ELITISM_PERCENT);
@@ -38,20 +38,29 @@ process.on('SIGINT', function() {
 let genCount = 1;
 let lastTotalDuration = Infinity;
 let bestPartition;
-let bestPartitionGenerationNumber = genCount;
 let timeStart = Date.now();
 let timeLastBest = Date.now();
 
-function sendToClient(partition) {
+let bestResult = {
+  genNumber: 0,
+  partitionId: 0,
+  totalTime: 0,
+  trips: []
+}
+
+function sendToClient(partition, totalTime) {
 
   if (partition.totalDuration < lastTotalDuration) {
 
     lastTotalDuration = partition.totalDuration;
 
     bestPartition = partition;
-    bestPartitionGenerationNumber = genCount;
 
     timeLastBest = Date.now();
+    bestResult.genNumber = genCount;
+    bestResult.partitionId = partition.id;
+    bestResult.totalTime = totalTime;
+    bestResult.trips = partition.trips;
 
     console.log('best : ');
     console.log(partition);
@@ -99,24 +108,25 @@ function reproduceForever(initialPop) {
       //   }
       // }
 
-      sendToClient(nextGen[0]);
+      let totalTime = (Date.now() - timeStart);
+
+      sendToClient(nextGen[0], totalTime);
 
       console.log(' ************** generation ' + (++genCount) + ' Born ************** ');
       console.log('');
 
-      if (forever && bestPartitionGenerationNumber + MAX_GEN_WITHOUT_BETTER > genCount)
+      if (forever && bestResult.genNumber + MAX_GEN_WITHOUT_BETTER > genCount)
         reproduceForever(nextGen);
       else {
         console.log('best partition found : ');
         console.log(bestPartition);
 
-        let totalTime = (Date.now() - timeStart);
         let timeSinceBest = (Date.now() - timeLastBest);
 
         console.log(timeSinceBest / 1000 + ' sec without better result');
         console.log(totalTime / 1000 + ' sec total');
 
-        common.writeJson("gaResults/bestTours.json", bestPartition.trips);
+        common.writeJson(common.serverConfig.resultsFolder + "/bestTours.json", bestResult);
       }
     });
 }
