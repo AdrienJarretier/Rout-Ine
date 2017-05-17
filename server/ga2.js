@@ -11,6 +11,8 @@ const ELITISM_PERCENT = 0 / 100;
 
 const ELECTED_COUNT = Math.ceil(POPULATION_SIZE * ELITISM_PERCENT);
 
+const MAX_GEN_WITHOUT_BETTER = 100;
+
 let idealNbElementsInSubset; // calcule dans firtPopuplation apres avoir pris connaissance du nombre d'adresses et du nbTrips demande
 
 /**
@@ -97,7 +99,7 @@ function reproduceForever(initialPop) {
       console.log(' ************** generation ' + (++genCount) + ' Born ************** ');
       console.log('');
 
-      if (forever && bestPartitionGenerationNumber + 100 > genCount)
+      if (forever && bestPartitionGenerationNumber + MAX_GEN_WITHOUT_BETTER > genCount)
         reproduceForever(nextGen);
       else {
         console.log('best partition found : ');
