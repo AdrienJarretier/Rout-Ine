@@ -7,8 +7,8 @@ strict mode code can sometimes be made to run faster than identical code that's 
 Third, strict mode prohibits some syntax likely to be defined in future versions of ECMAScript.
 */
 
+const common = require('./common.js');
 const express = require('express');
-const fs = require('fs');
 const mysql = require('mysql');
 /*
   chargement des différents modules :
@@ -26,7 +26,7 @@ const testTournee = require('./testTournee.js');
 let app = express();
 // The app object conventionally denotes the Express application
 
-const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
+const config = common.serverConfig;
 
 // sert le contenu statique de ../client, c.a.d les pages web.
 app.use(express.static(__dirname + '/../client'));
@@ -77,8 +77,12 @@ app.get('/testTournee', function(req, res) {
   // on peut envoyer le tableau de donnees au client{
   testTournee.getAll().then((trips) => {
 
-    console.log('sending trips to client');
-    res.send(trips);
+    common.writeJson('testTournee.json', trips)
+      .then(() => {
+
+        console.log('sending trips to client');
+        res.send(trips);
+      });
 
   });
 });
