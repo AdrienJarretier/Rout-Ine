@@ -1,7 +1,11 @@
 class FeatureCollection {
   constructor(featuresArray) {
     this.type = 'FeatureCollection';
-    this.features = featuresArray;
+
+    if (!featuresArray)
+      this.features = [];
+    else
+      this.features = featuresArray;
   }
 
   push(feature) {
