@@ -15,29 +15,8 @@ Il faut savoir pour une date donnée, quelles beneficiaires à livrer, avec éve
 
 
 
-    l'algo génétique doit travailler sur des objets (classe Subset) de valeurs booleenes :
-      dans firstPopulation() on recupere les adresses de la bdd
-      une fois les adress hors albi retirées on peut passer à un objet de booleens
-        dont les clés sont les ids des adresses pour chaque sous ensemble d'adresses
-      une Partition est alors une liste (tableau ou objet) de ces objets Subset
-
-cette partie est *** OK ***
-
-une reference vers le tableau d'adresses est enfait maintenue dans l'objet subset pour faire la correspondance avec le chromosome
 
 
-
-
-
-
-
-
-
-quand on lance ga.js, l'algorithme génétique doit faire son travail et à chaque fois qu'une meilleure partition est trouvée la sauvegarder,
-  SQLite ?
-  dans la base mysql ccas_beneficiaries ?
-
-le serveur web doit envoyer au client la meilleure partition trouvée.
 
 donner la possibilité de faire des simulations, cad :
   - parametrer le jour du planning à calculer
