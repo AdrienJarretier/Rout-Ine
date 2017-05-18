@@ -102,6 +102,8 @@ exports.start = function(nbTrips, socket) {
       bestResult.totalTime = totalTime;
       bestResult.trips = partition.trips;
 
+      common.writeJson(common.serverConfig.resultsFolder + "/bestTours.json", bestResult);
+
       socket.emit('bestResult', bestResult);
 
       console.log('best : ');
@@ -149,8 +151,6 @@ exports.start = function(nbTrips, socket) {
 
           console.log(timeSinceBest / 1000 + ' sec without better result');
           console.log(totalTime / 1000 + ' sec total');
-
-          common.writeJson(common.serverConfig.resultsFolder + "/bestTours.json", bestResult);
 
           // process.on('SIGINT', function() {
 
