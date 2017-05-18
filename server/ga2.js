@@ -35,7 +35,7 @@ exports.start = function(nbTrips, socket) {
     });
 
   const POPULATION_SIZE = 8;
-  const ELITISM_PERCENT = 7 / 100;
+  const ELITISM_PERCENT = 0 / 100;
 
   const ELECTED_COUNT = Math.ceil(POPULATION_SIZE * ELITISM_PERCENT);
 

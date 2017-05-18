@@ -12,6 +12,11 @@ body {
     font-family: "candara";
 }
 
-#mapid {
+#map {
     height: 720px;
+}
+
+#infos {
+    float: right;
+    margin-right: 100px;
 }
