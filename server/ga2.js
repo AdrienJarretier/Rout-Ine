@@ -47,7 +47,7 @@ exports.start = function(nbTrips, socket) {
   const POPULATION_SIZE = 47;
   const ELITISM_PERCENT = 7 / 100;
 
-  const ELECTED_COUNT = Math.ceil(POPULATION_SIZE * ELITISM_PERCENT);
+  const ELECTED_COUNT = Math.round(POPULATION_SIZE * ELITISM_PERCENT);
 
   const MAX_GEN_WITHOUT_BETTER = Infinity;
 
@@ -205,6 +205,8 @@ exports.start = function(nbTrips, socket) {
       while (pop.length < POPULATION_SIZE) {
         let child = mate(weightedRouletteWheel(currentPop), weightedRouletteWheel(currentPop));
 
+        mutate(child);
+
         // pop.push(child);
 
         if (acceptChild(child))
@@ -231,6 +233,89 @@ exports.start = function(nbTrips, socket) {
       }
 
     });
+
+  }
+
+  function mutate(population) {
+
+    /**
+     *  Selection aleatoirement un des element de la partition donnee (une adresse, la premiere exclue)
+     *  et le place dans un subset aleatoire
+     */
+    function moveRandomElement(partition) {
+
+      // recuperons l'id maximal des adresses
+      let max = partition.subsets[0].addressesGeoJson.features.length - 1;
+
+      // on pioche un nombre entre 1 (car on exclu la premiere adresses) et max
+      let picked = common.Random.integer(1, max)(common.mt);
+
+      // on ne sait pas dans quel subset est l'element, donc on va simplement mettre a faux cette position dans tous
+      for (let sub of partition.subsets)
+        sub.chrom[picked] = false;
+
+      // et enfin on choisit un subset aleatoire dans lequel placer notre picked
+      let subsetPicked = common.Random.integer(0, partition.subsets.length - 1)(common.mt);
+
+      partition.subsets[subsetPicked].chrom[picked] = true;
+
+    }
+
+    // les tailles des bandes
+    let bandsSizes = [
+
+      ELECTED_COUNT,
+      Math.round(POPULATION_SIZE * 33 / 100),
+      Math.round(POPULATION_SIZE * 30 / 100),
+
+    ];
+
+    // le nombre de mutations que chaque partition de la bande correspondante subira
+    // avec la probabilité de mutation associee
+    mutationsParameters = [
+
+      {
+        mutationsCount: 1,
+        mutationProbability: 10 / 100
+      },
+
+      {
+        mutationsCount: 4,
+        mutationProbability: 50 / 100
+      },
+
+      {
+        mutationsCount: 10,
+        mutationProbability: 50 / 100
+      },
+
+      {
+        mutationsCount: 20,
+        mutationProbability: 50 / 100
+      }
+
+    ]
+
+    let bands = [];
+    let sliceStart = 0;
+
+    for (let i = 0; i < bandsSizes.length; ++i) {
+
+      bands.push(population.slice(sliceStart, sliceStart + bandsSizes[i]));
+
+      sliceStart += bandsSizes[i];
+    }
+
+    bands.push(population.slice(sliceStart));
+
+
+    // pour chaque partition d'un bande on a 'mutationsCount' fois 'mutationProbability' de chances d'effectuer une mutation
+
+    for (let i in bands)
+      for (let part of bands[i])
+        for (let j = 0; j < mutationsParameters[i].mutationsCount; ++j)
+          if (common.Random.bool(mutationsParameters[i].mutationProbability)(common.mt))
+            moveRandomElement(part);
 
   }
 
