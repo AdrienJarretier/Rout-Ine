@@ -1,0 +1,17 @@
+a,
+a:visited {
+    color: #3a4654;
+}
+
+a:hover {
+    color: #800080;
+    background-color: #bfbfbf;
+}
+
+body {
+    font-family: "candara";
+}
+
+#mapid {
+    height: 720px;
+}
