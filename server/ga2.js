@@ -44,7 +44,7 @@ exports.start = function(nbTrips, socket) {
 
     });
 
-  const POPULATION_SIZE = 47;
+  const POPULATION_SIZE = 250;
   const ELITISM_PERCENT = 7 / 100;
 
   const ELECTED_COUNT = Math.round(POPULATION_SIZE * ELITISM_PERCENT);
@@ -205,8 +205,6 @@ exports.start = function(nbTrips, socket) {
       while (pop.length < POPULATION_SIZE) {
         let child = mate(weightedRouletteWheel(currentPop), weightedRouletteWheel(currentPop));
 
-        mutate(child);
-
         // pop.push(child);
 
         if (acceptChild(child))
@@ -214,6 +212,8 @@ exports.start = function(nbTrips, socket) {
         else if (++rejectedCount >= MAX_REJECT)
           forever = false;
       }
+
+      mutate(pop);
 
       let computationsDone = ELECTED_COUNT;
       for (let i = ELECTED_COUNT; i < pop.length; ++i) {
@@ -272,7 +272,7 @@ exports.start = function(nbTrips, socket) {
 
     // le nombre de mutations que chaque partition de la bande correspondante subira
     // avec la probabilité de mutation associee
-    mutationsParameters = [
+    let mutationsParameters = [
 
       {
         mutationsCount: 1,
