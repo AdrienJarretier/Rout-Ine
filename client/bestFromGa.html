@@ -37,9 +37,17 @@
 
       let tours = bestResult.trips;
 
+      let infosList = $('#infos ul');
+
+      infosList.append($('<li>').html(bestResult.genNumber + "<sup>ème</sup> génération"));
+      infosList.append($('<li>').text('id partition : ' + bestResult.partitionId));
+      infosList.append($('<li>').text('obtenu en : ' + utils.s2hours(bestResult.totalTime / 1000, true)));
+
       for (let i in tours) {
 
         let tour = tours[i];
+
+        infosList.append($('<li>').text('durée ' + markersColors[i] + ' : ' + utils.s2hours(tour.trip.trips[0].duration, false)));
 
         let routeLayer = L.geoJSON(tour.trip.trips[0].geometry).addTo(map);
         routeLayer.setStyle(function(feature) {
@@ -51,12 +59,6 @@
         // L.geoJSON(tour.addresses).addTo(map);
 
       }
-
-      let infosList = $('#infos ul');
-
-      infosList.append($('<li>').html(bestResult.genNumber + "<sup>ème</sup> génération"));
-      infosList.append($('<li>').text('id partition : ' + bestResult.partitionId));
-      infosList.append($('<li>').text('obtenu en : ' + utils.s2hours(bestResult.totalTime / 1000, true)));
 
     });
 
