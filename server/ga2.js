@@ -27,6 +27,9 @@ exports.start = function(nbTrips, socket) {
   firstPopulation(nbTrips)
     .then((pop) => {
 
+      ++genCount;
+      console.log(' ************** initial pop ready ************** ');
+
       console.log(pop[0]);
       sendToClient(pop[0], (Date.now() - timeStart));
 
@@ -34,7 +37,7 @@ exports.start = function(nbTrips, socket) {
 
     });
 
-  const POPULATION_SIZE = 8;
+  const POPULATION_SIZE = 14;
   const ELITISM_PERCENT = 0 / 100;
 
   const ELECTED_COUNT = Math.ceil(POPULATION_SIZE * ELITISM_PERCENT);
