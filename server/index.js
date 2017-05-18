@@ -80,12 +80,12 @@ app.get('/testTournee', function(req, res) {
 
     let promises = [];
 
-    for (let i in trips) {
+    // for (let i in trips) {
 
-      promises.push(common.writeJson('tourTrip' + i + '.json', trips[i].osrmTrip.trips[0]));
-      promises.push(common.writeJson('tourAddresses' + i + '.json', trips[i].addresses));
+    //   promises.push(common.writeJson('tourTrip' + i + '.json', trips[i].osrmTrip.trips[0]));
+    //   promises.push(common.writeJson('tourAddresses' + i + '.json', trips[i].addresses));
 
-    }
+    // }
 
     Promise.all(promises)
       .then(() => {
