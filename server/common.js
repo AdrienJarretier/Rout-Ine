@@ -7,6 +7,12 @@ strict mode code can sometimes be made to run faster than identical code that's 
 Third, strict mode prohibits some syntax likely to be defined in future versions of ECMAScript.
 */
 
+let Random = require("random-js");
+let mt = Random.engines.mt19937().autoSeed();
+
+exports.Random = Random;
+exports.mt = mt;
+
 const fs = require('fs');
 
 const serverConfig = JSON.parse(fs.readFileSync('config.json', 'utf8'));
