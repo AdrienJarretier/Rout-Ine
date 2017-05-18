@@ -21,6 +21,14 @@ else
   });
 */
 
+let forever;
+
+exports.stop = function() {
+
+  forever = false;
+
+}
+
 exports.start = function(nbTrips, socket) {
 
   console.log('initial generation');
@@ -58,7 +66,7 @@ exports.start = function(nbTrips, socket) {
 
   }
 
-  let forever = true;
+  forever = true;
 
   // process.on('SIGINT', function() {
 

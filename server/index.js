@@ -135,6 +135,13 @@ io.on('connection', function(socket) {
 
   });
 
+  socket.on('stop', function() {
+
+    console.log('stopping ga');
+
+    ga2.stop();
+
+  });
 
   socket.on('disconnect', function() {
     console.log('disconnected');

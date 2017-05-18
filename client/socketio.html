@@ -43,6 +43,12 @@
 
     });
 
+    $('#stopGa').click(function() {
+
+      socket.emit('stop');
+
+    });
+
     let routes = [];
 
     socket.on('bestResult', function(bestResult) {
@@ -79,8 +85,6 @@
 
         routes.push(routeLayer);
 
-        // L.geoJSON(tour.addresses).addTo(map);
-
       }
 
       infosList.append($('<br>'));
@@ -101,6 +105,7 @@
     </ul>
   </nav>
   <button id="startGa">démarrer le calcul</button>
+  <button id="stopGa">Stop</button>
   <div id="infos">
     <ul>
     </ul>
