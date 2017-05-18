@@ -260,7 +260,8 @@ exports.start = function(nbTrips, socket) {
 
     let foundNowhere = [];
 
-    for (let i = 0; i < subsets[0].chrom.length; ++i) {
+    // on commence a 1 pour ne pas supprimer l'adresse de depart commune, le ccas
+    for (let i = 1; i < subsets[0].chrom.length; ++i) {
 
       let alreadyFound = false;
       let foundAt;
@@ -275,6 +276,7 @@ exports.start = function(nbTrips, socket) {
           // remove it from the more erroneous one
 
           // c'est l'ensemble courant le plus mauvais, car ils sont tries du meilleur au pire par leur duree
+          // et on a deja trouve l'element dans un sous ensemble precedent
           sub.chrom[i] = false;
 
           break; // can't be in a third subset because they are disjoint
