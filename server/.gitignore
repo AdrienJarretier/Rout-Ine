@@ -3,5 +3,5 @@ node_modules/*
 *.db
 *.gpx
 *.kml
-tests/*
+tests/*.json
 gaResults/*.json
