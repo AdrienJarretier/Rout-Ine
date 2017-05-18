@@ -132,24 +132,6 @@ exports.start = function(nbTrips, socket) {
     nextGeneration(initialPop)
       .then((nextGen) => {
 
-        // for (let part of nextGen) {
-        //   console.log(part);
-        //   for (let sub of part.subsets) {
-
-        //     var countElementsInSubset = sub.chrom.reduce(
-        //       (acc, cur) => {
-
-        //         if (cur)
-        //           acc++;
-
-        //         return acc;
-
-        //       }, 0);
-
-        //     console.log(countElementsInSubset);
-        //   }
-        // }
-
         let totalTime = (Date.now() - timeStart);
 
         console.log(' ************** generation ' + (++genCount) + ' Born ************** ');
