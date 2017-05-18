@@ -44,7 +44,7 @@ exports.start = function(nbTrips, socket) {
 
     });
 
-  const POPULATION_SIZE = 250;
+  const POPULATION_SIZE = 20;
   const ELITISM_PERCENT = 7 / 100;
 
   const ELECTED_COUNT = Math.round(POPULATION_SIZE * ELITISM_PERCENT);
@@ -213,24 +213,25 @@ exports.start = function(nbTrips, socket) {
           forever = false;
       }
 
-      mutate(pop);
+      let promises = [];
 
-      let computationsDone = ELECTED_COUNT;
-      for (let i = ELECTED_COUNT; i < pop.length; ++i) {
+      for (let part of pop) {
 
-        pop[i].computeAllTrips()
-          .then(() => {
-
-            if (++computationsDone == pop.length) {
-
-              applyPartitionsFitness(pop);
-
-              resolve(pop);
-            }
-
-          });
-
+        promises.push(part.computeAllTrips());
       }
+
+      Promise.all(promises)
+        .then(() => {
+
+          applyPartitionsFitness(pop);
+
+          mutate(pop);
+
+          applyPartitionsFitness(pop);
+
+          resolve(pop);
+
+        });
 
     });
 
