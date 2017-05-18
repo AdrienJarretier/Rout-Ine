@@ -27,7 +27,6 @@ exports.start = function(nbTrips, socket) {
   firstPopulation(nbTrips)
     .then((pop) => {
 
-      ++genCount;
       console.log(' ************** initial pop ready ************** ');
 
       console.log(pop[0]);
@@ -37,12 +36,14 @@ exports.start = function(nbTrips, socket) {
 
     });
 
-  const POPULATION_SIZE = 14;
+  const POPULATION_SIZE = 250;
   const ELITISM_PERCENT = 7 / 100;
 
   const ELECTED_COUNT = Math.ceil(POPULATION_SIZE * ELITISM_PERCENT);
 
-  const MAX_GEN_WITHOUT_BETTER = 7;
+  const MAX_GEN_WITHOUT_BETTER = Infinity;
+
+  const MAX_REJECT = Infinity;
 
   let idealNbElementsInSubset; // calcule dans firtPopuplation apres avoir pris connaissance du nombre d'adresses et du nbTrips demande
 
@@ -143,10 +144,10 @@ exports.start = function(nbTrips, socket) {
 
         let totalTime = (Date.now() - timeStart);
 
-        sendToClient(nextGen[0], totalTime);
-
         console.log(' ************** generation ' + (++genCount) + ' Born ************** ');
         console.log('');
+
+        sendToClient(nextGen[0], totalTime);
 
         if (forever && bestResult.genNumber + MAX_GEN_WITHOUT_BETTER > genCount)
           reproduceForever(nextGen);
@@ -169,7 +170,7 @@ exports.start = function(nbTrips, socket) {
       });
   }
 
-  /*function acceptChild(partition) {
+  function acceptChild(partition) {
 
     let notOneEmpty = true;
 
@@ -199,11 +200,9 @@ exports.start = function(nbTrips, socket) {
 
     return notOneEmpty;
 
-  }*/
+  }
 
   function nextGeneration(currentPop) {
-
-    const MAX_REJECT = 4;
 
     return new Promise((resolve, reject) => {
 
@@ -216,12 +215,12 @@ exports.start = function(nbTrips, socket) {
       while (pop.length < POPULATION_SIZE) {
         let child = mate(weightedRouletteWheel(currentPop), weightedRouletteWheel(currentPop));
 
-        pop.push(child);
+        // pop.push(child);
 
-        // if (acceptChild(child))
-        //   pop.push(child);
-        // else if (++rejectedCount >= MAX_REJECT)
-        //   forever = false;
+        if (acceptChild(child))
+          pop.push(child);
+        else if (++rejectedCount >= MAX_REJECT)
+          forever = false;
       }
 
       let computationsDone = ELECTED_COUNT;
