@@ -38,11 +38,11 @@ exports.start = function(nbTrips, socket) {
     });
 
   const POPULATION_SIZE = 14;
-  const ELITISM_PERCENT = 0 / 100;
+  const ELITISM_PERCENT = 7 / 100;
 
   const ELECTED_COUNT = Math.ceil(POPULATION_SIZE * ELITISM_PERCENT);
 
-  const MAX_GEN_WITHOUT_BETTER = 100;
+  const MAX_GEN_WITHOUT_BETTER = 7;
 
   let idealNbElementsInSubset; // calcule dans firtPopuplation apres avoir pris connaissance du nombre d'adresses et du nbTrips demande
 
@@ -59,12 +59,12 @@ exports.start = function(nbTrips, socket) {
 
   let forever = true;
 
-  process.on('SIGINT', function() {
+  // process.on('SIGINT', function() {
 
-    console.log('terminating');
+  //   console.log('terminating');
 
-    forever = false;
-  });
+  //   forever = false;
+  // });
 
   let genCount = 1;
   let lastTotalDuration = Infinity;
@@ -161,10 +161,10 @@ exports.start = function(nbTrips, socket) {
 
           common.writeJson(common.serverConfig.resultsFolder + "/bestTours.json", bestResult);
 
-          process.on('SIGINT', function() {
+          // process.on('SIGINT', function() {
 
-            process.exit(0);
-          });
+          //   process.exit(0);
+          // });
         }
       });
   }
@@ -788,7 +788,7 @@ exports.start = function(nbTrips, socket) {
       currentCumulFit = population[++j].cumulatedFitness;
     }
 
-    return population[0].copy();
+    return population[j].copy();
 
   }
 
