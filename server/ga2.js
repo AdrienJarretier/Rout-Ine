@@ -44,7 +44,7 @@ exports.start = function(nbTrips, socket) {
 
     });
 
-  const POPULATION_SIZE = 2;
+  const POPULATION_SIZE = 3;
   const ELITISM_PERCENT = 7 / 100;
 
   const ELECTED_COUNT = Math.round(POPULATION_SIZE * ELITISM_PERCENT);
@@ -508,40 +508,46 @@ exports.start = function(nbTrips, socket) {
 
         let tripsComputed = 0;
 
+        let promises = [];
+
         for (let subset of this.subsets) {
 
-          subset.computeTrip()
-            .catch((reason) => {
-              /*
-              la promesse a ete rejete si osrm n'a pas pu calculer le trajet, 2 cas :
-                - trop d'adresses, dans ce cas augmenter le max-trip-size du serveur osrm
-                - moins de 2, adresses, alors tuer cet enfant
-              */
-            })
-            .then((tripAndAddresses) => {
+          promises.push(subset.computeTrip());
 
-              this.trips.push(tripAndAddresses);
+        }
+
+        Promise.all(promises)
+          .catch((reason) => {
+            /*
+            la promesse a ete rejete si osrm n'a pas pu calculer le trajet, 2 cas :
+              - trop d'adresses, dans ce cas augmenter le max-trip-size du serveur osrm
+              - moins de 2, adresses, alors tuer cet enfant
+            */
+            console.log('caught');
+          })
+          .then((tripAndAddresses) => {
+
+            this.trips = this.trips.concat(tripAndAddresses);
+
+
+            for (let subset of this.subsets) {
 
               this.totalDistance += subset.distance;
               this.totalDuration += subset.duration;
 
-              if (++tripsComputed == this.subsets.length) {
+            }
 
-                // si tous les trajets ont ete calcules
-                // on peut trier la partition pour avoir les meilleurs sous ensembles en premier
-                // avant de resoudre la promesse
+            // si tous les trajets ont ete calcules
+            // on peut trier la partition pour avoir les meilleurs sous ensembles en premier
+            // avant de resoudre la promesse
 
-                this.subsets.sort((a, b) => {
-                  return a.duration - b.duration
-                });
-
-                resolve(this);
-              }
-
-
+            this.subsets.sort((a, b) => {
+              return a.duration - b.duration
             });
 
-        }
+            resolve(this);
+          });
+
 
       });
 
