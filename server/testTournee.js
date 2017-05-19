@@ -24,8 +24,8 @@ function getAll() {
   return new Promise((resolve, reject) => {
 
     const files = [
-      'tournee_prest2.csv',
-      'tournee_prest_T2.csv'
+      'exampleTours/tournee_prest2.csv',
+      'exampleTours/tournee_prest_T2.csv'
     ];
 
     let tripsDone = 0;

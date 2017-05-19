@@ -700,7 +700,7 @@ exports.start = function(nbTrips, socket) {
 
     return new Promise((resolve, reject) => {
 
-      db.extractNamesList('tour1and2.csv')
+      db.extractNamesList('exampleTours/tour1and2.csv')
         .then(db.getFullAddressesData)
         .then((addressesGeoJson) => {
 
