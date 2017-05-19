@@ -1,15 +1,14 @@
 'use strict';
 
-
 const async = require('async');
+const common = require('./common.js');
 const fs = require('fs');
-const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 const request = require('request');
 const db = require('./db.js');
 const shuffle = require('shuffle-array');
 const utils = require('./utils.js');
-const Random = require("random-js");
-const mt = Random.engines.mt19937().autoSeed();
+
+const config = common.serverConfig;
 
 /**
  * Represente une requete pour le serveur osrm
@@ -336,7 +335,7 @@ function pickDestinationFitness(durationsLine) {
     let maxCumulatedFitness = durationsLine[durationsLine.length - 1].cumulatedFitness;
 
     // console.log('maxCumulatedFitness : ' + maxCumulatedFitness);
-    let pickedFit = Random.real(0, maxCumulatedFitness, true)(mt);
+    let pickedFit = common.Random.real(0, maxCumulatedFitness, true)(common.mt);
 
     let j = 0;
 
@@ -367,7 +366,7 @@ function pickDestination(durationsLine) {
 
   } else {
 
-    return durationsLine[Random.integer(0, durationsLine.length - 1)(mt)];
+    return durationsLine[common.Random.integer(0, durationsLine.length - 1)(common.mt)];
   }
 }
 
@@ -512,6 +511,4 @@ exports.getTripFromAddresses = getTripFromAddresses;
 exports.OsrmRequest = OsrmRequest;
 exports.pickDestination = pickDestination;
 exports.pickDestinationFitness = pickDestinationFitness;
-exports.Random = Random;
-exports.mt = mt;
 exports.removeDestination = removeDestination;

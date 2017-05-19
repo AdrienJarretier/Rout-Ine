@@ -340,7 +340,7 @@ exports.start = function(nbTrips, socket) {
 
           let indexes = [j, foundAt];
 
-          let indexPicked = osrm.Random.pick(osrm.mt, indexes);
+          let indexPicked = common.Random.pick(common.mt, indexes);
 
           subsets[indexPicked].chrom[i] = false;
 
@@ -783,7 +783,7 @@ exports.start = function(nbTrips, socket) {
 
     let maxCumulatedFitness = population[population.length - 1].cumulatedFitness;
 
-    let pickedFit = osrm.Random.real(0, maxCumulatedFitness, true)(osrm.mt);
+    let pickedFit = common.Random.real(0, maxCumulatedFitness, true)(common.mt);
 
     let j = 0;
 
@@ -838,7 +838,7 @@ exports.start = function(nbTrips, socket) {
       console.log('picking destinations');
       while (dur[firstId].length > 0) {
 
-        let i = osrm.Random.integer(0, nbTrips - 1)(osrm.mt);
+        let i = common.Random.integer(0, nbTrips - 1)(common.mt);
 
         let sourceId = partition.subsets[i].lastAddressId;
         // on recupere l'id de la derniere adresse ajoutee,
