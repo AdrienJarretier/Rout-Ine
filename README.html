@@ -1,0 +1,50 @@
+<h3>Installer NodeJs sur Ubuntu</h3>
+<pre><code class="language-bash">curl <span class="hljs-operator">-s</span>L https://deb.nodesource.com/setup_6.x | sudo -E bash -
+sudo apt-get install -y nodejs
+</code></pre>
+<p>pour d'autres systèmes : <a href="https://nodejs.org/en/download/package-manager/#installing-node-js-via-package-manager">Installing Node.js</a></p>
+<h3>Configurer le serveur</h3>
+<pre><code class="language-bash"><span class="hljs-built_in">cd</span> server
+npm install
+</code></pre>
+<p>configuration dans <code>config.json</code></p>
+<p>Le fichier <code>utils.js</code> qui se trouve dans le dossier client ne doit pas être modifié directement, c'est en fait la version "navigateur" du fichier server/utils.js obtenu avec les modules <code>browserify</code> et <code>watchify</code></p>
+<p>installation globales de ces modules :</p>
+<p><code>npm instal -g browserify watchify</code></p>
+<p>utilisation :</p>
+<pre><code class="language-bash">watchify utils.js -o ../client/utils.js <span class="hljs-operator">-s</span> utils -v
+</code></pre>
+<h3>Démarrer le serveur</h3>
+<pre><code class="language-bash">node .
+</code></pre>
+<p>C'est tout, <code>ctrl-c</code> pour arrêter le serveur</p>
+<h2>OSRM</h2>
+<p><a href="https://github.com/Project-OSRM/osrm-backend/wiki/Building-on-Ubuntu#ubuntu-1604">Dépendances Ubuntu</a></p>
+<p><a href="https://github.com/Project-OSRM/osrm-backend/wiki/Building-OSRM#general-build-instructions-from-source">Compilation et installation</a></p>
+<p>Pour démarrer avec OSRM il faut d'abord des données Open Street Map
+on peut en obtenir sur (<a href="https://mapzen.com/data/metro-extracts">https://mapzen.com/data/metro-extracts</a>),
+Télécharger les données au format <strong>osm.pbf</strong></p>
+<p>Mon fichier utilisé sera ici nommée <strong>albi_large.osm.pbf</strong> :</p>
+<p>Les données de routage vont pouvoir être extraites et normalisée par <code>osrm-extract</code></p>
+<p>Nous sommes intéressés par le routage routier uniquement, nous allons donc utliser le profil par défaut voitures <code>car.lua</code> :</p>
+<p><code>osrm-extract albi_large.osm.pbf -p /usr/local/share/osrm/profiles/car.lua</code></p>
+<p>Si OSRM a besoin de trop de mémoire il est préférable d'allouer un fichier de swap :</p>
+<pre><code class="language-bash">fallocate <span class="hljs-operator">-l</span> <span class="hljs-number">100</span>G /path/to/swapfile
+chmod <span class="hljs-number">600</span> /path/to/swapfile
+mkswap /path/to/swapfile
+swapon /path/to/swapfile
+</code></pre>
+<p>Le résultat de <code>osrm-extract</code> est un fichier <strong>albi_large.osrm</strong> entre autres.</p>
+<p>L'étape finale de préparation est l'exécution de <code>osrm-contract</code> :</p>
+<p><code>osrm-contract albi_large.osrm</code></p>
+<p>Le serveur est fin prêt !</p>
+<h3>Lancement du serveur osrm :</h3>
+<p><code>osrm-routed albi_large.osrm --max-trip-size 400 --max-table-size 700</code></p>
+<p>L'option <code>--max-trip-size</code> spécifie le maximum de coordonnées que le serveur acceptera pour le service <code>trip</code>
+L'option <code>--max-table-size</code> spécifie le maximum de coordonnées que le serveur acceptera pour le service <code>table</code></p>
+<p>Le serveur écoute sur le port 5000 par défaut, un test dans le navigateur sur l'ip du serveur et le port 5000 doit retourner du json similaire à</p>
+<pre><code class="language-json">{
+  "<span class="hljs-attribute">message</span>":<span class="hljs-value"><span class="hljs-string">"URL string malformed close to position 1: \"\/\""</span></span>,
+  "<span class="hljs-attribute">code</span>":<span class="hljs-value"><span class="hljs-string">"InvalidUrl"</span>
+</span>}
+</code></pre>

@@ -23,3 +23,8 @@ donner la possibilité de faire des simulations, cad :
   - parametrer le temps d'arret (actuellement 3 min pour albi)
   - afficher le temps d'arret et surtout en fonction de la duree max d'un trajet afficher le temps d'arret max / adresse possible
   - parametrer le nombre de trajets et/ou pour une duree max par trajet et d'un temps d'arret afficher le nombre minimum de tajets à prévoir
+
+
+
+si aucun fichier présent de meilleur resultat corriger le crash
+
