@@ -102,7 +102,7 @@ io.on('connection', function(socket) {
 
     console.log('starting ga');
 
-    ga2.start(2, socket);
+    ga2.start(6, socket);
 
   });
 

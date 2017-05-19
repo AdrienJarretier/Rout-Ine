@@ -44,7 +44,7 @@ exports.start = function(nbTrips, socket) {
 
     });
 
-  const POPULATION_SIZE = 250;
+  const POPULATION_SIZE = 2;
   const ELITISM_PERCENT = 7 / 100;
 
   const ELECTED_COUNT = Math.round(POPULATION_SIZE * ELITISM_PERCENT);
@@ -678,6 +678,9 @@ exports.start = function(nbTrips, socket) {
         osrm.getTripFromAddresses(featColl, true)
           .then((trip) => {
 
+            if(!trip.trips)
+                reject(trip);
+
             this.distance = trip.trips[0].distance;
             this.duration = trip.trips[0].duration;
 
@@ -700,8 +703,10 @@ exports.start = function(nbTrips, socket) {
 
     return new Promise((resolve, reject) => {
 
-      db.extractNamesList('exampleTours/tour1and2.csv')
-        .then(db.getFullAddressesData)
+      // db.extractNamesList('exampleTours/tour1and2.csv')
+      //   .then(db.getFullAddressesData)
+
+      db.getFullAddressesData()
         .then((addressesGeoJson) => {
 
           // la premiere adresse est le depart, c'est l'adresse du ccas,
