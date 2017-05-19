@@ -39,7 +39,15 @@
 
       $('#infos ul').empty();
 
-      socket.emit('start');
+      socket.emit('start',
+
+        {
+          nbTrips: $('#nbTrips').val(),
+          popSize: $('#popSize').val(),
+          stopTime: $('#stopTime').val()
+        }
+
+      );
 
     });
 
@@ -106,6 +114,12 @@
   </nav>
   <button id="startGa">démarrer le calcul</button>
   <button id="stopGa">Stop</button>
+  <label for="nbTrips">nombre de tournées : </label>
+  <input id="nbTrips" type="number">
+  <label for="popSize">popSize : </label>
+  <input id="popSize" type="number">
+  <label for="stopTime">temps d'arrêt par adresse : </label>
+  <input id="stopTime" type="number"> m
   <div id="infos">
     <ul>
     </ul>

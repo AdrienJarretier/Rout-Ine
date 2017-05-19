@@ -98,11 +98,11 @@ server.listen(config.port, function() {
 
 io.on('connection', function(socket) {
 
-  socket.on('start', function() {
+  socket.on('start', function(params) {
 
     console.log('starting ga');
 
-    ga2.start(6, socket);
+    ga2.start(params, socket);
 
   });
 

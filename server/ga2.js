@@ -14,7 +14,11 @@ exports.stop = function() {
 
 }
 
-exports.start = function(nbTrips, socket) {
+exports.start = function(params, socket) {
+
+  let nbTrips = params.nbTrips;
+  const POPULATION_SIZE = params.popSize;
+  const STOP_TIME = params.stopTime * 60;
 
   console.log('initial generation');
   firstPopulation(nbTrips)
@@ -29,7 +33,6 @@ exports.start = function(nbTrips, socket) {
 
     });
 
-  const POPULATION_SIZE = 4;
   const ELITISM_PERCENT = 7 / 100;
 
   const ELECTED_COUNT = Math.round(POPULATION_SIZE * ELITISM_PERCENT);
@@ -183,9 +186,10 @@ exports.start = function(nbTrips, socket) {
         if (acceptChild(child))
           pop.push(child);
         else {
-          forever = false;
+          // forever = false;
           console.log('vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv child vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv');
-          console.log(child);
+          console.log(child.subsets);
+          console.log(' ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ child ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ');
         }
       }
 
@@ -673,7 +677,7 @@ exports.start = function(nbTrips, socket) {
 
             else {
 
-              trip.trips[0].duration += featColl.features.length * 180;
+              trip.trips[0].duration += featColl.features.length * STOP_TIME;
 
               this.distance = trip.trips[0].distance;
               this.duration = trip.trips[0].duration;
@@ -698,11 +702,11 @@ exports.start = function(nbTrips, socket) {
 
     return new Promise((resolve, reject) => {
 
-      // db.extractNamesList('exampleTours/tour1and2.csv')
-      //   .then(db.getFullAddressesData)
+      db.extractNamesList('exampleTours/tour1and2.csv')
+        .then(db.getFullAddressesData)
 
-      db.getFullAddressesData()
-        .then((addressesGeoJson) => {
+      // db.getFullAddressesData()
+      .then((addressesGeoJson) => {
 
           // la premiere adresse est le depart, c'est l'adresse du ccas,
           // elle est positionne en 1ere position par la fonction getAddresses du module db
