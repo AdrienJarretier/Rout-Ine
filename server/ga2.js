@@ -29,7 +29,7 @@ exports.start = function(nbTrips, socket) {
 
     });
 
-  const POPULATION_SIZE = 3;
+  const POPULATION_SIZE = 4;
   const ELITISM_PERCENT = 7 / 100;
 
   const ELECTED_COUNT = Math.round(POPULATION_SIZE * ELITISM_PERCENT);
@@ -755,18 +755,21 @@ exports.start = function(nbTrips, socket) {
 
   function applyPartitionsFitness(population) {
 
+    // on trie la population par ordre de duree maximale de leurs trajets croissant
     population.sort((a, b) => {
-      return a.subsets[a.subsets.length - 1].duration - b.subsets[a.subsets.length - 1].duration
+      return a.subsets[a.subsets.length - 1].duration - b.subsets[b.subsets.length - 1].duration
     });
 
-    let HIGH = population[population.length - 1].subsets[population[population.length - 1].subsets.length -
-      1].duration;
+    // la valeur haute est la duree maximale des trajet de la derniere partition
+    let lastPartition = population[population.length - 1];
+    let lastSubsets = lastPartition.subsets;
+    let HIGH = lastSubsets[lastSubsets.length - 1].duration;
 
     let cumulatedFitness = 0.0;
 
     for (let part of population) {
 
-      part.fitness = HIGH / part.subsets[part.subsets.length - 1].duration;
+      part.fitness = HIGH - part.subsets[part.subsets.length - 1].duration + 1;
       // part.fitness = HIGH + 1 - part.subsets[part.subsets.length - 1].duration;
 
       cumulatedFitness += part.fitness;
