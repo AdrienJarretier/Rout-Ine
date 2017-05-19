@@ -36,8 +36,6 @@ exports.start = function(nbTrips, socket) {
 
   const MAX_GEN_WITHOUT_BETTER = Infinity;
 
-  const MAX_REJECT = Infinity;
-
   let idealNbElementsInSubset; // calcule dans firtPopuplation apres avoir pris connaissance du nombre d'adresses et du nbTrips demande
 
   /**
@@ -133,39 +131,39 @@ exports.start = function(nbTrips, socket) {
       });
   }
 
-  /*
-    function acceptChild(partition) {
 
-      let notOneEmpty = true;
+  function acceptChild(partition) {
 
-      // le nombre minimal d'elements dans un sous ensemble pour qu'il soit accepté
-      const MIN_ELEMENTS = 10;
+    let notOneEmpty = true;
 
-      for (let sub of partition.subsets) {
+    // le nombre minimal d'elements dans un sous ensemble pour qu'il soit accepté
+    const MIN_ELEMENTS = 2;
 
-        let empty = true;
+    for (let sub of partition.subsets) {
 
-        let count = 0;
+      let empty = true;
 
-        let c = sub.chrom;
-        for (let i = 0; i < c.length; ++i) {
+      let count = 0;
 
-          if (c[i] && ++count == MIN_ELEMENTS) {
-            empty = false;
-            break;
-          }
-        }
-        if (empty) {
-          notOneEmpty = false;
+      let c = sub.chrom;
+      for (let i = 0; i < c.length; ++i) {
+
+        if (c[i] && ++count == MIN_ELEMENTS) {
+          empty = false;
           break;
         }
-
+      }
+      if (empty) {
+        notOneEmpty = false;
+        break;
       }
 
-      return notOneEmpty;
-
     }
-  */
+
+    return notOneEmpty;
+
+  }
+
 
   function nextGeneration(currentPop) {
 
@@ -180,12 +178,15 @@ exports.start = function(nbTrips, socket) {
       while (pop.length < POPULATION_SIZE) {
         let child = mate(weightedRouletteWheel(currentPop), weightedRouletteWheel(currentPop));
 
-        pop.push(child);
+        // pop.push(child);
 
-        // if (acceptChild(child))
-        //   pop.push(child);
-        // else if (++rejectedCount >= MAX_REJECT)
-        //   forever = false;
+        if (acceptChild(child))
+          pop.push(child);
+        else {
+          forever = false;
+          console.log('vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv child vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv');
+          console.log(child);
+        }
       }
 
       let promises = [];
@@ -201,6 +202,18 @@ exports.start = function(nbTrips, socket) {
           applyPartitionsFitness(pop);
 
           mutate(pop);
+
+          promises.length = 0;
+
+          for (let part of pop) {
+
+            promises.push(part.computeAllTrips());
+          }
+
+          return Promise.all(promises);
+
+        })
+        .then(() => {
 
           applyPartitionsFitness(pop);
 
