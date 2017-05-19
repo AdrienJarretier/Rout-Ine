@@ -13,7 +13,7 @@ const tokml = require('tokml');
 
 const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 
-// saveTourToKML('tournee_prest2.csv', 'testTour');
+// saveTourToKML('tournee_prest2.csv', 'tests/testTour');
 
 // getAll()
 //   .then((dfqsf) => { console.log('ok'); })
