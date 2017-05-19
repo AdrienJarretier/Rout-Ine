@@ -511,6 +511,13 @@ exports.start = function(nbTrips, socket) {
         for (let subset of this.subsets) {
 
           subset.computeTrip()
+            .catch((reason) => {
+              /*
+              la promesse a ete rejete si osrm n'a pas pu calculer le trajet, 2 cas :
+                - trop d'adresses, dans ce cas augmenter le max-trip-size du serveur osrm
+                - moins de 2, adresses, alors tuer cet enfant
+              */
+            })
             .then((tripAndAddresses) => {
 
               this.trips.push(tripAndAddresses);
