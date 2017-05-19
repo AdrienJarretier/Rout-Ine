@@ -6,21 +6,6 @@ const FeatureCollection = require('./FeatureCollection.js');
 const osrm = require('./osrm.js');
 const utils = require('./utils.js');
 
-/*
-if (!process.argv[2])
-  console.log("provide population size");
-else
-  firstPopulation(2)
-  .then((pop) => {
-
-    console.log('initial generation');
-    console.log(pop);
-
-    reproduceForever(pop);
-
-  });
-*/
-
 let forever;
 
 exports.stop = function() {
@@ -67,13 +52,6 @@ exports.start = function(nbTrips, socket) {
   }
 
   forever = true;
-
-  // process.on('SIGINT', function() {
-
-  //   console.log('terminating');
-
-  //   forever = false;
-  // });
 
   let genCount = 1;
   let lastTotalDuration = Infinity;
@@ -151,11 +129,6 @@ exports.start = function(nbTrips, socket) {
 
           console.log(timeSinceBest / 1000 + ' sec without better result');
           console.log(totalTime / 1000 + ' sec total');
-
-          // process.on('SIGINT', function() {
-
-          //   process.exit(0);
-          // });
         }
       });
   }
@@ -333,15 +306,8 @@ exports.start = function(nbTrips, socket) {
       return a.duration - b.duration
     });
 
-    // console.log('sorted');
-    // for (let sub of subsets)
-    //   console.log(sub.duration);
 
     subsets.length /= 2;
-
-    // console.log('culled');
-    // for (let sub of subsets)
-    //   console.log(sub.duration);
 
 
     // repairing subsets
@@ -378,7 +344,7 @@ exports.start = function(nbTrips, socket) {
 
           subsets[indexPicked].chrom[i] = false;
 
-          // console.log(i);
+
           break; // can't be in a third subset because they are disjoint
 
         } else {
@@ -642,10 +608,6 @@ exports.start = function(nbTrips, socket) {
 
       let medianCoord = [lngs[medianLngIndex], lats[medianLatIndex]];
 
-      // console.log(lngs);
-      // console.log(lats);
-      // console.log(medianCoord);
-
       return medianCoord;
 
     }
@@ -658,13 +620,10 @@ exports.start = function(nbTrips, socket) {
      */
     addAddress(addrId) {
 
-      // console.log('add : ' + addrId);
-
       for (let i in this.addressesGeoJson.features) {
 
         if (this.addressesGeoJson.features[i].id == addrId) {
 
-          // console.log('found at : ' + i);
           this.chrom[i] = true;
           break;
 
@@ -691,8 +650,6 @@ exports.start = function(nbTrips, socket) {
         }
 
         let featColl = new FeatureCollection(featuresArray);
-
-        // console.log(featColl);
 
         osrm.getTripFromAddresses(featColl, true)
           .then((trip) => {
@@ -778,8 +735,6 @@ exports.start = function(nbTrips, socket) {
 
                     console.log('partitioning #' + i + ' trip computed, done');
 
-                    // console.log(partition);
-
                     population.push(partition);
 
                     if (population.length == POPULATION_SIZE) {
@@ -818,65 +773,6 @@ exports.start = function(nbTrips, socket) {
 
       part.cumulatedFitness = cumulatedFitness;
     }
-
-
-    // let maxTotalDuration = population[population.length - 1].totalDuration;
-
-    // let cumulatedFitness = 0.0;
-
-
-
-    // let maxPartError = 0.0;
-
-    // for (let part of population) {
-
-    //   let partError = 0.0;
-    //   for (let sub of part.subsets) {
-    //     let countElementsInSubset = sub.chrom.reduce(
-    //       (acc, cur) => {
-
-    //         if (cur)
-    //           acc++;
-
-    //         return acc;
-
-    //       }, 0);
-
-    //     sub.error = Math.abs(idealNbElementsInSubset - countElementsInSubset);
-
-    //     partError += Math.pow(sub.error, 2);
-    //   }
-    //   part.error = Math.sqrt(partError);
-
-    //   if (part.error > maxPartError)
-    //     maxPartError = part.error;
-
-    // }
-
-    // for (let part of population) {
-
-    //   // let durationFitness = (maxTotalDuration + 1 - part.totalDuration)/maxTotalDuration;
-    //   // let errorFitness = (maxPartError + 1 - part.error)/maxPartError;
-
-    //   let durationFitness = maxTotalDuration/(maxTotalDuration + 1 - part.totalDuration);
-    //   let errorFitness = Math.pow(maxPartError,2)/Math.pow((maxPartError + 1 - part.error),2);
-
-    //   part.fitness = durationFitness * errorFitness;
-
-    // }
-
-    // console.log('sorting population by decreasing fitness');
-    // population.sort((a, b) => {
-    //   return b.fitness - a.fitness
-    // });
-
-
-    // for (let part of population) {
-
-    //   cumulatedFitness += part.fitness;
-
-    //   part.cumulatedFitness = cumulatedFitness;
-    // }
 
   }
 
