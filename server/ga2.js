@@ -160,37 +160,39 @@ exports.start = function(nbTrips, socket) {
       });
   }
 
-  function acceptChild(partition) {
+  /*
+    function acceptChild(partition) {
 
-    let notOneEmpty = true;
+      let notOneEmpty = true;
 
-    // le nombre minimal d'elements dans un sous ensemble pour qu'il soit accepté
-    const MIN_ELEMENTS = 10;
+      // le nombre minimal d'elements dans un sous ensemble pour qu'il soit accepté
+      const MIN_ELEMENTS = 10;
 
-    for (let sub of partition.subsets) {
+      for (let sub of partition.subsets) {
 
-      let empty = true;
+        let empty = true;
 
-      let count = 0;
+        let count = 0;
 
-      let c = sub.chrom;
-      for (let i = 0; i < c.length; ++i) {
+        let c = sub.chrom;
+        for (let i = 0; i < c.length; ++i) {
 
-        if (c[i] && ++count == MIN_ELEMENTS) {
-          empty = false;
+          if (c[i] && ++count == MIN_ELEMENTS) {
+            empty = false;
+            break;
+          }
+        }
+        if (empty) {
+          notOneEmpty = false;
           break;
         }
+
       }
-      if (empty) {
-        notOneEmpty = false;
-        break;
-      }
+
+      return notOneEmpty;
 
     }
-
-    return notOneEmpty;
-
-  }
+  */
 
   function nextGeneration(currentPop) {
 
@@ -205,12 +207,12 @@ exports.start = function(nbTrips, socket) {
       while (pop.length < POPULATION_SIZE) {
         let child = mate(weightedRouletteWheel(currentPop), weightedRouletteWheel(currentPop));
 
-        // pop.push(child);
+        pop.push(child);
 
-        if (acceptChild(child))
-          pop.push(child);
-        else if (++rejectedCount >= MAX_REJECT)
-          forever = false;
+        // if (acceptChild(child))
+        //   pop.push(child);
+        // else if (++rejectedCount >= MAX_REJECT)
+        //   forever = false;
       }
 
       let promises = [];
@@ -678,18 +680,24 @@ exports.start = function(nbTrips, socket) {
         osrm.getTripFromAddresses(featColl, true)
           .then((trip) => {
 
-            if(!trip.trips)
-                reject(trip);
+            if (!trip.trips)
 
-            this.distance = trip.trips[0].distance;
-            this.duration = trip.trips[0].duration;
+              reject(JSON.stringify(trip));
 
-            let tripAndAddresses = {
-              trip: trip,
-              addresses: featColl
+            else {
+
+              trip.trips[0].duration += featColl.features.length * 180;
+
+              this.distance = trip.trips[0].distance;
+              this.duration = trip.trips[0].duration;
+
+              let tripAndAddresses = {
+                trip: trip,
+                addresses: featColl
+              }
+
+              resolve(tripAndAddresses);
             }
-
-            resolve(tripAndAddresses);
 
           });
 
