@@ -502,6 +502,10 @@ exports.start = function(nbTrips, socket) {
 
       return new Promise((resolve, reject) => {
 
+        this.trips.length = 0;
+        this.totalDistance = 0;
+        this.totalDuration = 0;
+
         let tripsComputed = 0;
 
         for (let subset of this.subsets) {
