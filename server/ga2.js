@@ -186,6 +186,9 @@ exports.start = function(params, socket) {
 
         if (acceptChild(child))
           pop.push(child);
+        else
+          pop.push(randomChunkify(currentPop[0].subsets[0].addressesGeoJson, nbTrips));
+
         // else {
         //   // forever = false;
         //   // console.log('vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv child vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv');
@@ -703,11 +706,11 @@ exports.start = function(params, socket) {
 
     return new Promise((resolve, reject) => {
 
-      db.extractNamesList('exampleTours/tour1and2.csv')
-        .then(db.getFullAddressesData)
+      // db.extractNamesList('exampleTours/tour1and2.csv')
+      //   .then(db.getFullAddressesData)
 
-      // db.getFullAddressesData()
-      .then((addressesGeoJson) => {
+      db.getFullAddressesData()
+        .then((addressesGeoJson) => {
 
           // la premiere adresse est le depart, c'est l'adresse du ccas,
           // elle est positionne en 1ere position par la fonction getAddresses du module db
