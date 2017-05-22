@@ -35,7 +35,7 @@ function addressesMarkers(waypoints, addresses, color) {
     let feature = addresses.features[address_index];
 
     let p = feature.properties;
-    let popContent = p.label + (p.special != undefined ? ', ' + p.special : '');
+    let popContent = p.label + (p.special != undefined ? ', ' + p.special : '') + ', ' + p.town;
 
     for (let b of p.beneficiaries) {
 
