@@ -28,12 +28,11 @@ exports.start = function(params, socket) {
     socket.emit('maxTooSmall');
     return;
   }
+  const MAX_ELEMENTS = params.maxStops - MIN_ELEMENTS;
 
   console.log('starting ga');
 
   socket.emit('started');
-
-  const MAX_ELEMENTS = params.maxStops - MIN_ELEMENTS;
 
   console.log('initial generation');
   firstPopulation(nbTrips)
@@ -205,6 +204,8 @@ exports.start = function(params, socket) {
 
       let promises = [];
 
+      console.log('computing trips');
+
       for (let part of pop) {
 
         promises.push(part.computeAllTrips());
@@ -213,12 +214,16 @@ exports.start = function(params, socket) {
       Promise.all(promises)
         .then(() => {
 
+          console.log('done');
+
           applyPartitionsFitness(pop);
 
           mutate(pop);
 
           promises.length = 0;
 
+
+          console.log('computing trips');
           for (let part of pop) {
 
             promises.push(part.computeAllTrips());
@@ -228,6 +233,8 @@ exports.start = function(params, socket) {
 
         })
         .then(() => {
+
+          console.log('done');
 
           applyPartitionsFitness(pop);
 
