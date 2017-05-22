@@ -39,7 +39,7 @@ exports.start = function(params, socket) {
 
   const MAX_GEN_WITHOUT_BETTER = Infinity;
 
-  let idealNbElementsInSubset; // calcule dans firtPopuplation apres avoir pris connaissance du nombre d'adresses et du nbTrips demande
+  // let idealNbElementsInSubset; // calcule dans firtPopuplation apres avoir pris connaissance du nombre d'adresses et du nbTrips demande
 
   /**
    * en fonction du pourcentage d'elitisme,
@@ -181,16 +181,16 @@ exports.start = function(params, socket) {
       while (pop.length < POPULATION_SIZE) {
         let child = mate(weightedRouletteWheel(currentPop), weightedRouletteWheel(currentPop));
 
-        // pop.push(child);
+        pop.push(child);
 
-        if (acceptChild(child))
-          pop.push(child);
-        else {
-          // forever = false;
-          console.log('vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv child vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv');
-          console.log(child.subsets);
-          console.log(' ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ child ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ');
-        }
+        // if (acceptChild(child))
+        //   pop.push(child);
+        // else {
+        //   // forever = false;
+        //   // console.log('vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv child vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv');
+        //   // console.log(child.subsets);
+        //   // console.log(' ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ child ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ');
+        // }
       }
 
       let promises = [];
@@ -726,7 +726,7 @@ exports.start = function(params, socket) {
           }
 
           let totalAddresses = addresses.albi.length;
-          idealNbElementsInSubset = totalAddresses / nbTrips;
+          // idealNbElementsInSubset = totalAddresses / nbTrips;
 
           return addresses;
 
