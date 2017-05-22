@@ -745,12 +745,7 @@ exports.start = function(params, socket) {
 
                 console.log('partitioning #' + i);
 
-                greedyChunk(addresses.albi, nbTrips, table, i)
-                  .then((partition) => {
-
-                    return partition.computeAllTrips();
-
-                  })
+                randomChunkify(addresses.albi, nbTrips).computeAllTrips()
                   .then((partition) => {
 
                     console.log('partitioning #' + i + ' trip computed, done');
@@ -826,11 +821,10 @@ exports.start = function(params, socket) {
    * @param {GeoJson FeatureCollection object} addressesGeoJson, l'objet geoJson correspondant a une collection de AddressFeature
    * @param {Integer} nbTrips le nombre de sous tableaux demandes
    * @param {2d array} durationsTable la matrice des durees de trajet entre les adresses
-   * @param {Integer} partitionNumber le numero de cette partition, utile dans l'algo pour savoir quand on reparti dans d'autres trajets
    *
    * @returns {Promise} la promesse qui se resoudra avec un tableau 2D [num voyage][AddressFeature]
    */
-  function greedyChunk(addressesGeoJson, nbTrips, durationsTable, partitionNumber) {
+  function greedyChunk(addressesGeoJson, nbTrips, durationsTable) {
 
     return new Promise((resolve, reject) => {
 
@@ -876,6 +870,48 @@ exports.start = function(params, socket) {
       resolve(partition);
 
     });
+
+  }
+
+
+  /**
+   * decoupe l'objet addressesGeoJson en <nbTrips> tableaux
+   * en repartissant aleatoirement les adresses
+   *
+   * @param {GeoJson FeatureCollection object} addressesGeoJson, l'objet geoJson correspondant a une collection de AddressFeature
+   * @param {Integer} nbTrips le nombre de sous tableaux demandes
+   *
+   * @returns {Partition} voir la classe Partition
+   */
+  function randomChunkify(addressesGeoJson, nbTrips) {
+
+    let partition = new Partition();
+
+    let startAddress = addressesGeoJson.features[0];
+    let firstId = startAddress.id;
+
+    console.log('-------------------------------------------------------');
+
+    // // toujours commencer par la premiere adresse, le depot
+    for (let i = 0; i < nbTrips; ++i) {
+      let sub = new Subset(addressesGeoJson);
+      sub.addAddress(firstId);
+      partition.push(sub);
+    }
+
+    console.log('picking destinations');
+
+    // pour i de 1 a nombre d'adresses - 1 on choisi un sous ensemble aleatoire dans lequel placer adresse[i]
+
+    for (let i = 1; i < addressesGeoJson.features.length - 1; ++i) {
+
+      let sub = common.Random.pick(common.mt, partition.subsets);
+
+      sub.chrom[i] = true;
+
+    }
+
+    return partition;
 
   }
 
