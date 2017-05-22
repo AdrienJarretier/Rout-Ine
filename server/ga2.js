@@ -185,7 +185,10 @@ exports.start = function(params, socket) {
 
       let rejectedCount = 0;
       while (pop.length < POPULATION_SIZE) {
-        let child = mate(weightedRouletteWheel(currentPop), weightedRouletteWheel(currentPop));
+
+        let firstParent = weightedRouletteWheel(currentPop);
+
+        let child = mate(firstParent, weightedRouletteWheel(currentPop, firstParent.id));
 
         // pop.push(child);
 
@@ -476,6 +479,8 @@ exports.start = function(params, socket) {
     copy() {
 
       let copyPart = new Partition();
+
+      copyPart.id = this.id;
 
       for (let sub of this.subsets) {
 
@@ -826,9 +831,22 @@ exports.start = function(params, socket) {
 
   }
 
-  function weightedRouletteWheel(population) {
+  function weightedRouletteWheel(population, ignoreId) {
 
     let maxCumulatedFitness = population[population.length - 1].cumulatedFitness;
+
+    if (ignoreId) {
+
+      // on recherche la partition ayant l'id a ignorer
+
+      let i = 0;
+      while (population[i].id != ignoreId) {
+        ++i;
+      }
+
+      maxCumulatedFitness -= population[i].fitness;
+
+    }
 
     let pickedFit = common.Random.real(0, maxCumulatedFitness, true)(common.mt);
 
@@ -840,6 +858,9 @@ exports.start = function(params, socket) {
 
       currentCumulFit = population[++j].cumulatedFitness;
     }
+
+    if (ignoreId && population[j].id == ignoreId)
+      ++j;
 
     return population[j].copy();
 
