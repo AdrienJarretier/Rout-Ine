@@ -140,7 +140,8 @@ exports.start = function(params, socket) {
     let notOneEmpty = true;
 
     // le nombre minimal d'elements dans un sous ensemble pour qu'il soit accepté
-    const MIN_ELEMENTS = 2;
+    const MIN_ELEMENTS = 21;
+    // const MAX_ELEMENTS = 100;
 
     for (let sub of partition.subsets) {
 
@@ -149,7 +150,7 @@ exports.start = function(params, socket) {
       let count = 0;
 
       let c = sub.chrom;
-      for (let i = 0; i < c.length; ++i) {
+      for (let i = 1; i < c.length; ++i) {
 
         if (c[i] && ++count == MIN_ELEMENTS) {
           empty = false;
@@ -181,10 +182,10 @@ exports.start = function(params, socket) {
       while (pop.length < POPULATION_SIZE) {
         let child = mate(weightedRouletteWheel(currentPop), weightedRouletteWheel(currentPop));
 
-        pop.push(child);
+        // pop.push(child);
 
-        // if (acceptChild(child))
-        //   pop.push(child);
+        if (acceptChild(child))
+          pop.push(child);
         // else {
         //   // forever = false;
         //   // console.log('vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv child vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv');
@@ -702,10 +703,10 @@ exports.start = function(params, socket) {
 
     return new Promise((resolve, reject) => {
 
-      // db.extractNamesList('exampleTours/tour1and2.csv')
-      //   .then(db.getFullAddressesData)
+      db.extractNamesList('exampleTours/tour1and2.csv')
+        .then(db.getFullAddressesData)
 
-      db.getFullAddressesData()
+      // db.getFullAddressesData()
       .then((addressesGeoJson) => {
 
           // la premiere adresse est le depart, c'est l'adresse du ccas,
@@ -732,6 +733,8 @@ exports.start = function(params, socket) {
 
         })
         .then((addresses) => {
+
+          console.log(addresses.albi.length + ' addresses');
 
           osrm.getTableFromAddresses(addresses.albi)
             .then((table) => {
