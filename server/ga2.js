@@ -69,9 +69,9 @@ exports.start = function(params, socket) {
 
   function sendToClient(partition, totalTime) {
 
-    if (partition.totalDuration < lastTotalDuration) {
+    if (partition.subsets[partition.subsets.length-1].duration < lastTotalDuration) {
 
-      lastTotalDuration = partition.totalDuration;
+      lastTotalDuration = partition.subsets[partition.subsets.length-1].duration;
 
       bestPartition = partition;
 
@@ -702,10 +702,10 @@ exports.start = function(params, socket) {
 
     return new Promise((resolve, reject) => {
 
-      db.extractNamesList('exampleTours/tour1and2.csv')
-        .then(db.getFullAddressesData)
+      // db.extractNamesList('exampleTours/tour1and2.csv')
+      //   .then(db.getFullAddressesData)
 
-      // db.getFullAddressesData()
+      db.getFullAddressesData()
       .then((addressesGeoJson) => {
 
           // la premiere adresse est le depart, c'est l'adresse du ccas,
