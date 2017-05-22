@@ -22,7 +22,18 @@ exports.start = function(params, socket) {
 
   // le nombre minimal et max d'elements dans un sous ensemble pour qu'il soit accepté
   const MIN_ELEMENTS = 22;
-  const MAX_ELEMENTS = (params.maxStops > MIN_ELEMENTS ? params.maxStops + 1 : Infinity);
+
+  if (params.maxStops < MIN_ELEMENTS * 2) {
+
+    socket.emit('maxTooSmall');
+    return;
+  }
+
+  console.log('starting ga');
+
+  socket.emit('started');
+
+  const MAX_ELEMENTS = params.maxStops - MIN_ELEMENTS;
 
   console.log('initial generation');
   firstPopulation(nbTrips)

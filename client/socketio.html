@@ -24,6 +24,8 @@
 
   $(document).ready(function() {
 
+    $('#errorTooSmall').hide();
+
     let map = L.map('map').setView([43.93002883039214, 2.1581183602941194], 13);
 
     L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
@@ -37,8 +39,6 @@
 
     $('#startGa').click(function() {
 
-      $('#infos ul').empty();
-
       socket.emit('start',
 
         {
@@ -49,6 +49,19 @@
         }
 
       );
+
+    });
+
+    socket.on('started', function() {
+
+      $('#errorTooSmall').hide();
+      $('#infos ul').empty();
+
+    });
+
+    socket.on('maxTooSmall', function() {
+
+      $('#errorTooSmall').show();
 
     });
 
@@ -122,6 +135,7 @@
   <input id="popSize" type="number">
   <label for="stopTime">temps d'arrêt par adresse : </label>
   <input id="stopTime" type="number"> m
+  <div id="errorTooSmall">maximum trop petit</div>
   <label for="maxStops">nombre maximum de livraisons par tournee : </label>
   <input id="maxStops" type="number">
   <div id="infos">
