@@ -20,6 +20,10 @@ exports.start = function(params, socket) {
   const POPULATION_SIZE = params.popSize;
   const STOP_TIME = params.stopTime * 60;
 
+  // le nombre minimal et max d'elements dans un sous ensemble pour qu'il soit accepté
+  const MIN_ELEMENTS = 22;
+  const MAX_ELEMENTS = (params.maxStops > MIN_ELEMENTS ? params.maxStops + 1 : Infinity);
+
   console.log('initial generation');
   firstPopulation(nbTrips)
     .then((pop) => {
@@ -137,34 +141,25 @@ exports.start = function(params, socket) {
 
   function acceptChild(partition) {
 
-    let notOneEmpty = true;
-
-    // le nombre minimal d'elements dans un sous ensemble pour qu'il soit accepté
-    const MIN_ELEMENTS = 21;
-    // const MAX_ELEMENTS = 100;
-
     for (let sub of partition.subsets) {
 
-      let empty = true;
+      let elementsInSub = sub.getCount();
 
-      let count = 0;
+      if (elementsInSub < MIN_ELEMENTS) {
 
-      let c = sub.chrom;
-      for (let i = 1; i < c.length; ++i) {
-
-        if (c[i] && ++count == MIN_ELEMENTS) {
-          empty = false;
-          break;
-        }
+        console.log('rejected : not enough elements');
+        return false;
       }
-      if (empty) {
-        notOneEmpty = false;
-        break;
+
+      if (elementsInSub > MAX_ELEMENTS) {
+
+        console.log('rejected : too many elements');
+        return false;
       }
 
     }
 
-    return notOneEmpty;
+    return true;
 
   }
 
@@ -698,6 +693,22 @@ exports.start = function(params, socket) {
 
       });
 
+    }
+
+    /**
+     * Compte le nomrbe d'elements dans ce sous ensemble
+     */
+    getCount() {
+
+      return this.chrom.reduce(
+        (acc, cur) => {
+
+          if (cur)
+            acc++;
+
+          return acc;
+
+        }, 0);
     }
 
   }

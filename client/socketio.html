@@ -44,7 +44,8 @@
         {
           nbTrips: $('#nbTrips').val(),
           popSize: $('#popSize').val(),
-          stopTime: $('#stopTime').val()
+          stopTime: $('#stopTime').val(),
+          maxStops: $('#maxStops').val()
         }
 
       );
@@ -81,7 +82,8 @@
 
         let tour = tours[i];
 
-        infosList.append($('<li>').text('durée ' + markersColors[i] + ' : ' + utils.s2hours(tour.trip.trips[0].duration, false)));
+        infosList.append($('<li>')
+          .text(markersColors[i] + ' : ' + utils.s2hours(tour.trip.trips[0].duration, false) + '( ' + (tour.addresses.features.length - 1) + ' )'));
 
         let routeLayer = L.geoJSON(tour.trip.trips[0].geometry).addTo(map);
 
@@ -120,6 +122,8 @@
   <input id="popSize" type="number">
   <label for="stopTime">temps d'arrêt par adresse : </label>
   <input id="stopTime" type="number"> m
+  <label for="maxStops">nombre maximum de livraisons par tournee : </label>
+  <input id="maxStops" type="number">
   <div id="infos">
     <ul>
     </ul>
