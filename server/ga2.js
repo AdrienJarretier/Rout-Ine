@@ -69,9 +69,9 @@ exports.start = function(params, socket) {
 
   function sendToClient(partition, totalTime) {
 
-    if (partition.subsets[partition.subsets.length-1].duration < lastTotalDuration) {
+    if (partition.subsets[partition.subsets.length - 1].duration < lastTotalDuration) {
 
-      lastTotalDuration = partition.subsets[partition.subsets.length-1].duration;
+      lastTotalDuration = partition.subsets[partition.subsets.length - 1].duration;
 
       bestPartition = partition;
 
