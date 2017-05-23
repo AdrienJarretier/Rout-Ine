@@ -8,6 +8,7 @@
   <title>Chargement du planning</title>
   <link rel="stylesheet" href="style.css">
   <script src="jquery-latest.min.js"></script>
+  <script type="text/javascript" src="utils.js"></script>
   <script src="/socket.io/socket.io.js"></script>
   <!-- Leaflet -->
   <link rel="stylesheet" href="leaflet/leaflet.css">
@@ -39,6 +40,9 @@
 
     let socket = io.connect();
 
+    $('#startGa').prop("disabled", false);;
+    $('#stopGa').prop("disabled", true);;
+
     $('#startGa').click(function() {
 
       socket.emit('start',
@@ -58,6 +62,18 @@
 
       $('#errorTooSmall').hide();
       $('#infos ul').empty();
+
+      $('#startGa').prop("disabled", true);;
+      $('#stopGa').prop("disabled", false);;
+
+
+    });
+
+
+    socket.on('stopped', function() {
+
+      $('#startGa').prop("disabled", false);;
+      $('#stopGa').prop("disabled", true);;
 
     });
 
@@ -161,6 +177,10 @@
         <div id="map"></div>
       </div>
       <div class="col-xs-3">
+        <div id="infos">
+          <ul>
+          </ul>
+        </div>
       </div>
     </div>
   </div>

@@ -197,6 +197,7 @@ exports.start = function(params, socket) {
           console.log('*****   *****');
           console.log(' GA STOPPED');
           console.log('*****   *****');
+          socket.emit('stopped');
         }
       });
   }
