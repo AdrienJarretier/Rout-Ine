@@ -6,46 +6,96 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
   <title>Chargement du planning</title>
+  <link rel="stylesheet" href="style.css">
   <!-- Bootstrap -->
   <link href="bootstrap-3.3.7-dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
   <script src="jquery-latest.min.js"></script>
   <!-- Include all compiled plugins (below), or include individual files as needed -->
+  <link rel="stylesheet" href="leaflet/leaflet.css">
+  <script src="leaflet/leaflet.js"></script>
   <script src="bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+  <script src='common.js'></script>
+  <script src='mapFunctions.js'></script>
+  <script type="text/javascript">
+  'use strict';
+  /*
+  Strict mode makes several changes to normal JavaScript semantics.
+  First, strict mode eliminates some JavaScript silent errors by changing them to throw errors.
+  Second, strict mode fixes mistakes that make it difficult for JavaScript engines to perform optimizations:
+  strict mode code can sometimes be made to run faster than identical code that's not strict mode.
+  Third, strict mode prohibits some syntax likely to be defined in future versions of ECMAScript.
+  */
+
+  // execute le javascript quand la page est completement chargee
+  $(document).ready(function() {
+
+    let map = initMap();
+
+
+    $('#errorTooSmall').hide();
+
+    socket.on('started', function() {
+
+      $('#errorTooSmall').hide();
+      $('#infos ul').empty();
+
+    });
+
+    socket.on('maxTooSmall', function() {
+
+      $('#errorTooSmall').show();
+
+    });
+
+
+  });
+  </script>
 </head>
 
 <body>
   <h1>Chargement du planning</h1>
-  <form>
-    <div class="form-group">
-      <label for="nbTrips">Nombre de tournées : </label>
-      <input class="form-control" id="nbTrips" type="date">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-xs-3">
+        <form>
+          <div class="form-group">
+            <label for="nbTrips">Nombre de tournées : </label>
+            <input class="form-control" id="nbTrips" type="number">
+          </div>
+          <div class="form-group">
+            <label for="popSize">PopSize : </label>
+            <input class="form-control" id="popSize" type="number">
+          </div>
+          <div class="form-group">
+            <label for="stopTime">Temps d'arrêt par adresse : </label>
+            <input class="form-control" id="stopTime" type="number"> m
+          </div>
+          <div class="form-group">
+            <div id="errorTooSmall" class="alert alert-danger" role="alert">Maximum trop petit</div>
+            <label for="maxStops">Nombre maximum de livraisons par tournee : </label>
+            <input class="form-control" id="maxStops" type="number">
+          </div>
+          <div class="form-group">
+            <label for="inputSchedule">Sélection du planning</label>
+            <input type="file" id="inputSchedule">
+          </div>
+          <div class="form-group">
+            <label for="daySelection">Jour à calculer</label>
+            <select id="daySelection" class="form-control">
+            </select>
+          </div>
+          <button id="startGa" class="btn btn-primary">Démarrer le calcul</button>
+          <button id="stopGa" class="btn btn-danger">Stop</button>
+        </form>
+      </div>
+      <div class="col-xs-6">
+        <div id="map"></div>
+      </div>
+      <div class="col-xs-3">
+      </div>
     </div>
-    <div class="form-group">
-      <label for="popSize">PopSize : </label>
-      <input class="form-control" id="popSize" type="number">
-    </div>
-    <div class="form-group">
-      <label for="stopTime">Temps d'arrêt par adresse : </label>
-      <input class="form-control" id="stopTime" type="number"> m
-    </div>
-    <div class="form-group">
-      <div id="errorTooSmall" class="alert alert-danger" role="alert">Maximum trop petit</div>
-      <label for="maxStops">Nombre maximum de livraisons par tournee : </label>
-      <input class="form-control" id="maxStops" type="number">
-    </div>
-    <div class="form-group">
-      <label for="inputSchedule">Sélection du planning</label>
-      <input type="file" id="inputSchedule">
-    </div>
-    <div class="form-group">
-      <label for="daySelection">Jour à calculer</label>
-      <select id="daySelection" class="form-control">
-      </select>
-    </div>
-    <button id="startGa" class="btn btn-primary">Démarrer le calcul</button>
-    <button id="stopGa" class="btn btn-danger">Stop</button>
-  </form>
+  </div>
 </body>
 
 </html>
