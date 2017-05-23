@@ -58,17 +58,11 @@
           return {
             color: markersColors[i]
           };
-        });
+        }).addTo(map);
 
         console.log(tour);
 
         let markers = addressesMarkers(tour.trip.waypoints, tour.addresses, markersColors[i]);
-
-
-
-        // let group = L.layerGroup([
-        //   routeLayer
-        // ]);
 
         overlayMaps[groupTours][markersColors[i]] = routeLayer;
         overlayMaps[groupMarkers][markersColors[i]] = markers;
@@ -79,9 +73,6 @@
         // Make the "trips" group exclusive (use radio inputs)
         // exclusiveGroups: [groupName]
       };
-
-      overlayMaps[groupTours][markersColors[0]].addTo(map);
-      overlayMaps[groupMarkers][markersColors[0]].addTo(map);
 
       L.control.groupedLayers(null, overlayMaps, options).addTo(map);
 
