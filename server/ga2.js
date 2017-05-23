@@ -1,5 +1,6 @@
 'use strict';
 
+const async = require('async');
 const common = require('./common.js');
 const db = require('./db.js');
 const FeatureCollection = require('./FeatureCollection.js');
@@ -34,6 +35,14 @@ exports.start = function(params, socket) {
 
   socket.emit('started');
 
+
+  let sendToClientQ = async.queue(function(task, callback) {
+
+    sendToClient(task.partition, task.totalTime)
+      .then(() => { callback(); });
+
+  }, 1);
+
   console.log('initial generation');
   firstPopulation(nbTrips)
     .then((pop) => {
@@ -41,7 +50,19 @@ exports.start = function(params, socket) {
       console.log(' ************** initial pop ready ************** ');
 
       console.log(pop[0]);
-      sendToClient(pop[0], (Date.now() - timeStart));
+
+      sendToClientQ.push({
+          partition: pop[0],
+          totalTime: (Date.now() - timeStart)
+        },
+        function(err) {
+
+          if (err) {
+            console.log('error when sending initial pop');
+            console.log(err);
+          } else
+            console.log('initial pop sent');
+        });
 
       reproduceForever(pop);
 
@@ -78,47 +99,64 @@ exports.start = function(params, socket) {
     genNumber: 0,
     partitionId: 0,
     totalTime: 0,
-    trips: []
+    trips: [] // un tableau d'objets {
+      //                trip: trip,
+      //                addresses: featColl
+      //              }
+
   }
 
   function sendToClient(partition, totalTime) {
 
-    if (partition.subsets[partition.subsets.length - 1].duration < lastTotalDuration) {
+    return new Promise((resolve, reject) => {
 
-      lastTotalDuration = partition.subsets[partition.subsets.length - 1].duration;
+      if (partition.subsets[partition.subsets.length - 1].duration < lastTotalDuration) {
 
-      bestPartition = partition;
+        partition.computeAllTrips(true)
+          .then(() => {
 
-      timeLastBest = Date.now();
-      bestResult.genNumber = genCount;
-      bestResult.partitionId = partition.id;
-      bestResult.totalTime = totalTime;
-      bestResult.trips = partition.trips;
+            lastTotalDuration = partition.subsets[partition.subsets.length - 1].duration;
 
-      common.writeJson(common.serverConfig.resultsFolder + "/bestTours.json", bestResult);
+            bestPartition = partition;
 
-      socket.emit('bestResult', bestResult);
+            timeLastBest = Date.now();
+            bestResult.genNumber = genCount;
+            bestResult.partitionId = partition.id;
+            bestResult.totalTime = totalTime;
 
-      console.log('best : ');
-      console.log(partition);
+            bestResult.trips = partition.subsetsTrips;
 
-      for (let sub of partition.subsets) {
+            common.writeJson(common.serverConfig.resultsFolder + "/bestTours.json", bestResult);
 
-        let countElementsInSubset = sub.chrom.reduce(
-          (acc, cur) => {
+            socket.emit('bestResult', bestResult);
 
-            if (cur)
-              acc++;
+            console.log('best : ');
+            console.log(partition);
 
-            return acc;
+            for (let sub of partition.subsets) {
 
-          }, 0);
+              let countElementsInSubset = sub.chrom.reduce(
+                (acc, cur) => {
 
-        console.log('');
-        console.log(countElementsInSubset);
-      }
+                  if (cur)
+                    acc++;
 
-    }
+                  return acc;
+
+                }, 0);
+
+              console.log('');
+              console.log(countElementsInSubset);
+            }
+
+            resolve();
+
+          });
+
+      } else
+        resolve();
+
+    });
 
   }
 
@@ -132,7 +170,18 @@ exports.start = function(params, socket) {
         console.log(' ************** generation ' + (++genCount) + ' Born ************** ');
         console.log('');
 
-        sendToClient(nextGen[0], totalTime);
+        sendToClientQ.push({
+            partition: nextGen[0],
+            totalTime: totalTime
+          },
+          function(err) {
+
+            if (err) {
+              console.log('error when sending new generation');
+              console.log(err);
+            } else
+              console.log('new gen sent');
+          });
 
         if (forever && bestResult.genNumber + MAX_GEN_WITHOUT_BETTER > genCount)
           reproduceForever(nextGen);
@@ -464,7 +513,7 @@ exports.start = function(params, socket) {
       this.fitness = 0.0;
       this.cumulatedFitness = 0.0;
 
-      this.trips = [];
+      this.subsetsTrips = [];
 
     }
 
@@ -499,11 +548,11 @@ exports.start = function(params, socket) {
 
     }
 
-    computeAllTrips() {
+    computeAllTrips(fullRoutes) {
 
       return new Promise((resolve, reject) => {
 
-        this.trips.length = 0;
+        this.subsetsTrips.length = 0;
         this.totalDistance = 0;
         this.totalDuration = 0;
 
@@ -513,7 +562,7 @@ exports.start = function(params, socket) {
 
         for (let subset of this.subsets) {
 
-          promises.push(subset.computeTrip());
+          promises.push(subset.computeTrip((fullRoutes ? true : false)));
 
         }
 
@@ -526,9 +575,9 @@ exports.start = function(params, socket) {
             */
             console.log('caught');
           })
-          .then((tripAndAddresses) => {
+          .then((subsetsTrips) => {
 
-            this.trips = this.trips.concat(tripAndAddresses);
+            this.subsetsTrips = subsetsTrips;
 
 
             for (let subset of this.subsets) {
@@ -662,7 +711,7 @@ exports.start = function(params, socket) {
 
     }
 
-    computeTrip() {
+    computeTrip(fullRoute) {
 
       return new Promise((resolve, reject) => {
 
@@ -678,7 +727,7 @@ exports.start = function(params, socket) {
 
         let featColl = new FeatureCollection(featuresArray);
 
-        osrm.getTripFromAddresses(featColl, true)
+        osrm.getTripFromAddresses(featColl, fullRoute)
           .then((trip) => {
 
             if (!trip.trips)
@@ -728,11 +777,11 @@ exports.start = function(params, socket) {
 
     return new Promise((resolve, reject) => {
 
-      // db.extractNamesList('exampleTours/tour1and2.csv')
-      //   .then(db.getFullAddressesData)
+      db.extractNamesList('exampleTours/tour1and2.csv')
+        .then(db.getFullAddressesData)
 
-      db.getFullAddressesData()
-        .then((addressesGeoJson) => {
+      // db.getFullAddressesData()
+      .then((addressesGeoJson) => {
 
           // la premiere adresse est le depart, c'est l'adresse du ccas,
           // elle est positionne en 1ere position par la fonction getAddresses du module db
