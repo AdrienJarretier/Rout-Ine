@@ -193,6 +193,10 @@ exports.start = function(params, socket) {
 
           console.log(timeSinceBest / 1000 + ' sec without better result');
           console.log(totalTime / 1000 + ' sec total');
+
+          console.log('*****   *****');
+          console.log(' GA STOPPED');
+          console.log('*****   *****');
         }
       });
   }
@@ -777,11 +781,11 @@ exports.start = function(params, socket) {
 
     return new Promise((resolve, reject) => {
 
-      db.extractNamesList('exampleTours/tour1and2.csv')
-        .then(db.getFullAddressesData)
+      // db.extractNamesList('exampleTours/tour1and2.csv')
+      //   .then(db.getFullAddressesData)
 
-      // db.getFullAddressesData()
-      .then((addressesGeoJson) => {
+      db.getFullAddressesData()
+        .then((addressesGeoJson) => {
 
           // la premiere adresse est le depart, c'est l'adresse du ccas,
           // elle est positionne en 1ere position par la fonction getAddresses du module db
