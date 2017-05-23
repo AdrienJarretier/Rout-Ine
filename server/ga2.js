@@ -773,30 +773,27 @@ exports.start = function(params, socket) {
 
           console.log(addresses.albi.length + ' addresses');
 
-          
+          let population = [];
 
+          for (let i = 0; i < POPULATION_SIZE; ++i) {
 
-              let population = [];
+            console.log('partitioning #' + i);
 
-              for (let i = 0; i < POPULATION_SIZE; ++i) {
+            randomChunkify(addresses.albi, nbTrips).computeAllTrips()
+              .then((partition) => {
 
-                console.log('partitioning #' + i);
+                console.log('partitioning #' + i + ' trip computed, done');
 
-                randomChunkify(addresses.albi, nbTrips).computeAllTrips()
-                  .then((partition) => {
+                population.push(partition);
 
-                    console.log('partitioning #' + i + ' trip computed, done');
+                if (population.length == POPULATION_SIZE) {
 
-                    population.push(partition);
+                  applyPartitionsFitness(population);
+                  resolve(population);
+                }
 
-                    if (population.length == POPULATION_SIZE) {
-
-                      applyPartitionsFitness(population);
-                      resolve(population);
-                    }
-
-                  });
-              }
+              });
+          }
 
         });
 
