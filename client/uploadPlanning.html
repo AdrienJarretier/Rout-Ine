@@ -8,6 +8,7 @@
   <title>Chargement du planning</title>
   <link rel="stylesheet" href="style.css">
   <script src="jquery-latest.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
   <!-- Leaflet -->
   <link rel="stylesheet" href="leaflet/leaflet.css">
   <script src="leaflet/leaflet.js"></script>
@@ -36,6 +37,23 @@
 
     $('#errorTooSmall').hide();
 
+    let socket = io.connect();
+
+    $('#startGa').click(function() {
+
+      socket.emit('start',
+
+        {
+          nbTrips: $('#nbTrips').val(),
+          popSize: $('#popSize').val(),
+          stopTime: $('#stopTime').val(),
+          maxStops: $('#maxStops').val()
+        }
+
+      );
+
+    });
+
     socket.on('started', function() {
 
       $('#errorTooSmall').hide();
@@ -46,6 +64,55 @@
     socket.on('maxTooSmall', function() {
 
       $('#errorTooSmall').show();
+
+    });
+
+    $('#stopGa').click(function() {
+
+      socket.emit('stop');
+
+    });
+
+    let routes = [];
+
+    socket.on('bestResult', function(bestResult) {
+
+      console.log(bestResult);
+
+      let markersColors = ["darkred", "blue", "green", "orange", "black", "purple"];
+
+      let tours = bestResult.trips;
+
+      routes.forEach(function(layer) {
+        map.removeLayer(layer);
+      });
+
+      let infosList = $('#infos ul');
+
+      infosList.append($('<li>').html(bestResult.genNumber + "<sup>ème</sup> génération"));
+      infosList.append($('<li>').text('id partition : ' + bestResult.partitionId));
+      infosList.append($('<li>').text('obtenu en : ' + utils.s2hours(bestResult.totalTime / 1000, true)));
+
+      for (let i in tours) {
+
+        let tour = tours[i];
+
+        infosList.append($('<li>')
+          .text(markersColors[i] + ' : ' + utils.s2hours(tour.trip.trips[0].duration, false) + '( ' + (tour.addresses.features.length - 1) + ' )'));
+
+        let routeLayer = L.geoJSON(tour.trip.trips[0].geometry).addTo(map);
+
+        routeLayer.setStyle(function(feature) {
+          return {
+            color: markersColors[i]
+          };
+        });
+
+        routes.push(routeLayer);
+
+      }
+
+      infosList.append($('<br>'));
 
     });
 
@@ -73,9 +140,9 @@
             <input class="form-control" id="stopTime" type="number"> m
           </div>
           <div class="form-group">
-            <div id="errorTooSmall" class="alert alert-danger" role="alert">Maximum trop petit</div>
             <label for="maxStops">Nombre maximum de livraisons par tournee : </label>
             <input class="form-control" id="maxStops" type="number">
+            <div id="errorTooSmall" class="alert alert-danger" role="alert">Maximum trop petit</div>
           </div>
           <div class="form-group">
             <label for="inputSchedule">Sélection du planning</label>
@@ -86,8 +153,8 @@
             <select id="daySelection" class="form-control">
             </select>
           </div>
-          <button id="startGa" class="btn btn-primary">Démarrer le calcul</button>
-          <button id="stopGa" class="btn btn-danger">Stop</button>
+          <button id="startGa" class="btn btn-primary" type="button">Démarrer le calcul</button>
+          <button id="stopGa" class="btn btn-danger" type="button">Stop</button>
         </form>
       </div>
       <div class="col-xs-6">
