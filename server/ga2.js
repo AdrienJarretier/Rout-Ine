@@ -464,8 +464,6 @@ exports.start = function(params, socket) {
       this.fitness = 0.0;
       this.cumulatedFitness = 0.0;
 
-      this.error = 0.0;
-
       this.trips = [];
 
     }
@@ -496,8 +494,6 @@ exports.start = function(params, socket) {
 
       copyPart.fitness = this.fitness;
       copyPart.cumulatedFitness = this.cumulatedFitness;
-
-      copyPart.error = this.error;
 
       return copyPart;
 
@@ -572,10 +568,6 @@ exports.start = function(params, socket) {
       this.distance = 0.0;
       this.duration = 0.0;
 
-      this.error = 0.0;
-
-      this.lastAddressId; // utilise par greedyChunk
-
     }
 
     copy() {
@@ -586,10 +578,6 @@ exports.start = function(params, socket) {
 
       copySub.distance = this.distance;
       copySub.duration = this.duration;
-
-      copySub.error = this.error;
-
-      copySub.lastAddressId = this.lastAddressId; // utilise par greedyChunk
 
       return copySub;
 
