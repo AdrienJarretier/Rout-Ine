@@ -773,8 +773,8 @@ exports.start = function(params, socket) {
 
           console.log(addresses.albi.length + ' addresses');
 
-          osrm.getTableFromAddresses(addresses.albi)
-            .then((table) => {
+          
+
 
               let population = [];
 
@@ -797,8 +797,6 @@ exports.start = function(params, socket) {
 
                   });
               }
-
-            });
 
         });
 
