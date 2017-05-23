@@ -15,8 +15,3 @@ body {
 #map {
     height: 600px;
 }
-
-#infos {
-    float: right;
-    margin-right: 100px;
-}
