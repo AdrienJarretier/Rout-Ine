@@ -141,7 +141,7 @@
 
       let reader = new FileReader();
 
-      reader.readAsText(schedule);
+      reader.readAsText(schedule, 'Windows-1252');
 
       reader.onloadend = function() {
 
