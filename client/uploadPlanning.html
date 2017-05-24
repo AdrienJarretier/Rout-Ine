@@ -137,28 +137,17 @@
 
     $('#inputSchedule').change(function() {
 
-      console.log('changed');
+      let schedule = this.files[0];
 
-      $.post('parseSchedule', $('#formSchedule').serialize(),
-        function(data, textStatus, jqXHR) {
+      let reader = new FileReader();
 
-          console.log(data);
+      reader.readAsText(schedule);
 
-          // boulodromesLayer.addData(data);
-          // formBoulodromesLayer.addData(data);
-          // clicked = false;
-          // document.getElementById("ajoutBoulodrome").reset();
-          // popup.remove();
-          // $('#erreur').hide();
-        });
+      reader.onloadend = function() {
 
-      // let formData = new FormData(document.getElementById('formSchedule'));
+        console.log(reader.result);
 
-      // $.get(formData.get('inputSchedule').name, function(data) {
-
-      //   console.log(data);
-
-      // });
+      };
 
     });
 
