@@ -2,7 +2,7 @@
 
 const common = require('./common.js');
 
-const TARGET_DIRECTORY = 'tests';
+const TARGET_DIRECTORY = common.serverConfig.resultsFolder;
 
 common.readFile('gaResults/bestTours.json')
   .then((content) => {
