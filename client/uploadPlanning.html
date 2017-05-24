@@ -138,7 +138,27 @@
     $('#inputSchedule').change(function() {
 
       console.log('changed');
-      console.log($(this));
+
+      $.post('parseSchedule', $('#formSchedule').serialize(),
+        function(data, textStatus, jqXHR) {
+
+          console.log(data);
+
+          // boulodromesLayer.addData(data);
+          // formBoulodromesLayer.addData(data);
+          // clicked = false;
+          // document.getElementById("ajoutBoulodrome").reset();
+          // popup.remove();
+          // $('#erreur').hide();
+        });
+
+      // let formData = new FormData(document.getElementById('formSchedule'));
+
+      // $.get(formData.get('inputSchedule').name, function(data) {
+
+      //   console.log(data);
+
+      // });
 
     });
 
@@ -158,31 +178,31 @@
   <div class="container-fluid">
     <div class="row">
       <div class="col-xs-3">
-        <form>
+        <form id='formSchedule'>
           <div class="form-group">
             <label for="nbTrips">Nombre de tournées : </label>
-            <input class="form-control" id="nbTrips" type="number">
+            <input class="form-control" id="nbTrips" name="nbTrips" type="number">
           </div>
           <div class="form-group">
             <label for="popSize">PopSize : </label>
-            <input class="form-control" id="popSize" type="number">
+            <input class="form-control" id="popSize" name="popSize" type="number">
           </div>
           <div class="form-group">
             <label for="stopTime">Temps d'arrêt par adresse : </label>
-            <input class="form-control" id="stopTime" type="number"> m
+            <input class="form-control" id="stopTime" name="stopTime" type="number"> m
           </div>
           <div class="form-group">
             <label for="maxStops">Nombre maximum de livraisons par tournee : </label>
-            <input class="form-control" id="maxStops" type="number">
+            <input class="form-control" id="maxStops" name="maxStops" type="number">
             <div id="errorTooSmall" class="alert alert-danger" role="alert">Maximum trop petit</div>
           </div>
           <div class="form-group">
             <label for="inputSchedule">Sélection du planning</label>
-            <input type="file" id="inputSchedule">
+            <input type="file" id="inputSchedule" name="inputSchedule">
           </div>
           <div class="form-group">
             <label for="daySelection">Jour à calculer</label>
-            <select id="daySelection" class="form-control">
+            <select id="daySelection" name="daySelection" class="form-control">
             </select>
           </div>
           <button id="startGa" class="btn btn-primary" type="button">Démarrer le calcul</button>

@@ -143,3 +143,13 @@ app.get('/downloadTrip', function(req, res) {
   sendTour(req, res, 'tourTrip');
 
 });
+
+app.post('/parseSchedule', function(req, res) {
+
+  let schedule = req.body;
+
+  console.log(schedule);
+
+  res.send('ok');
+
+});
