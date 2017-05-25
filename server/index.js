@@ -82,38 +82,38 @@ app.get('/bestFromGa', function(req, res) {
   const RESULT_FILE = 'bestTours.json';
 
   common.readFile(config.resultsFolder + '/' + RESULT_FILE)
-    .catch((err) => {
-
-      if (err.code == 'ENOENT') {
-
-        const logMsg = 'impossible de trouver le fichier ' + RESULT_FILE;
-
-        console.log(logMsg);
-        common.writeInLog(logMsg)
-          .then(() => {
-
-            res.send(err);
-
-          });
-
-      } else {
-
-        console.log(err);
-        common.writeInLog(err.Error)
-          .then(() => {
-
-            res.send(err);
-
-          });
-
-      }
-
-    })
     .then((fileContent) => {
 
-      console.log('sdfsd');
-      res.send(JSON.parse(fileContent));
-    });
+        console.log('sdfsd');
+        res.send(JSON.parse(fileContent));
+      },
+      (err) => {
+
+        if (err.code == 'ENOENT') {
+
+          const logMsg = 'impossible de trouver le fichier ' + RESULT_FILE;
+
+          console.log(logMsg);
+          common.writeInLog(logMsg)
+            .then(() => {
+
+              res.send(err);
+
+            });
+
+        } else {
+
+          console.log(err);
+          common.writeInLog(err.Error)
+            .then(() => {
+
+              res.send(err);
+
+            });
+
+        }
+
+      });
 
 });
 
