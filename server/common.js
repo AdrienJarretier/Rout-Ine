@@ -22,36 +22,84 @@ function readFile(file) {
   return new Promise((resolve, reject) => {
 
     fs.open(file, 'r', (err, fd) => {
-      fs.readFile(fd, 'utf8', (err, fileContent) => {
 
-        fs.close(fd);
+      if (err) {
 
-        resolve(fileContent);
+        reject(err);
 
-      });
+      } else {
+
+        fs.readFile(fd, 'utf8', (err, fileContent) => {
+
+          fs.close(fd);
+
+          if (err)
+            reject(err);
+          else {
+
+            resolve(fileContent);
+          }
+
+        });
+
+      }
     });
   });
 }
 
-function writeFile(file, content) {
+function writeFile(file, content, append) {
 
   return new Promise((resolve, reject) => {
 
-    fs.writeFile(file, content, 'utf8', (err) => {
+    fs.open(file, (append ? 'a' : 'w'), (err, fd) => {
 
-      if (err)
+      if (err) {
+
         reject(err);
-      else
-        resolve();
 
+      } else {
+
+        fs.writeFile(fd, content, 'utf8', (err) => {
+
+          if (err) {
+            reject(err);
+          } else {
+
+            fs.close(fd);
+            resolve();
+          }
+
+        });
+
+      }
     });
   });
+
 }
 
 function writeJson(file, object) {
 
   return writeFile(file, JSON.stringify(object, null, 2));
 }
+
+
+/**
+ * writes current date time in logfile then logs the given information
+ *
+ * @param {String} info information to write in logfile
+ *
+ */
+function writeInLog(info) {
+
+  let currentDate = new Date();
+
+  let dateTimeString = currentDate.toLocaleDateString() + '_' + currentDate.toLocaleTimeString();
+
+  let logFile = serverConfig.logs.dir + '/' + serverConfig.logs.errors;
+
+  return writeFile(logFile, dateTimeString + ' : ' + info + '\n', true);
+}
+exports.writeInLog = writeInLog;
 
 exports.readFile = readFile;
 exports.serverConfig = serverConfig;

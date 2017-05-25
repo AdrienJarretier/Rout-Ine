@@ -8,8 +8,12 @@
   },
   "osrm": {
     "protocol": "http",
-    "ip": "10.1.0.205",
+    "ip": "127.0.0.1",
     "port": 5000
   },
-  "resultsFolder": "gaResults"
+  "resultsFolder": "gaResults",
+  "logs": {
+    "dir": "logs",
+    "errors": "errors.log"
+  }
 }
