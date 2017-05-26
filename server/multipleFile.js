@@ -15,8 +15,8 @@ common.readFile('gaResults/bestTours.json')
 
       let tour = object.trips[i];
 
-      common.writeFile(TARGET_DIRECTORY + '/tourTrip' + i + '.js', 'let jsonFeatureTrip = ' + JSON.stringify(
-        tour.trip.trips[0], null, 2) + ';');
+      common.writeFile(TARGET_DIRECTORY + '/tourTrip' + i + '.js', JSON.stringify(
+        tour.trip.trips[0], null, 2));
 
       // common.writeJson(TARGET_DIRECTORY+'/tourTrip' + i + '.json', tour.trip.trips[0]);
 
@@ -33,8 +33,8 @@ common.readFile('gaResults/bestTours.json')
       // }
 
 
-      common.writeFile(TARGET_DIRECTORY + '/tourAddresses' + i + '.js', 'let geojsonFeature = ' + JSON.stringify(
-        tour.addresses, null, 2) + ';');
+      common.writeFile(TARGET_DIRECTORY + '/tourAddresses' + i + '.js', JSON.stringify(
+        tour.addresses, null, 2));
       // common.writeJson('tourAddresses' + i + '.json', tour.addresses);
 
     }
