@@ -126,7 +126,8 @@ exports.start = function(params, socket) {
 
             bestResult.trips = partition.subsetsTrips;
 
-            common.writeJson(common.serverConfig.resultsFolder + "/bestTours.json", bestResult);
+            common.writeJson(common.serverConfig.resultsFolder + '/bestTours' + utils.currentDateTimeString() +
+              '.json', bestResult);
 
             socket.emit('bestResult', bestResult);
 
@@ -782,11 +783,11 @@ exports.start = function(params, socket) {
 
     return new Promise((resolve, reject) => {
 
-      // db.extractNamesList('exampleTours/tour1and2.csv')
-      //   .then(db.getFullAddressesData)
+      db.extractNamesList('exampleTours/tour1and2.csv')
+        .then(db.getFullAddressesData)
 
-      db.getFullAddressesData()
-        .then((addressesGeoJson) => {
+      // db.getFullAddressesData()
+      .then((addressesGeoJson) => {
 
           // la premiere adresse est le depart, c'est l'adresse du ccas,
           // elle est positionne en 1ere position par la fonction getAddresses du module db

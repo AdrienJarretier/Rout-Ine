@@ -106,3 +106,18 @@ function s2hours(seconds, appendSeconds) {
   return textTime;
 }
 exports.s2hours = s2hours;
+
+function currentDateTimeString() {
+
+  let currentDate = new Date();
+
+  let dateTimeString = currentDate.toLocaleDateString() + '_' + currentDate.toLocaleTimeString();
+
+  dateTimeString = dateTimeString.replace(/:/g, '-');
+
+  return dateTimeString;
+
+}
+exports.currentDateTimeString = currentDateTimeString;
+
+console.log(currentDateTimeString());
