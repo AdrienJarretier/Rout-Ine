@@ -126,8 +126,8 @@ exports.start = function(params, socket) {
 
             bestResult.trips = partition.subsetsTrips;
 
-            common.writeJson(common.serverConfig.resultsFolder + '/bestTours' + utils.currentDateTimeString() +
-              '.json', bestResult);
+            // common.writeJson(common.serverConfig.resultsFolder + '/bestTours' + utils.currentDateTimeString() +
+            //   '.json', bestResult);
 
             socket.emit('bestResult', bestResult);
 
@@ -189,6 +189,9 @@ exports.start = function(params, socket) {
         else {
           console.log('best partition found : ');
           console.log(bestPartition);
+
+          common.writeJson(common.serverConfig.resultsFolder + '/bestTours' + utils.currentDateTimeString() +
+            '.json', bestResult);
 
           let timeSinceBest = (Date.now() - timeLastBest);
 
