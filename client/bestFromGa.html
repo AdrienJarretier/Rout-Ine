@@ -14,7 +14,6 @@
   <link rel="stylesheet" href="Leaflet.awesome-numbered-marker-master/src/leaflet_awesome_number_markers.css" />
   <script src="Leaflet.awesome-numbered-marker-master/src/leaflet_awesome_number_markers.js"></script>
   <!--  -->
-  <link rel="stylesheet" href="style.css" />
   <!-- groupedlayercontrol -->
   <script src='leaflet-groupedlayercontrol-0.6.0/dist/leaflet.groupedlayercontrol.min.js'></script>
   <link rel="stylesheet" href="leaflet-groupedlayercontrol-0.6.0/dist/leaflet.groupedlayercontrol.min.css">
@@ -23,6 +22,7 @@
   <link href="bootstrap-3.3.7-dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
   <!-- -->
+  <link rel="stylesheet" href="style.css" />
   <script src='common.js'></script>
   <script src='mapFunctions.js'></script>
   <script>
@@ -32,92 +32,143 @@
 
     $('#error').hide();
     $('#errorNoData').hide();
+    $('#datesDropwdownMenu').hide();
 
     let map = initMap();
 
-    $.get("bestFromGa", function(bestResult) {
+    $.get('listResults', function(dates) {
 
-      if (bestResult.code == "ENOENT") {
+      if (dates.length == 0) {
 
         $('#errorNoData').show();
-
-      } else if (bestResult.trips) {
-
-        let markersColors = ["darkred", "blue", "green", "orange", "black", "purple"];
-
-        let tours = bestResult.trips;
-
-        let infosList = $('#infos ul');
-
-        infosList.append($('<li>').html(bestResult.genNumber + "<sup>ème</sup> génération"));
-        infosList.append($('<li>').text('id partition : ' + bestResult.partitionId));
-        infosList.append($('<li>').text('obtenu en : ' + utils.s2hours(bestResult.totalTime / 1000, true)));
-
-        let groupTours = 'Tournées',
-          groupMarkers = 'Adresses';
-        let overlayMaps = {
-          [groupTours]: {},
-          [groupMarkers]: {}
-        };
-
-        for (let i in tours) {
-
-          let tour = tours[i];
-
-          infosList.append($('<li>').text('durée ' + markersColors[i] + ' : ' + utils.s2hours(tour.trip.trips[0].duration, false)));
-
-          let routeLayer = L.geoJSON(tour.trip.trips[0].geometry);
-          routeLayer.setStyle(function(feature) {
-            return {
-              color: markersColors[i]
-            };
-          }).addTo(map);
-
-          console.log(tour);
-
-          let markers = addressesMarkers(tour.trip.waypoints, tour.addresses, markersColors[i]);
-
-          overlayMaps[groupTours][markersColors[i]] = routeLayer;
-          overlayMaps[groupMarkers][markersColors[i]] = markers;
-
-        }
-
-        var options = {
-          // Make the "trips" group exclusive (use radio inputs)
-          // exclusiveGroups: [groupName]
-        };
-
-        L.control.groupedLayers(null, overlayMaps, options).addTo(map);
-
-
       } else {
 
-        $('#error').show();
+        $('#datesDropwdownMenu').show();
 
+        for (let i in dates) {
+
+          let d = dates[i];
+
+          let time = d.time.replace('-', 'h');
+          time = time.replace(/-.*/, '');
+
+          let link = $('<a href="#">').text(d.date + ' ' + time);
+
+          link.click(function() {
+
+            console.log(d);
+          });
+
+          $('#datesDropwdownMenu ul').append($('<li>').append(link));
+
+        }
       }
 
-
     });
+
+    // $.get("bestFromGa", function(bestResult) {
+
+    //   if (bestResult.code == "ENOENT") {
+
+    //     $('#errorNoData').show();
+
+    //   } else if (bestResult.trips) {
+
+    //     let markersColors = ["darkred", "blue", "green", "orange", "black", "purple"];
+
+    //     let tours = bestResult.trips;
+
+    //     let infosList = $('#infos ul');
+
+    //     infosList.append($('<li>').html(bestResult.genNumber + "<sup>ème</sup> génération"));
+    //     infosList.append($('<li>').text('id partition : ' + bestResult.partitionId));
+    //     infosList.append($('<li>').text('obtenu en : ' + utils.s2hours(bestResult.totalTime / 1000, true)));
+
+    //     let groupTours = 'Tournées',
+    //       groupMarkers = 'Adresses';
+    //     let overlayMaps = {
+    //       [groupTours]: {},
+    //       [groupMarkers]: {}
+    //     };
+
+    //     for (let i in tours) {
+
+    //       let tour = tours[i];
+
+    //       infosList.append($('<li>').text('durée ' + markersColors[i] + ' : ' + utils.s2hours(tour.trip.trips[0].duration, false)));
+
+    //       let routeLayer = L.geoJSON(tour.trip.trips[0].geometry);
+    //       routeLayer.setStyle(function(feature) {
+    //         return {
+    //           color: markersColors[i]
+    //         };
+    //       }).addTo(map);
+
+    //       console.log(tour);
+
+    //       let markers = addressesMarkers(tour.trip.waypoints, tour.addresses, markersColors[i]);
+
+    //       overlayMaps[groupTours][markersColors[i]] = routeLayer;
+    //       overlayMaps[groupMarkers][markersColors[i]] = markers;
+
+    //     }
+
+    //     var options = {
+    //       // Make the "trips" group exclusive (use radio inputs)
+    //       // exclusiveGroups: [groupName]
+    //     };
+
+    //     L.control.groupedLayers(null, overlayMaps, options).addTo(map);
+
+
+    //   } else {
+
+    //     $('#error').show();
+
+    //   }
+
+
+    // });
 
   });
   </script>
 </head>
 
 <body>
-  <h1><a href="index.html">Meilleur résultat</a></h1>
-  <nav>
-    <ul>
-      <li><a href="testTournee.html">Tournées exemples</a></li>
-      <li><a href="uploadPlanning.html">Calcul des tournées</a></li>
-    </ul>
-  </nav>
-  <div id="errorNoData" class="alert alert-danger" role="alert">Aucun résultat, lancer un <a href="uploadPlanning.html">Calcul des tournées</a></div>
+  <header>
+    <h1><a href="index.html">Meilleur résultat</a></h1>
+    <nav>
+      <ul>
+        <li><a href="testTournee.html">Tournées exemples</a></li>
+        <li><a href="uploadPlanning.html">Calcul des tournées</a></li>
+      </ul>
+    </nav>
+  </header>
   <div id="error" class="alert alert-danger" role="alert">Une erreur inconnue s'est produite, se référer aux logs serveur</div>
-  <div id="infos">
-    <ul>
-    </ul>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-xs-3">
+        <div id="errorNoData" class="alert alert-danger" role="alert">Aucun résultat, lancer un <a href="uploadPlanning.html">Calcul des tournées</a></div>
+        <div id="datesDropwdownMenu" class="dropdown">
+          <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+            Dropdown
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+          </ul>
+        </div>
+      </div>
+      <div class="col-xs-6">
+        <div id="map"></div>
+      </div>
+      <div class="col-xs-3">
+        <div id="infos">
+          <ul>
+          </ul>
+        </div>
+      </div>
+    </div>
   </div>
-  <div id="map"></div>
 </body>
 
 </html>

@@ -7,7 +7,6 @@
   <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
   <title>Localisation bénéficiaires - Calcul des tournées</title>
   <script src='csv-parse.js'></script>
-  <link rel="stylesheet" href="style.css">
   <script src="jquery-latest.min.js"></script>
   <script type="text/javascript" src="utils.js"></script>
   <script src="/socket.io/socket.io.js"></script>
@@ -19,6 +18,7 @@
   <link href="bootstrap-3.3.7-dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
   <!-- -->
+  <link rel="stylesheet" href="style.css">
   <script src='common.js'></script>
   <script src='mapFunctions.js'></script>
   <script type="text/javascript">
@@ -166,13 +166,15 @@
 </head>
 
 <body>
-  <h1><a href="index.html">Calcul des tournées</a></h1>
-  <nav>
-    <ul>
-      <li><a href="testTournee.html">Tournées exemples</a></li>
-      <li><a href="bestFromGa.html">Voir le meilleur resultat obtenu avec l'algorithme</a></li>
-    </ul>
-  </nav>
+  <header>
+    <h1><a href="index.html">Calcul des tournées</a></h1>
+    <nav>
+      <ul>
+        <li><a href="testTournee.html">Tournées exemples</a></li>
+        <li><a href="bestFromGa.html">Voir le meilleur resultat obtenu avec l'algorithme</a></li>
+      </ul>
+    </nav>
+  </header>
   <div class="container-fluid">
     <div class="row">
       <div class="col-xs-3">
