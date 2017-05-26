@@ -101,15 +101,48 @@ function writeInLog(info) {
 }
 exports.writeInLog = writeInLog;
 
+
+function getResultsDates() {
+
+  return new Promise((resolve, reject) => {
+
+    fs.readdir('gaResults', (err, files) => {
+
+      if (err) throw err;
+
+      const BASE_NAME = 'bestTours';
+      const EXT = '.json';
+
+      let dateTimes = [];
+
+      for (let file of files) {
+
+        if (file.startsWith(BASE_NAME)) {
+
+          let resultDateTime = file.slice(BASE_NAME.length, file.length - EXT.length);
+
+          let resultDate = resultDateTime.replace(/_.*/g, '');
+          let resultTime = resultDateTime.replace(/.*_/g, '');
+
+          let dateTime = {
+            date: resultDate,
+            time: resultTime
+          }
+
+          dateTimes.push(dateTime);
+        }
+
+      }
+
+      resolve(dateTimes);
+
+    })
+
+  });
+}
+exports.getResultsDates = getResultsDates;
+
 exports.readFile = readFile;
 exports.serverConfig = serverConfig;
 exports.writeFile = writeFile;
 exports.writeJson = writeJson;
-
-
-// const FeatureCollection = require('./FeatureCollection');
-
-// let testO = new FeatureCollection(['ljkljop']);
-
-// writeJson('testWrite.json', testO)
-//   .then(() => { console.log('fiel written'); });
