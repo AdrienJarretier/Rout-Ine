@@ -18,18 +18,20 @@ exports.stop = function() {
 exports.start = function(params, socket) {
 
   let nbTrips = params.nbTrips;
-  const POPULATION_SIZE = params.popSize;
+  const POPULATION_SIZE = 168;
   const STOP_TIME = params.stopTime * 60;
 
   // le nombre minimal et max d'elements dans un sous ensemble pour qu'il soit accepté
   const MIN_ELEMENTS = 22;
 
-  if (params.maxStops < MIN_ELEMENTS * 2) {
+  // if (params.maxStops < MIN_ELEMENTS * 2) {
 
-    socket.emit('maxTooSmall');
-    return;
-  }
-  const MAX_ELEMENTS = params.maxStops - MIN_ELEMENTS;
+  //   socket.emit('maxTooSmall');
+  //   return;
+  // }
+  // const MAX_ELEMENTS = params.maxStops - MIN_ELEMENTS;
+
+   const MAX_ELEMENTS = Infinity;
 
   console.log('starting ga');
 
