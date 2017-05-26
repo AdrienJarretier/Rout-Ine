@@ -52,7 +52,7 @@
           let time = d.time.replace('-', 'h');
           time = time.replace(/-.*/, '');
 
-          let link = $('<a href="#">').text(d.date + ' ' + time);
+          let link = $('<a href="#">').text('calcul de ' + d.date + ' ' + time);
 
           link.click(function() {
 
