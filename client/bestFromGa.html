@@ -67,6 +67,22 @@
 
     });
 
+    let routes = [];
+    let controls = [];
+
+    function cleanMap() {
+
+      routes.forEach(function(layer) {
+        map.removeLayer(layer);
+      });
+
+      controls.forEach(function(control) {
+        map.removeControl(control);
+      });
+
+      $('#infos').empty();
+    }
+
     function displayBest(bestResult) {
 
       if (bestResult.trips) {
@@ -75,7 +91,9 @@
 
         let tours = bestResult.trips;
 
-        let infosList = $('#infos ul');
+        cleanMap();
+
+        let infosList = $('#infos');
 
         infosList.append($('<li>').html(bestResult.genNumber + "<sup>ème</sup> génération"));
         infosList.append($('<li>').text('id partition : ' + bestResult.partitionId));
@@ -101,9 +119,13 @@
             };
           }).addTo(map);
 
+          routes.push(routeLayer);
+
           console.log(tour);
 
           let markers = addressesMarkers(tour.trip.waypoints, tour.addresses, markersColors[i]);
+
+          routes.push(markers);
 
           overlayMaps[groupTours][markersColors[i]] = routeLayer;
           overlayMaps[groupMarkers][markersColors[i]] = markers;
@@ -115,8 +137,11 @@
           // exclusiveGroups: [groupName]
         };
 
-        L.control.groupedLayers(null, overlayMaps, options).addTo(map);
+        let groupControl = L.control.groupedLayers(null, overlayMaps, options);
 
+        groupControl.addTo(map);
+
+        controls.push(groupControl);
 
       } else {
 
@@ -159,10 +184,8 @@
         <div id="map"></div>
       </div>
       <div class="col-xs-3">
-        <div id="infos">
-          <ul>
-          </ul>
-        </div>
+        <p id="infos">
+        </p>
       </div>
     </div>
   </div>
