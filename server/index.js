@@ -7,6 +7,7 @@ strict mode code can sometimes be made to run faster than identical code that's 
 Third, strict mode prohibits some syntax likely to be defined in future versions of ECMAScript.
 */
 
+var bodyParser = require('body-parser');
 const common = require('./common.js');
 const express = require('express');
 const mysql = require('mysql');
@@ -25,6 +26,9 @@ const testTournee = require('./testTournee.js');
 
 let app = express();
 // The app object conventionally denotes the Express application
+
+app.use(bodyParser.json()); // for parsing application/json
+app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
 const config = common.serverConfig;
 
@@ -88,14 +92,17 @@ app.get('/listResults', function(req, res) {
 
 });
 
-app.get('/bestFromGa', function(req, res) {
+app.post('/bestFromGa', function(req, res) {
 
-  const RESULT_FILE = 'bestTours.json';
+  let date = req.body
+
+  console.log(date);
+
+  const RESULT_FILE = 'bestTours' + date.date + '_' + date.time + '.json';
 
   common.readFile(config.resultsFolder + '/' + RESULT_FILE)
     .then((fileContent) => {
 
-        console.log('sdfsd');
         res.send(JSON.parse(fileContent));
       },
       (err) => {
