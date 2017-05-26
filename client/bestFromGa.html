@@ -63,6 +63,9 @@
           $('#datesDropwdownMenu ul').append($('<li>').append(link));
 
         }
+
+        $.post('bestFromGa', dates[dates.length - 1], displayBest);
+
       }
 
     });
