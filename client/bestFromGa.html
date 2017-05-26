@@ -56,7 +56,8 @@
 
           link.click(function() {
 
-            console.log(d);
+            $.post('bestFromGa', d, displayBest);
+
           });
 
           $('#datesDropwdownMenu ul').append($('<li>').append(link));
@@ -66,69 +67,65 @@
 
     });
 
-    // $.get("bestFromGa", function(bestResult) {
+    function displayBest(bestResult) {
 
-    //   if (bestResult.code == "ENOENT") {
+      if (bestResult.trips) {
 
-    //     $('#errorNoData').show();
+        let markersColors = ["darkred", "blue", "green", "orange", "black", "purple"];
 
-    //   } else if (bestResult.trips) {
+        let tours = bestResult.trips;
 
-    //     let markersColors = ["darkred", "blue", "green", "orange", "black", "purple"];
+        let infosList = $('#infos ul');
 
-    //     let tours = bestResult.trips;
+        infosList.append($('<li>').html(bestResult.genNumber + "<sup>ème</sup> génération"));
+        infosList.append($('<li>').text('id partition : ' + bestResult.partitionId));
+        infosList.append($('<li>').text('obtenu en : ' + utils.s2hours(bestResult.totalTime / 1000, true)));
 
-    //     let infosList = $('#infos ul');
+        let groupTours = 'Tournées',
+          groupMarkers = 'Adresses';
+        let overlayMaps = {
+          [groupTours]: {},
+          [groupMarkers]: {}
+        };
 
-    //     infosList.append($('<li>').html(bestResult.genNumber + "<sup>ème</sup> génération"));
-    //     infosList.append($('<li>').text('id partition : ' + bestResult.partitionId));
-    //     infosList.append($('<li>').text('obtenu en : ' + utils.s2hours(bestResult.totalTime / 1000, true)));
+        for (let i in tours) {
 
-    //     let groupTours = 'Tournées',
-    //       groupMarkers = 'Adresses';
-    //     let overlayMaps = {
-    //       [groupTours]: {},
-    //       [groupMarkers]: {}
-    //     };
+          let tour = tours[i];
 
-    //     for (let i in tours) {
+          infosList.append($('<li>').text('durée ' + markersColors[i] + ' : ' + utils.s2hours(tour.trip.trips[0].duration, false)));
 
-    //       let tour = tours[i];
+          let routeLayer = L.geoJSON(tour.trip.trips[0].geometry);
+          routeLayer.setStyle(function(feature) {
+            return {
+              color: markersColors[i]
+            };
+          }).addTo(map);
 
-    //       infosList.append($('<li>').text('durée ' + markersColors[i] + ' : ' + utils.s2hours(tour.trip.trips[0].duration, false)));
+          console.log(tour);
 
-    //       let routeLayer = L.geoJSON(tour.trip.trips[0].geometry);
-    //       routeLayer.setStyle(function(feature) {
-    //         return {
-    //           color: markersColors[i]
-    //         };
-    //       }).addTo(map);
+          let markers = addressesMarkers(tour.trip.waypoints, tour.addresses, markersColors[i]);
 
-    //       console.log(tour);
+          overlayMaps[groupTours][markersColors[i]] = routeLayer;
+          overlayMaps[groupMarkers][markersColors[i]] = markers;
 
-    //       let markers = addressesMarkers(tour.trip.waypoints, tour.addresses, markersColors[i]);
+        }
 
-    //       overlayMaps[groupTours][markersColors[i]] = routeLayer;
-    //       overlayMaps[groupMarkers][markersColors[i]] = markers;
+        var options = {
+          // Make the "trips" group exclusive (use radio inputs)
+          // exclusiveGroups: [groupName]
+        };
 
-    //     }
-
-    //     var options = {
-    //       // Make the "trips" group exclusive (use radio inputs)
-    //       // exclusiveGroups: [groupName]
-    //     };
-
-    //     L.control.groupedLayers(null, overlayMaps, options).addTo(map);
+        L.control.groupedLayers(null, overlayMaps, options).addTo(map);
 
 
-    //   } else {
+      } else {
 
-    //     $('#error').show();
+        $('#error').show();
 
-    //   }
+      }
 
 
-    // });
+    };
 
   });
   </script>
