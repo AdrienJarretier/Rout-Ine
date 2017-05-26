@@ -77,6 +77,17 @@ app.get('/testTournee', function(req, res) {
   });
 });
 
+app.get('/listResults', function(req, res) {
+
+  common.getResultsDates()
+    .then((dates) => {
+
+      res.send(dates);
+
+    });
+
+});
+
 app.get('/bestFromGa', function(req, res) {
 
   const RESULT_FILE = 'bestTours.json';

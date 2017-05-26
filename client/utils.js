@@ -121,7 +121,5 @@ function currentDateTimeString() {
 }
 exports.currentDateTimeString = currentDateTimeString;
 
-console.log(currentDateTimeString());
-
 },{}]},{},[1])(1)
 });

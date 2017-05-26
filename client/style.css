@@ -7,9 +7,18 @@ a:hover {
     color: #800080;
     background-color: #bfbfbf;
 }
-
+/*
 body {
-    font-family: "candara";
+    background: #d3e8ba  ;
+}*/
+
+h1 {
+    margin-top: 0px;
+}
+
+header {
+    /*background: #abd37c;*/
+    padding-bottom: 20px;
 }
 
 #map {
