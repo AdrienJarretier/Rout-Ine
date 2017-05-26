@@ -52,7 +52,7 @@
           let time = d.time.replace('-', 'h');
           time = time.replace(/-.*/, '');
 
-          let link = $('<a href="#">').text('calcul de ' + d.date + ' ' + time);
+          let link = $('<a href="#">').text('otenu le ' + d.date + ' à ' + time);
 
           link.click(function() {
 
@@ -176,7 +176,7 @@
         <div id="errorNoData" class="alert alert-danger" role="alert">Aucun résultat, lancer un <a href="uploadPlanning.html">Calcul des tournées</a></div>
         <div id="datesDropwdownMenu" class="dropdown">
           <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-            Dropdown
+            Sélection du résultat
             <span class="caret"></span>
           </button>
           <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
