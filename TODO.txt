@@ -28,3 +28,6 @@ donner la possibilité de faire des simulations, cad :
 
 si aucun fichier présent de meilleur resultat corriger le crash
 
+
+
+taille pop : 168
