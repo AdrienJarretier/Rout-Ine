@@ -17,7 +17,7 @@ const fs = require('fs');
 
 const serverConfig = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 
-function readFile(file) {
+function readFile(file, encoding) {
 
   return new Promise((resolve, reject) => {
 
@@ -29,7 +29,7 @@ function readFile(file) {
 
       } else {
 
-        fs.readFile(fd, 'utf8', (err, fileContent) => {
+        fs.readFile(fd, (encoding ? encoding : 'utf8'), (err, fileContent) => {
 
           fs.close(fd);
 
