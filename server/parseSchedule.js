@@ -17,6 +17,7 @@ class Beneficiary {
 
   constructor(parsedLine) {
 
+    this.name = parsedLine[0];
     this.address = new Address(parsedLine);
     this.address_additional = parsedLine[2];
     this.phones = [parsedLine[4]];
@@ -75,7 +76,13 @@ function parseSchedule(schedule) {
   });
 }
 
-function getBenef(name, dbCon) {
+function updateAddress(address) {
+
+  console.log(address);
+
+}
+
+function updateBenef(benef, dbCon) {
 
   return new Promise((resolve, reject) => {
 
@@ -83,13 +90,28 @@ function getBenef(name, dbCon) {
       ' FROM beneficiary \n' +
       ' WHERE name = ? ;';
 
-    let selectBenef = mysql.format(sqlSelectBenef, [name]);
+    const sqlInsertBenef = ' INSERT INTO beneficiary(name, address_additional, address_id, note) \n' +
+      ' VALUE(?,?,?,?) \n' +
+      ' WHERE name = ? ;';
+
+    const sqlUpdateBenef = ' SELECT * \n' +
+      ' FROM beneficiary \n' +
+      ' WHERE name = ? ;';
+
+    updateAddress(benef.address);
+
+    let selectBenef = mysql.format(sqlSelectBenef, [benef.name]);
 
     dbCon.query(
       selectBenef,
       (err, row, fields) => {
 
         if (err) throw err
+
+        // si ce beneficiaire est nouveau on lance un insert
+        if (row.length == 0) {
+
+        }
 
         resolve(row);
 
@@ -107,7 +129,9 @@ function getAllBeneficiariesFromDb(beneficiariesList) {
 
   for (let name in beneficiariesList.beneficiaries) {
 
-    promises.push(getBenef(name, dbCon));
+    let benef = beneficiariesList.beneficiaries[name];
+
+    promises.push(updateBenef(benef, dbCon));
 
   }
 
