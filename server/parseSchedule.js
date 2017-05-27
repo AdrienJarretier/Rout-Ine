@@ -1,14 +1,13 @@
-const csvParse = require('csv-parse');
 const common = require('./common.js');
-
-
+const csvParse = require('csv-parse');
+const mysql = require('mysql');
 
 class Address {
 
-  constructor(row) {
+  constructor(parsedLine) {
 
-    this.label = row[1];
-    this.town = row[3];
+    this.label = parsedLine[1];
+    this.town = parsedLine[3];
 
   }
 
@@ -16,22 +15,22 @@ class Address {
 
 class Beneficiary {
 
-  constructor(row) {
+  constructor(parsedLine) {
 
-    this.address = new Address(row);
-    this.address_additional = row[2];
-    this.phones = [row[4]];
+    this.address = new Address(parsedLine);
+    this.address_additional = parsedLine[2];
+    this.phones = [parsedLine[4]];
     this.deliveries = [];
 
-    this.addDelivery(row);
+    this.addDelivery(parsedLine);
 
-    this.note = row[6];
+    this.note = parsedLine[6];
 
   }
 
-  addDelivery(row) {
+  addDelivery(parsedLine) {
 
-    this.deliveries.push(row[5]);
+    this.deliveries.push(parsedLine[5]);
 
   }
 
@@ -43,14 +42,14 @@ class BeneficiariesList {
 
     this.beneficiaries = {};
 
-    for (let row of parsedSchedule) {
+    for (let parsedLine of parsedSchedule) {
 
-      let benef = this.beneficiaries[row[0]];
+      let benef = this.beneficiaries[parsedLine[0]];
 
       if (benef)
-        benef.addDelivery(row);
+        benef.addDelivery(parsedLine);
       else
-        this.beneficiaries[row[0]] = new Beneficiary(row);
+        this.beneficiaries[parsedLine[0]] = new Beneficiary(parsedLine);
 
     }
 
@@ -76,12 +75,52 @@ function parseSchedule(schedule) {
   });
 }
 
-// this.export = parseSchedule;
+function getBenef(name, dbCon) {
+
+  return new Promise((resolve, reject) => {
+
+    const sqlSelectBenef = ' SELECT * \n' +
+      ' FROM beneficiary \n' +
+      ' WHERE name = ? ;';
+
+    let selectBenef = mysql.format(sqlSelectBenef, [name]);
+
+    dbCon.query(
+      selectBenef,
+      (err, row, fields) => {
+
+        if (err) throw err
+
+        resolve(row);
+
+      });
+
+  });
+
+}
+
+function getAllBeneficiariesFromDb(beneficiariesList) {
+
+  let dbCon = mysql.createConnection(common.serverConfig.db);
+
+  let promises = [];
+
+  for (let name in beneficiariesList.beneficiaries) {
+
+    promises.push(getBenef(name, dbCon));
+
+  }
+
+  Promise.all(promises)
+    .then((values) => {
+
+      console.log(values);
+      dbCon.end();
+
+    });
+
+}
 
 common.readFile('exampleTours/tournées_CCAS_par_dateShort.csv', 'binary')
   .then(parseSchedule)
-  .then((output) => {
-
-    console.log(JSON.stringify(output, null, 2));
-
-  });
+  .then(getAllBeneficiariesFromDb);
