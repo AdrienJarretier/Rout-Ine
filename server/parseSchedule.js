@@ -5,7 +5,8 @@ common.readFile('exampleTours/tournées_CCAS_par_dateShort.csv', 'binary')
   .then((fileContent) => {
 
     let options = {
-      delimiter: ";"
+      delimiter: ";",
+      from: 2
     }
 
     csvParse(fileContent, options, function(err, output) {
