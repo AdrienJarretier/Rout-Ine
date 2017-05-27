@@ -4,7 +4,7 @@
     "host": "localhost",
     "user": "root",
     "password": "mysql",
-    "database": "ccas_beneficiaries"
+    "database": "ccas_beneficiariestmp"
   },
   "osrm": {
     "protocol": "http",
