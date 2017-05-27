@@ -21,7 +21,10 @@ class Beneficiary {
     this.address = new Address(row);
     this.address_additional = row[2];
     this.phones = [row[4]];
-    this.deliveries = [row[5]];
+    this.deliveries = [];
+
+    this.addDelivery(row);
+
     this.note = row[6];
 
   }
