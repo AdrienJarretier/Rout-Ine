@@ -157,3 +157,5 @@ function geocode(addressObject) {
   });
 
 }
+
+module.exports = geocode;
