@@ -24,13 +24,6 @@ let requestsQ = async.queue(function(task, callback) {
 
 }, 1);
 
-
-// $config['geocoding']['api']="google";
-// $config['geocoding']['enable']="1";
-
-// require_once 'geo.php';
-// require_once 'log.php';
-
 geocode_google('4, Allée Alphonse Daudet 81000 ALBI')
   .then((coordinates) => {
 
@@ -74,43 +67,9 @@ function geocode_google(address) {
 
       }
 
-
-
-      // let coordinates = {
-      //   'lat': bestFeature.geometry.coordinates[1],
-      //   'lng': bestFeature.geometry.coordinates[0]
-      // };
-
-      // common.logInfo('adresse [' + address + '] géocodée avec google (score ' + bestScore + '), (' + coordinates['lat'] + ', ' + coordinates['lng'] + ')';
-
-      //   resolve(coordinates);
     });
 
   });
-
-
-
-
-
-  // $location;
-
-  // try {
-  //   $location = get_geolocation($address);
-  // } catch (Exception $e) {
-  //   throw $e;
-  // }
-
-  // $coordinates = {
-  //   'lat': $location['location_lat'],
-  //   'lng': $location['location_lon']
-  // };
-
-  // writeInLog('adresse ['.$address.
-  //   '] géocodée avec google ('.$coordinates['lat'].
-  //   ', '.$coordinates['lng'].
-  //   ')');
-
-  // return $coordinates;
 }
 
 
