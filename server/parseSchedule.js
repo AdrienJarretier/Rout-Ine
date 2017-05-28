@@ -98,8 +98,6 @@ function updateAddress(address, dbCon) {
 
   return new Promise((resolve, reject) => {
 
-    console.log('updateAddress');
-
     const sqlSelectAddress = ' SELECT * \n' +
       ' FROM address \n' +
       ' WHERE label = ? \n' +
@@ -116,8 +114,6 @@ function updateAddress(address, dbCon) {
           geocode(address)
             .then((coords) => {
 
-              console.log('inserting address');
-
               const sqlInsertAddress = ' INSERT INTO address(label, town, lat, lng) \n' +
                 ' VALUES(?,?,?,?) ; ';
 
@@ -125,9 +121,6 @@ function updateAddress(address, dbCon) {
 
               dbQuery(insertAddress, dbCon)
                 .then((result) => {
-
-                  console.log('inserted address, result : ');
-                  console.log(result);
 
                   resolve(result.insertId);
 
@@ -150,6 +143,8 @@ function updateAddress(address, dbCon) {
 }
 
 function updatePhones(benefId, phones, dbCon) {
+
+  return new Promise((resolve, reject) => {
 
   // delete phones for benefId
 
@@ -175,9 +170,11 @@ function updatePhones(benefId, phones, dbCon) {
 
       }
 
-      return Promise.all(promises);
+      resolve(Promise.all(promises));
 
     });
+
+  });
 
 }
 
@@ -197,7 +194,6 @@ function updateBenef(benef, dbCon) {
 
   updateAddress(benef.address, dbCon)
     .then((addressId) => {
-      console.log('addres updated');
 
       const sqlSelectBenef = ' SELECT * \n' +
         ' FROM beneficiary \n' +
