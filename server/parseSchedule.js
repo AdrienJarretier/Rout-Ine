@@ -78,6 +78,8 @@ function parseSchedule(schedule) {
 
 function updateAddress(address, dbCon) {
 
+  console.log(address);
+
   const sqlSelectAddress = ' SELECT * \n' +
     ' FROM address \n' +
     ' WHERE label = ? \n' +
@@ -99,10 +101,10 @@ function updateAddress(address, dbCon) {
 
         const insertAddress = mysql.format(sqlInsertAddress, [address.label, address.town]);
 
-        connection.query('INSERT INTO posts SET ?', { title: 'test' }, function(error, results, fields) {
-          if (error) throw error;
-          console.log(result.insertId);
-        });
+        // connection.query('INSERT INTO posts SET ?', { title: 'test' }, function(error, results, fields) {
+        //   if (error) throw error;
+        //   console.log(result.insertId);
+        // });
 
 
       }
@@ -134,7 +136,7 @@ function updateBenef(benef, dbCon) {
       ' FROM beneficiary \n' +
       ' WHERE name = ? ; ';
 
-    updateAddress(benef.address);
+    updateAddress(benef.address, dbCon);
 
     let selectBenef = mysql.format(sqlSelectBenef, [benef.name]);
 
