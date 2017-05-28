@@ -89,6 +89,7 @@ function writeJson(file, object) {
 }
 
 
+
 /**
  * writes current date time in logfile then logs the given information
  *
@@ -106,6 +107,36 @@ function writeInLog(info) {
   return writeFile(logFile, dateTimeString + ' : ' + info + '\n', true);
 }
 exports.writeInLog = writeInLog;
+
+
+function logError(errorMsg) {
+
+  const LOG_FILE = serverConfig.logs.dir + '/' + serverConfig.logs.errors;
+
+  let currentDate = new Date();
+
+  let dateTimeString = currentDate.toLocaleDateString() + '_' + currentDate.toLocaleTimeString();
+
+  return writeFile(LOG_FILE, dateTimeString + ' : ' + errorMsg + '\n', true);
+}
+exports.logError = logError;
+
+
+
+function logInfo(info) {
+
+  const LOG_FILE = serverConfig.logs.dir + '/' + serverConfig.logs.infos;
+
+  let currentDate = new Date();
+
+  let dateTimeString = currentDate.toLocaleDateString() + '_' + currentDate.toLocaleTimeString();
+
+  return writeFile(LOG_FILE, dateTimeString + ' : ' + info + '\n', true);
+}
+exports.logInfo = logInfo;
+
+
+
 
 
 function getResultsDates() {
