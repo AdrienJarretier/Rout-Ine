@@ -76,9 +76,46 @@ function parseSchedule(schedule) {
   });
 }
 
-function updateAddress(address) {
+function updateAddress(address, dbCon) {
 
-  console.log(address);
+  const sqlSelectAddress = ' SELECT * \n' +
+    ' FROM address \n' +
+    ' WHERE label = ? \n' +
+    ' AND town = ? ; ';
+
+  const selectAddress = mysql.format(sqlSelectAddress, [address.label, address.town]);
+
+  dbCon.query(
+    selectAddress,
+    (err, row, fields) => {
+
+      if (err) throw err
+
+      // si cette adresse est nouvelee on lance un insert
+      if (row.length == 0) {
+
+        const sqlInsertAddress = ' INSERT INTO address(label, town, lat, lng) \n' +
+          ' VALUES(?,?,?,?) ; ';
+
+        const insertAddress = mysql.format(sqlInsertAddress, [address.label, address.town]);
+
+        connection.query('INSERT INTO posts SET ?', { title: 'test' }, function(error, results, fields) {
+          if (error) throw error;
+          console.log(result.insertId);
+        });
+
+
+      }
+      // sinon on recupere l'id de l'adresse trouvee
+      else {
+        console.log(row);
+      }
+
+      // resolve(row);
+
+    });
+
+  // console.log(address);
 
 }
 
@@ -88,15 +125,14 @@ function updateBenef(benef, dbCon) {
 
     const sqlSelectBenef = ' SELECT * \n' +
       ' FROM beneficiary \n' +
-      ' WHERE name = ? ;';
+      ' WHERE name = ? ; ';
 
     const sqlInsertBenef = ' INSERT INTO beneficiary(name, address_additional, address_id, note) \n' +
-      ' VALUE(?,?,?,?) \n' +
-      ' WHERE name = ? ;';
+      ' VALUES(?,?,?,?) ; ';
 
     const sqlUpdateBenef = ' SELECT * \n' +
       ' FROM beneficiary \n' +
-      ' WHERE name = ? ;';
+      ' WHERE name = ? ; ';
 
     updateAddress(benef.address);
 
