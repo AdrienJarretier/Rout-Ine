@@ -24,13 +24,6 @@ let requestsQ = async.queue(function(task, callback) {
 
 }, 1);
 
-geocode_google('4, Allée Alphonse Daudet 81000 ALBI')
-  .then((coordinates) => {
-
-    console.log(coordinates);
-
-  });
-
 
 function geocode_google(address) {
 
@@ -71,10 +64,6 @@ function geocode_google(address) {
 
   });
 }
-
-
-
-
 
 function geocode_ban(address) {
 
@@ -120,46 +109,51 @@ function geocode_ban(address) {
 };
 
 
-// function geocode(addressObject) {
 
-//   const address = addressObject.label.
-//   " ".addressObject.town;
 
-//   const MAX_TRIALS = 2;
 
-//   let currentTry = 0;
-//   while (currentTry < MAX_TRIALS) {
-//     try {
+// geocode({ label: '11, Allée de la piscine', town: '81000 ALBI' })
+//   .then((coordinates) => {
 
-//       let coords;
+//     console.log(coordinates);
 
-//       switch (currentTry) {
-//         case 0:
-//           coords = geocode_google(address);
-//           break;
+//   });
 
-//         case 1:
-//           coords = geocode_ban(address);
-//           break;
 
-//         default:
-//           break;
-//       }
 
-//       return coords;
-//     } catch (Exception $e) {
 
-//       ++$currentTry;
+function geocode(addressObject) {
 
-//       switch ($currentTry) {
+  return new Promise((resolve, reject) => {
 
-//         case $MAX_TRIALS:
-//           throw $e;
-//           break;
+    const address = addressObject.label + " " + addressObject.town;
 
-//         default:
-//           break;
-//       }
-//     }
-//   }
-// }
+    geocode_google(address)
+      .then((coordinates) => {
+
+          resolve(coordinates);
+
+        },
+        (error) => {
+
+          common.logInfo(error);
+
+          return geocode_ban(address);
+
+        })
+      .then((coordinates) => {
+
+          resolve(coordinates);
+
+        },
+        (error) => {
+
+          common.logError(error);
+
+          reject(error);
+
+        });
+
+  });
+
+}
