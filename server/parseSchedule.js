@@ -193,6 +193,8 @@ function updatePhones(benefId, phones, dbCon) {
 
 function updateBenef(benef, dbCon) {
 
+  return new Promise((resolve, reject) => {
+
   updateAddress(benef.address, dbCon)
     .then((addressId) => {
       console.log('addres updated');
@@ -241,11 +243,13 @@ function updateBenef(benef, dbCon) {
         .then((benefId) => {
 
           console.log('updating phones');
-          return updatePhones(benefId, benef.phones, dbCon);
+          resolve(updatePhones(benefId, benef.phones, dbCon));
 
         });
 
     });
+
+});
 
 }
 
