@@ -7,6 +7,8 @@ common.logError = common.writeInLog;
 
 let requestsQ = async.queue(function(task, callback) {
 
+  console.log(task);
+
   request(task.requestUrl, (error, response, body) => {
 
     if (error) {
@@ -31,11 +33,14 @@ let requestsQ = async.queue(function(task, callback) {
 // require_once 'geo.php';
 // require_once 'log.php';
 
+geocode_google('4, Allée Alphonse Daudet 81000 ALBI');
+
+
 function geocode_google(address) {
 
   return new Promise((resolve, reject) => {
 
-    const requestUrl = "http://maps.googleapis.com/maps/api/geocode/json?sensor=false&address=".address;
+    const requestUrl = "http://maps.googleapis.com/maps/api/geocode/json?sensor=false&address=" + address;
 
     requestsQ.push({ requestUrl: requestUrl }, function(response) {
 
@@ -104,7 +109,7 @@ function geocode_ban(address) {
 
   return new Promise((resolve, reject) => {
 
-    const requestUrl = 'http://api-adresse.data.gouv.fr/search/?q='.address;
+    const requestUrl = 'http://api-adresse.data.gouv.fr/search/?q=' + address;
 
     requestsQ.push({ requestUrl: requestUrl }, function(response) {
 
