@@ -2,8 +2,6 @@ const async = require('async');
 const common = require('./common.js');
 const request = require('request');
 
-common.logError = common.writeInLog;
-
 
 let requestsQ = async.queue(function(task, callback) {
 
@@ -33,7 +31,12 @@ let requestsQ = async.queue(function(task, callback) {
 // require_once 'geo.php';
 // require_once 'log.php';
 
-geocode_google('4, Allée Alphonse Daudet 81000 ALBI');
+geocode_google('4, Allée Alphonse Daudet 81000 ALBI')
+  .then((coordinates) => {
+
+    console.log(coordinates);
+
+  });
 
 
 function geocode_google(address) {
@@ -44,23 +47,32 @@ function geocode_google(address) {
 
     requestsQ.push({ requestUrl: requestUrl }, function(response) {
 
-      console.log(response);
+      // console.log(JSON.stringify(response.results[0].geometry.location, null, 2));
 
-      // if ($data['status'] == 'OK') {
-      //   //echo '<br><br>';echo ('STATUS Google OK !!!!!****');
-      //   // Use google data only with good status response
-      //   $data = $data['results'][0];
-      // } else if ($data['status'] == 'OVER_QUERY_LIMIT') {
-      //   //echo '<br><br>';echo ('STATUS Goole Ko trop de demande');
-      //   // Return empty array for overquery limit (for later recheck)
-      //   throw new Exception("STATUS Goole Ko trop de demande");
-      // } else if ($data['status'] == 'ZERO_RESULTS') {
+      if (response['status'] == 'OK') {
 
-      //   // Throw Exception to indicate we couldn't geocode this address
-      //   throw new Exception("aucun résultat");
-      // } else {
-      //   throw new Exception($data['status']);
-      // }
+        // Use google data only with good status response
+
+        let coordinates = response.results[0].geometry.location;
+
+        common.logInfo('adresse [' + address + '] géocodée avec google, (' + coordinates['lat'] + ', ' + coordinates['lng'] + ')');
+
+        resolve(coordinates);
+
+      } else if (response['status'] == 'OVER_QUERY_LIMIT') {
+
+        reject("STATUS Goole Ko trop de demande");
+
+      } else if (response['status'] == 'ZERO_RESULTS') {
+
+        //  couldn't geocode this address
+        reject("aucun résultat");
+
+      } else {
+
+        reject(response['status']);
+
+      }
 
 
 
