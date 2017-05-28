@@ -238,7 +238,6 @@ function updateBenef(benef, dbCon) {
           })
           .then((benefId) => {
 
-            console.log('updating phones');
             resolve(updatePhones(benefId, benef.phones, dbCon));
 
           });
@@ -266,7 +265,6 @@ function getAllBeneficiariesFromDb(beneficiariesList) {
   Promise.all(promises)
     .then((values) => {
 
-      console.log('dbCon.end()');
       dbCon.end();
 
     });
