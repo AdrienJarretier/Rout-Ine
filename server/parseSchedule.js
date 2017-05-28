@@ -7,7 +7,7 @@ class Address {
 
   constructor(parsedLine) {
 
-    this.label = parsedLine[1];
+    this.label = parsedLine[1].replace(/^\s*0\s*,\s*/g, '');
     this.town = parsedLine[3];
 
   }
