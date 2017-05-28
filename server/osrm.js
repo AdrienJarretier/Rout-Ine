@@ -5,7 +5,6 @@ const common = require('./common.js');
 const fs = require('fs');
 const request = require('request');
 const db = require('./db.js');
-const shuffle = require('shuffle-array');
 const utils = require('./utils.js');
 
 const config = common.serverConfig;
