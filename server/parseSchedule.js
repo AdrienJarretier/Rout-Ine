@@ -146,33 +146,33 @@ function updatePhones(benefId, phones, dbCon) {
 
   return new Promise((resolve, reject) => {
 
-  // delete phones for benefId
+    // delete phones for benefId
 
-  const sqlDeletePhones = ' DELETE \n' +
-    ' FROM beneficiary_phone \n' +
-    ' WHERE beneficiary_id = ? ; ';
+    const sqlDeletePhones = ' DELETE \n' +
+      ' FROM beneficiary_phone \n' +
+      ' WHERE beneficiary_id = ? ; ';
 
-  const deletePhones = mysql.format(sqlDeletePhones, [benefId]);
+    const deletePhones = mysql.format(sqlDeletePhones, [benefId]);
 
-  dbQuery(deletePhones, dbCon)
-    .then(() => {
+    dbQuery(deletePhones, dbCon)
+      .then(() => {
 
-      // insert phones
-      const sqlInsertPhone = ' INSERT INTO beneficiary_phone(beneficiary_id, phone_number) \n' +
-        ' VALUES(?,?) ; ';
+        // insert phones
+        const sqlInsertPhone = ' INSERT INTO beneficiary_phone(beneficiary_id, phone_number) \n' +
+          ' VALUES(?,?) ; ';
 
-      let promises = [];
+        let promises = [];
 
-      for (let phone of phones) {
+        for (let phone of phones) {
 
-        const insertPhone = mysql.format(sqlInsertPhone, [benefId, phone]);
-        promises.push(dbQuery(insertPhone, dbCon));
+          const insertPhone = mysql.format(sqlInsertPhone, [benefId, phone]);
+          promises.push(dbQuery(insertPhone, dbCon));
 
-      }
+        }
 
-      resolve(Promise.all(promises));
+        resolve(Promise.all(promises));
 
-    });
+      });
 
   });
 
@@ -192,60 +192,60 @@ function updateBenef(benef, dbCon) {
 
   return new Promise((resolve, reject) => {
 
-  updateAddress(benef.address, dbCon)
-    .then((addressId) => {
+    updateAddress(benef.address, dbCon)
+      .then((addressId) => {
 
-      const sqlSelectBenef = ' SELECT * \n' +
-        ' FROM beneficiary \n' +
-        ' WHERE name = ? AND address_id = ? ; ';
+        const sqlSelectBenef = ' SELECT * \n' +
+          ' FROM beneficiary \n' +
+          ' WHERE name = ? AND address_id = ? ; ';
 
-      const selectBenef = mysql.format(sqlSelectBenef, [benef.name, addressId]);
+        const selectBenef = mysql.format(sqlSelectBenef, [benef.name, addressId]);
 
-      dbQuery(selectBenef, dbCon)
-        .then((rows) => {
+        dbQuery(selectBenef, dbCon)
+          .then((rows) => {
 
-          // si ce beneficiaire est nouveau on lance un insert
-          if (rows.length == 0) {
+            // si ce beneficiaire est nouveau on lance un insert
+            if (rows.length == 0) {
 
-            const sqlInsertBenef = ' INSERT INTO beneficiary(name, address_additional, address_id, note) \n' +
-              ' VALUES(?,?,?,?) ; ';
+              const sqlInsertBenef = ' INSERT INTO beneficiary(name, address_additional, address_id, note) \n' +
+                ' VALUES(?,?,?,?) ; ';
 
-            const insertBenef = mysql.format(sqlInsertBenef, [benef.name, benef.address_additional, addressId, benef.note]);
+              const insertBenef = mysql.format(sqlInsertBenef, [benef.name, benef.address_additional, addressId, benef.note]);
 
-            return dbQuery(insertBenef, dbCon)
-              .then((result) => {
+              return dbQuery(insertBenef, dbCon)
+                .then((result) => {
 
-                return result.insertId;
+                  return result.insertId;
 
-              });
+                });
 
-          } else {
+            } else {
 
-            const sqlUpdateBenef = ' UPDATE beneficiary \n' +
-              ' SET address_additional = ?, note = ? \n' +
-              ' WHERE id = ? ; ';
+              const sqlUpdateBenef = ' UPDATE beneficiary \n' +
+                ' SET address_additional = ?, note = ? \n' +
+                ' WHERE id = ? ; ';
 
-            const updateBenef = mysql.format(sqlUpdateBenef, [benef.address_additional, benef.note, rows[0].id]);
+              const updateBenef = mysql.format(sqlUpdateBenef, [benef.address_additional, benef.note, rows[0].id]);
 
-            return dbQuery(updateBenef, dbCon)
-              .then(() => {
+              return dbQuery(updateBenef, dbCon)
+                .then(() => {
 
-                return rows[0].id;
+                  return rows[0].id;
 
-              });
-          }
+                });
+            }
 
-        })
-        .then((benefId) => {
+          })
+          .then((benefId) => {
 
-          console.log('updating phones');
-          resolve(updatePhones(benefId, benef.phones, dbCon));
+            console.log('updating phones');
+            resolve(updatePhones(benefId, benef.phones, dbCon));
 
-        });
+          });
 
-    });
+      });
 
-});
+  });
 
 }
 
