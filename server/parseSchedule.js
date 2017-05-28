@@ -183,6 +183,6 @@ function getAllBeneficiariesFromDb(beneficiariesList) {
 
 }
 
-common.readFile('exampleTours/tournées_CCAS_par_dateShort.csv', 'binary')
+common.readFile('exampleTours/tournées_CCAS_par_dateShort.csv', 'windows-1252')
   .then(parseSchedule)
   .then(getAllBeneficiariesFromDb);

@@ -40,7 +40,7 @@ function geocode_google(address) {
 
   return new Promise((resolve, reject) => {
 
-    const requestUrl = "http://maps.googleapis.com/maps/api/geocode/json?sensor=false&address=" + address;
+    const requestUrl = "http://maps.googleapis.com/maps/api/geocode/json?sensor=false&address=" + encodeURIComponent(address);
 
     requestsQ.push({ requestUrl: requestUrl }, function(response) {
 
@@ -109,7 +109,7 @@ function geocode_ban(address) {
 
   return new Promise((resolve, reject) => {
 
-    const requestUrl = 'http://api-adresse.data.gouv.fr/search/?q=' + address;
+    const requestUrl = 'http://api-adresse.data.gouv.fr/search/?q=' + encodeURIComponent(address);
 
     requestsQ.push({ requestUrl: requestUrl }, function(response) {
 

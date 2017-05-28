@@ -14,6 +14,7 @@ exports.Random = Random;
 exports.mt = mt;
 
 const fs = require('fs');
+var iconv = require('iconv-lite');
 
 const serverConfig = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 
@@ -29,7 +30,7 @@ function readFile(file, encoding) {
 
       } else {
 
-        fs.readFile(fd, (encoding ? encoding : 'utf8'), (err, fileContent) => {
+        fs.readFile(fd, (encoding ? null : 'utf8'), (err, fileContent) => {
 
           fs.close(fd);
 
@@ -37,7 +38,12 @@ function readFile(file, encoding) {
             reject(err);
           else {
 
-            resolve(fileContent);
+            let buf = iconv.decode(fileContent, encoding);
+
+            let str = iconv.encode(buf, 'utf8');
+
+            resolve(str);
+
           }
 
         });

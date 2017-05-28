@@ -13,6 +13,7 @@
     "body-parser": "^1.17.2",
     "csv-parse": "^1.2.0",
     "express": "^4.15.2",
+    "iconv-lite": "^0.4.17",
     "mysql": "^2.13.0",
     "random-js": "^1.0.8",
     "request": "^2.81.0",
