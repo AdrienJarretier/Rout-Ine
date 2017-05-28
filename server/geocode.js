@@ -5,7 +5,7 @@ const request = require('request');
 
 let requestsQ = async.queue(function(task, callback) {
 
-  console.log(task);
+  // console.log(task);
 
   request(task.requestUrl, (error, response, body) => {
 
