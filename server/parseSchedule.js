@@ -1,12 +1,13 @@
 const common = require('./common.js');
 const csvParse = require('csv-parse');
+const geocode = require('./geocode.js');
 const mysql = require('mysql');
 
 class Address {
 
   constructor(parsedLine) {
 
-    this.label = parsedLine[1];
+    this.label = parsedLine[1].replace(/^\s*0\s*,\s*/g, '');
     this.town = parsedLine[3];
 
   }
@@ -76,82 +77,170 @@ function parseSchedule(schedule) {
   });
 }
 
-function updateAddress(address, dbCon) {
+function dbQuery(statement, dbCon) {
 
-  console.log(address);
+  return new Promise((resolve, reject) => {
 
-  const sqlSelectAddress = ' SELECT * \n' +
-    ' FROM address \n' +
-    ' WHERE label = ? \n' +
-    ' AND town = ? ; ';
+    dbCon.query(statement, function(error, result, fields) {
 
-  const selectAddress = mysql.format(sqlSelectAddress, [address.label, address.town]);
+      if (error) throw error;
 
-  dbCon.query(
-    selectAddress,
-    (err, row, fields) => {
-
-      if (err) throw err
-
-      // si cette adresse est nouvelee on lance un insert
-      if (row.length == 0) {
-
-        const sqlInsertAddress = ' INSERT INTO address(label, town, lat, lng) \n' +
-          ' VALUES(?,?,?,?) ; ';
-
-        const insertAddress = mysql.format(sqlInsertAddress, [address.label, address.town]);
-
-        // connection.query('INSERT INTO posts SET ?', { title: 'test' }, function(error, results, fields) {
-        //   if (error) throw error;
-        //   console.log(result.insertId);
-        // });
-
-
-      }
-      // sinon on recupere l'id de l'adresse trouvee
-      else {
-        console.log(row);
-      }
-
-      // resolve(row);
+      resolve(result);
 
     });
 
-  // console.log(address);
+
+  });
 
 }
+
+function updateAddress(address, dbCon) {
+
+  return new Promise((resolve, reject) => {
+
+    const sqlSelectAddress = ' SELECT * \n' +
+      ' FROM address \n' +
+      ' WHERE label = ? \n' +
+      ' AND town = ? ; ';
+
+    const selectAddress = mysql.format(sqlSelectAddress, [address.label, address.town]);
+
+    dbQuery(selectAddress, dbCon)
+      .then((rows) => {
+
+        // si l'adresse est nouvelle on insere
+        if (rows.length == 0) {
+
+          geocode(address)
+            .then((coords) => {
+
+              const sqlInsertAddress = ' INSERT INTO address(label, town, lat, lng) \n' +
+                ' VALUES(?,?,?,?) ; ';
+
+              const insertAddress = mysql.format(sqlInsertAddress, [address.label, address.town, coords.lat, coords.lng]);
+
+              dbQuery(insertAddress, dbCon)
+                .then((result) => {
+
+                  resolve(result.insertId);
+
+                });
+
+            });
+
+        }
+        // sinon on recupere l'id de l'adresse trouvee
+        else {
+
+          resolve(rows[0].id);
+
+        }
+
+      });
+
+  });
+
+}
+
+function updatePhones(benefId, phones, dbCon) {
+
+  return new Promise((resolve, reject) => {
+
+    // delete phones for benefId
+
+    const sqlDeletePhones = ' DELETE \n' +
+      ' FROM beneficiary_phone \n' +
+      ' WHERE beneficiary_id = ? ; ';
+
+    const deletePhones = mysql.format(sqlDeletePhones, [benefId]);
+
+    dbQuery(deletePhones, dbCon)
+      .then(() => {
+
+        // insert phones
+        const sqlInsertPhone = ' INSERT INTO beneficiary_phone(beneficiary_id, phone_number) \n' +
+          ' VALUES(?,?) ; ';
+
+        let promises = [];
+
+        for (let phone of phones) {
+
+          const insertPhone = mysql.format(sqlInsertPhone, [benefId, phone]);
+          promises.push(dbQuery(insertPhone, dbCon));
+
+        }
+
+        resolve(Promise.all(promises));
+
+      });
+
+  });
+
+}
+
+// let dbCon = mysql.createConnection(common.serverConfig.db);
+
+// updateAddress({ label: 'test5dd6', town: 'testAlbi' }, dbCon)
+//   .then((id) => {
+
+//     dbCon.end();
+//     console.log(id);
+
+//   });
 
 function updateBenef(benef, dbCon) {
 
   return new Promise((resolve, reject) => {
 
-    const sqlSelectBenef = ' SELECT * \n' +
-      ' FROM beneficiary \n' +
-      ' WHERE name = ? ; ';
+    updateAddress(benef.address, dbCon)
+      .then((addressId) => {
 
-    const sqlInsertBenef = ' INSERT INTO beneficiary(name, address_additional, address_id, note) \n' +
-      ' VALUES(?,?,?,?) ; ';
+        const sqlSelectBenef = ' SELECT * \n' +
+          ' FROM beneficiary \n' +
+          ' WHERE name = ? AND address_id = ? ; ';
 
-    const sqlUpdateBenef = ' SELECT * \n' +
-      ' FROM beneficiary \n' +
-      ' WHERE name = ? ; ';
+        const selectBenef = mysql.format(sqlSelectBenef, [benef.name, addressId]);
 
-    updateAddress(benef.address, dbCon);
+        dbQuery(selectBenef, dbCon)
+          .then((rows) => {
 
-    let selectBenef = mysql.format(sqlSelectBenef, [benef.name]);
+            // si ce beneficiaire est nouveau on lance un insert
+            if (rows.length == 0) {
 
-    dbCon.query(
-      selectBenef,
-      (err, row, fields) => {
+              const sqlInsertBenef = ' INSERT INTO beneficiary(name, address_additional, address_id, note) \n' +
+                ' VALUES(?,?,?,?) ; ';
 
-        if (err) throw err
+              const insertBenef = mysql.format(sqlInsertBenef, [benef.name, benef.address_additional, addressId, benef.note]);
 
-        // si ce beneficiaire est nouveau on lance un insert
-        if (row.length == 0) {
+              return dbQuery(insertBenef, dbCon)
+                .then((result) => {
 
-        }
+                  return result.insertId;
 
-        resolve(row);
+                });
+
+            } else {
+
+              const sqlUpdateBenef = ' UPDATE beneficiary \n' +
+                ' SET address_additional = ?, note = ? \n' +
+                ' WHERE id = ? ; ';
+
+              const updateBenef = mysql.format(sqlUpdateBenef, [benef.address_additional, benef.note, rows[0].id]);
+
+              return dbQuery(updateBenef, dbCon)
+                .then(() => {
+
+                  return rows[0].id;
+
+                });
+            }
+
+          })
+          .then((benefId) => {
+
+            resolve(updatePhones(benefId, benef.phones, dbCon));
+
+          });
 
       });
 
@@ -176,7 +265,6 @@ function getAllBeneficiariesFromDb(beneficiariesList) {
   Promise.all(promises)
     .then((values) => {
 
-      console.log(values);
       dbCon.end();
 
     });
