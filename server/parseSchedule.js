@@ -98,6 +98,8 @@ function updateAddress(address, dbCon) {
 
   return new Promise((resolve, reject) => {
 
+    console.log('updateAddress');
+
     const sqlSelectAddress = ' SELECT * \n' +
       ' FROM address \n' +
       ' WHERE label = ? \n' +
@@ -114,6 +116,8 @@ function updateAddress(address, dbCon) {
           geocode(address)
             .then((coords) => {
 
+              console.log('inserting address');
+
               const sqlInsertAddress = ' INSERT INTO address(label, town, lat, lng) \n' +
                 ' VALUES(?,?,?,?) ; ';
 
@@ -121,6 +125,9 @@ function updateAddress(address, dbCon) {
 
               dbQuery(insertAddress, dbCon)
                 .then((result) => {
+
+                  console.log('inserted address, result : ');
+                  console.log(result);
 
                   resolve(result.insertId);
 
@@ -188,6 +195,7 @@ function updateBenef(benef, dbCon) {
 
   updateAddress(benef.address, dbCon)
     .then((addressId) => {
+      console.log('addres updated');
 
       const sqlSelectBenef = ' SELECT * \n' +
         ' FROM beneficiary \n' +
@@ -232,6 +240,7 @@ function updateBenef(benef, dbCon) {
         })
         .then((benefId) => {
 
+          console.log('updating phones');
           return updatePhones(benefId, benef.phones, dbCon);
 
         });
@@ -257,17 +266,13 @@ function getAllBeneficiariesFromDb(beneficiariesList) {
   Promise.all(promises)
     .then((values) => {
 
-      console.log(values);
+      console.log('dbCon.end()');
       dbCon.end();
 
     });
 
 }
 
-// common.readFile('exampleTours/tournées_CCAS_par_dateShort.csv', 'windows-1252')
-//   .then(parseSchedule)
-//   .then((list) => {
-//     console.log(JSON.stringify(list, null, 2));
-//   })
-// .then(getAllBeneficiariesFromDb)
-;
+common.readFile('exampleTours/tournées_CCAS_par_dateShort.csv', 'windows-1252')
+  .then(parseSchedule)
+  .then(getAllBeneficiariesFromDb);
