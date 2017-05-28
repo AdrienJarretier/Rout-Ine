@@ -59,45 +59,50 @@ function geocode_google(address) {
 
 function geocode_ban(address) {
 
-  const requestUrl = 'http://api-adresse.data.gouv.fr/search/?q='.address;
+  return new Promise((resolve, reject) => {
 
-  requestsQ.push({ requestUrl: requestUrl }, function(response) {
+    const requestUrl = 'http://api-adresse.data.gouv.fr/search/?q='.address;
 
-    let i = 0;
-    let bestScore = 0.0;
-    let bestI = 0;
+    requestsQ.push({ requestUrl: requestUrl }, function(response) {
 
-    for (let feature of response.features) {
+      let i = 0;
+      let bestScore = 0.0;
+      let bestI = 0;
 
-      let score = feature.properties.score;
-      if (score > bestScore) {
-        bestScore = score;
-        bestI = i;
+      for (let feature of response.features) {
+
+        let score = feature.properties.score;
+        if (score > bestScore) {
+          bestScore = score;
+          bestI = i;
+        }
+
+        ++i;
       }
 
-      ++i;
-    }
+      if (i == 0) {
+        reject('no response from ban');
+      }
 
-    if (i == 0) {
-      throw new Exception('no response from ban');
-    }
+      let bestFeature = response.features[bestI];
 
-    let bestFeature = response.features[bestI];
+      let coordinates = [
+        'lat' => bestFeature.geometry.coordinates[1],
+        'lng' => bestFeature.geometry.coordinates[0]
+      ];
 
-    let coordinates = [
-      'lat' => bestFeature.geometry.coordinates[1],
-      'lng' => bestFeature.geometry.coordinates[0]
-    ];
+      common.logInfo('adresse ['.address.
+        '] géocodée avec ban (score '.bestScore.
+        '), ('.coordinates['lat'].
+        ', '.coordinates['lng'].
+        '), autres possibilités : '.(i - 1));
 
-    common.logInfo('adresse ['.address.
-      '] géocodée avec ban (score '.bestScore.
-      '), ('.coordinates['lat'].
-      ', '.coordinates['lng'].
-      '), autres possibilités : '.(i - 1));
+      resolve(coordinates);
+    });
 
-    resolve(coordinates);
   });
-});
+
+};
 
 
 function geocode(addressObject) {
