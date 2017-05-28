@@ -1,23 +1,45 @@
-
-
+const async = require('async');
+const common = require('./common.js');
 const request = require('request');
 
+const common.logError = common.writeInLog;
 
 
-$config['geocoding']['api']="google";
-$config['geocoding']['enable']="1";
+let requestsQ = async.queue(function(task, callback) {
 
-require_once 'geo.php';
-require_once 'log.php';
+  request(task.requestUrl, (error, response, body) => {
 
-function geocode_google($address) {
+    if (error) {
+
+      common.logError(JSON.stringify(error));
+      console.log('error:', error); // Print the error if one occurred
+
+    } else {
+
+      let response = JSON.parse(body);
+      callback(response);
+
+    }
+  });
+
+}, 1);
+
+
+// $config['geocoding']['api']="google";
+// $config['geocoding']['enable']="1";
+
+// require_once 'geo.php';
+// require_once 'log.php';
+
+function geocode_google(address) {
+
+  const requestUrl = "http://maps.googleapis.com/maps/api/geocode/json?sensor=false&address=".address;
 
   $location;
 
   try {
     $location = get_geolocation($address);
-  }
-  catch (Exception $e) {
+  } catch (Exception $e) {
     throw $e;
   }
 
@@ -26,96 +48,97 @@ function geocode_google($address) {
     'lng' => $location['location_lon']
   ];
 
-  writeInLog('adresse ['.$address.'] géocodée avec google ('.$coordinates['lat'].', '.$coordinates['lng'].')');
+  writeInLog('adresse ['.$address.
+    '] géocodée avec google ('.$coordinates['lat'].
+    ', '.$coordinates['lng'].
+    ')');
 
   return $coordinates;
 }
 
 
-function geocode_ban($address) {
+function geocode_ban(address) {
 
-  $url = 'http://api-adresse.data.gouv.fr/search/?q=';
+  const requestUrl = 'http://api-adresse.data.gouv.fr/search/?q='.address;
 
-  $request = $url.urlencode($address);
+  requestsQ.push({ requestUrl: requestUrl }, function(response) {
 
-  $response = json_decode(file_get_contents($request));
+    let i = 0;
+    let bestScore = 0.0;
+    let bestI = 0;
 
-  $i=0;
-  $bestScore = 0.0;
-  $bestI = 0;
+    for (let feature of response.features) {
 
-  foreach($response->features as $feature) {
-
-    $score = $feature->properties->score;
-    if( $score > $bestScore ) {
-      $bestScore = $score;
-      $bestI = $i;
-    }
-
-    ++$i;
-  }
-
-  if($i == 0) {
-    throw new Exception('no response from ban');
-  }
-
-  $bestFeature = $response->features[$bestI];
-
-  $coordinates = [
-    'lat' => $bestFeature->geometry->coordinates[1],
-    'lng' => $bestFeature->geometry->coordinates[0]
-  ];
-
-  writeInLog('adresse ['.$address.'] géocodée avec ban (score '.$bestScore.'), ('.$coordinates['lat'].', '.$coordinates['lng'].'), autres possibilités : '.($i-1));
-
-  return $coordinates;
-}
-
-/**
- * param beneficiary one record of parseCsv.parseBeneficiaries() result
- *
- * returns array with latitude and longitude
- *
- * throws Exception if the address is invalid and couldn't be geocoded by google api
- */
-function geocode($beneficiary) {
-
-  $address = $beneficiary["address"] . " " . $beneficiary["town"];
-
-  $MAX_TRIALS = 2;
-  $currentTry = 0;
-  while($currentTry < $MAX_TRIALS) {
-    try {
-
-      $coords;
-
-      switch($currentTry) {
-        case 0:
-          $coords = geocode_google($address);
-        break;
-
-        case 1:
-          $coords = geocode_ban($address);
-        break;
-
-        default:
-        break;
+      let score = feature.properties.score;
+      if (score > bestScore) {
+        bestScore = score;
+        bestI = i;
       }
 
-      return $coords;
+      ++i;
     }
-    catch (Exception $e) {
+
+    if (i == 0) {
+      throw new Exception('no response from ban');
+    }
+
+    let bestFeature = response.features[bestI];
+
+    let coordinates = [
+      'lat' => bestFeature.geometry.coordinates[1],
+      'lng' => bestFeature.geometry.coordinates[0]
+    ];
+
+    common.logInfo('adresse ['.address.
+      '] géocodée avec ban (score '.bestScore.
+      '), ('.coordinates['lat'].
+      ', '.coordinates['lng'].
+      '), autres possibilités : '.(i - 1));
+
+    resolve(coordinates);
+  });
+});
+
+
+function geocode(addressObject) {
+
+  const address = addressObject.label.
+  " ".addressObject.town;
+
+  const MAX_TRIALS = 2;
+
+  let currentTry = 0;
+  while (currentTry < MAX_TRIALS) {
+    try {
+
+      let coords;
+
+      switch (currentTry) {
+        case 0:
+          coords = geocode_google(address);
+          break;
+
+        case 1:
+          coords = geocode_ban(address);
+          break;
+
+        default:
+          break;
+      }
+
+      return coords;
+    } catch (Exception $e) {
 
       ++$currentTry;
 
-      switch($currentTry) {
+      switch ($currentTry) {
 
         case $MAX_TRIALS:
           throw $e;
-        break;
+          break;
 
         default:
-        break;
+          break;
       }
     }
   }
