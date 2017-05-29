@@ -470,6 +470,33 @@ function assignAddressToTour(addressId, tourNum, indexIntour, dbCon) {
 
 }
 
+
+
+
+function getNumberOfTours() {
+
+  return new Promise((resolve, reject) => {
+
+    const sqlMaxTour = ' SELECT max(tour_num) FROM tour_assignment ; ';
+
+    let dbCon = mysql.createConnection(common.serverConfig.db);
+
+    query(sqlMaxTour, dbCon)
+      .then((v) => {
+
+        dbCon.end();
+
+        resolve(v[0]['max(tour_num)']);
+
+      });
+
+  });
+
+}
+
+
+
+
 function query(statement, dbCon) {
 
   return new Promise((resolve, reject) => {
@@ -493,5 +520,6 @@ exports.clearTourAssignments = clearTourAssignments;
 exports.extractNamesList = extractNamesList;
 exports.getAddresses = getAddresses;
 exports.getFullAddressesData = getFullAddressesData;
+exports.getNumberOfTours = getNumberOfTours;
 exports.insertTours = insertTours;
 exports.query = query;
