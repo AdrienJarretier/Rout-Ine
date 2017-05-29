@@ -27,14 +27,25 @@ const testTournee = require('./testTournee.js');
 let app = express();
 // The app object conventionally denotes the Express application
 
+app.set('views', __dirname + '/../client');
+app.set('view engine', 'ejs');
+
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
 const config = common.serverConfig;
 
+
+app.get('/', function(req, res) {
+  res.render('index');
+})
+
+app.get('/bestFromGa', function(req, res) {
+  res.render('bestFromGa');
+})
+
 // sert le contenu statique de ../client, c.a.d les pages web.
 app.use(express.static(__dirname + '/../client'));
-
 
 // repondre aux requetes get sur l'url /beneficiaries
 app.get('/beneficiaries', function(req, res) {
