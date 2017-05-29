@@ -119,3 +119,28 @@ function currentDateTimeString() {
 
 }
 exports.currentDateTimeString = currentDateTimeString;
+
+function parseDateTime(dateTimeString) {
+
+  var str = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+var regexp = /[A-E]/gi;
+var matches_array = str.match(regexp);
+
+console.log(matches_array);
+
+  // parseDateTime.match(//);
+
+  // let parsedDate = {
+  //   year: dateTimeString,
+  //   month: dateTimeString,
+  //   date: dateTimeString,
+  //   toDate: function() {
+  //     return new Date(this.year, this.month, this.date);
+  //   }
+  // };
+
+  // console.log(JSON.stringify(parsedDate, null, 2));
+  // console.log(parsedDate.toDate());
+
+}
+exports.parseDateTime = parseDateTime;
