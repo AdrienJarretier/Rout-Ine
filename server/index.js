@@ -171,7 +171,7 @@ function sendTour(req, res, baseFileName) {
     root: __dirname + '/' + common.serverConfig.resultsFolder
   };
 
-  res.sendFile(baseFileName + req.query.num + '.js', options);
+  res.sendFile(baseFileName + req.query.num + '.json', options);
 
 }
 
