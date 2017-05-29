@@ -1,5 +1,5 @@
 {
-  "port": 9226,
+  "port": 80,
   "db": {
     "host": "localhost",
     "user": "root",
