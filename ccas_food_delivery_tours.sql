@@ -75,7 +75,7 @@ CREATE TABLE `beneficiary_delivery_date` (
 
 CREATE TABLE `beneficiary_phone` (
   `beneficiary_id` bigint(20) UNSIGNED NOT NULL,
-  `phone_number` char(14) NOT NULL
+  `phone_number` char(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
