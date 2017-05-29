@@ -4,6 +4,7 @@ const async = require('async');
 const common = require('./common.js');
 const db = require('./db.js');
 const FeatureCollection = require('./FeatureCollection.js');
+const manageTours = require('./multipleFile.js');
 const osrm = require('./osrm.js');
 const utils = require('./utils.js');
 
@@ -194,6 +195,8 @@ exports.start = function(params, socket) {
 
           common.writeJson(common.serverConfig.resultsFolder + '/bestTours' + utils.currentDateTimeString() +
             '.json', bestResult);
+
+          manageTours.fillDb(bestResult.trips);
 
           let timeSinceBest = (Date.now() - timeLastBest);
 
