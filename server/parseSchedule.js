@@ -118,7 +118,9 @@ function updateAddress(address, dbCon) {
               const sqlInsertAddress = ' INSERT INTO address(label, town, lat, lng) \n' +
                 ' VALUES(?,?,?,?) ; ';
 
-              const insertAddress = mysql.format(sqlInsertAddress, [address.label, address.town, coords.lat, coords.lng]);
+              const insertAddress = mysql.format(sqlInsertAddress, [address.label, address.town,
+                coords.lat, coords.lng
+              ]);
 
               dbQuery(insertAddress, dbCon)
                 .then((result) => {
@@ -193,10 +195,6 @@ function updateBenef(benef, dbCon) {
 
   return new Promise((resolve, reject) => {
 
-    console.log(JSON.stringify(benef.deliveries[0], null, 2));
-
-    console.log(utils.parseDateTime(benef.deliveries[0]));
-
     updateAddress(benef.address, dbCon)
       .then((addressId) => {
 
@@ -212,10 +210,13 @@ function updateBenef(benef, dbCon) {
             // si ce beneficiaire est nouveau on lance un insert
             if (rows.length == 0) {
 
-              const sqlInsertBenef = ' INSERT INTO beneficiary(name, address_additional, address_id, note) \n' +
+              const sqlInsertBenef =
+                ' INSERT INTO beneficiary(name, address_additional, address_id, note) \n' +
                 ' VALUES(?,?,?,?) ; ';
 
-              const insertBenef = mysql.format(sqlInsertBenef, [benef.name, benef.address_additional, addressId, benef.note]);
+              const insertBenef = mysql.format(sqlInsertBenef, [benef.name, benef.address_additional,
+                addressId, benef.note
+              ]);
 
               return dbQuery(insertBenef, dbCon)
                 .then((result) => {
@@ -230,7 +231,9 @@ function updateBenef(benef, dbCon) {
                 ' SET address_additional = ?, note = ? \n' +
                 ' WHERE id = ? ; ';
 
-              const updateBenef = mysql.format(sqlUpdateBenef, [benef.address_additional, benef.note, rows[0].id]);
+              const updateBenef = mysql.format(sqlUpdateBenef, [benef.address_additional, benef.note,
+                rows[0].id
+              ]);
 
               return dbQuery(updateBenef, dbCon)
                 .then(() => {
@@ -242,6 +245,10 @@ function updateBenef(benef, dbCon) {
 
           })
           .then((benefId) => {
+
+            console.log(JSON.stringify(benef.deliveries[0], null, 2));
+
+            console.log(utils.parseDateTime(benef.deliveries[0]));
 
             resolve(updatePhones(benefId, benef.phones, dbCon));
 
