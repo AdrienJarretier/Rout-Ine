@@ -1,8 +1,10 @@
+const async = require('async');
 const common = require('./common.js');
 const csvParse = require('csv-parse');
 const geocode = require('./geocode.js');
 const mysql = require('mysql');
 const utils = require('./utils.js');
+
 
 class Address {
 
@@ -285,26 +287,37 @@ function insertDeliveries(benefId, deliveriesDates, dbCon) {
 
 }
 
+let updateBenefsQ = async.queue(function(task, callback) {
+
+  updateBenef(task.benef, task.dbCon)
+    .then((values) => {
+
+      callback(values);
+
+    });
+
+}, 1);
+
 function getAllBeneficiariesFromDb(beneficiariesList) {
 
   let dbCon = mysql.createConnection(common.serverConfig.db);
-
-  let promises = [];
 
   for (let name in beneficiariesList.beneficiaries) {
 
     let benef = beneficiariesList.beneficiaries[name];
 
-    promises.push(updateBenef(benef, dbCon));
+    updateBenefsQ.push({ benef: benef, dbCon: dbCon }, function(values) {
+
+      // console.log(values);
+
+    });
 
   }
 
-  Promise.all(promises)
-    .then((values) => {
-
-      dbCon.end();
-
-    });
+  updateBenefsQ.drain = function() {
+    console.log('all items have been processed');
+    dbCon.end();
+  };
 
 }
 
