@@ -402,7 +402,43 @@ function getFullAddressesData(namesList) {
 
 }
 
+function insertTours(numberOfTours) {
+
+  const sqlInsertTour = ' INSERT IGNORE INTO tour(num) VALUES(?) ; ';
+
+  for (let i = 1; i <= numberOfTours; ++i) {
+
+    const insert = mysql.format(sqlInsertTour, i);
+
+    let dbCon = mysql.createConnection(common.serverConfig.db);
+
+    query(insert, dbCon)
+      .then(() => { dbCon.end(); });
+
+  }
+
+}
+
+function query(statement, dbCon) {
+
+  return new Promise((resolve, reject) => {
+
+    dbCon.query(statement, function(error, result, fields) {
+
+      if (error) throw error;
+
+      resolve(result);
+
+    });
+
+
+  });
+
+}
+
 exports.ccasAddress = ccasAddress;
 exports.extractNamesList = extractNamesList;
 exports.getAddresses = getAddresses;
 exports.getFullAddressesData = getFullAddressesData;
+exports.insertTours = insertTours;
+exports.query = query;

@@ -1,10 +1,12 @@
 const async = require('async');
 const common = require('./common.js');
 const csvParse = require('csv-parse');
+const db = require('./db.js');
 const geocode = require('./geocode.js');
 const mysql = require('mysql');
 const utils = require('./utils.js');
 
+const dbQuery = db.query;
 
 class Address {
 
@@ -78,23 +80,6 @@ function parseSchedule(schedule) {
     });
 
   });
-}
-
-function dbQuery(statement, dbCon) {
-
-  return new Promise((resolve, reject) => {
-
-    dbCon.query(statement, function(error, result, fields) {
-
-      if (error) throw error;
-
-      resolve(result);
-
-    });
-
-
-  });
-
 }
 
 function updateAddress(address, dbCon) {
