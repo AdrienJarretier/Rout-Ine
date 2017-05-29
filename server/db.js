@@ -406,7 +406,7 @@ function insertTours(numberOfTours) {
 
   const sqlInsertTour = ' INSERT IGNORE INTO tour(num) VALUES(?) ; ';
 
-  for (let i = 1; i <= numberOfTours; ++i) {
+  for (let i = 0; i < numberOfTours; ++i) {
 
     const insert = mysql.format(sqlInsertTour, i);
 
