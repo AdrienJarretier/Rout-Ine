@@ -122,25 +122,24 @@ exports.currentDateTimeString = currentDateTimeString;
 
 function parseDateTime(dateTimeString) {
 
-  var str = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-var regexp = /[A-E]/gi;
-var matches_array = str.match(regexp);
+  var regexp = /(.*)\/(.*)\/(.*) /;
+  var matches_array = dateTimeString.match(regexp);
 
-console.log(matches_array);
+  // console.log(matches_array);
 
   // parseDateTime.match(//);
 
-  // let parsedDate = {
-  //   year: dateTimeString,
-  //   month: dateTimeString,
-  //   date: dateTimeString,
-  //   toDate: function() {
-  //     return new Date(this.year, this.month, this.date);
-  //   }
-  // };
+  let parsedDate = {
+    year: matches_array[3],
+    month: matches_array[2],
+    date: matches_array[1],
+    toDate: function() {
+      let d = new Date(this.year, parseInt(this.month)-1, this.date)
+      return d.toLocaleDateString();
+    }
+  };
 
-  // console.log(JSON.stringify(parsedDate, null, 2));
-  // console.log(parsedDate.toDate());
+  return parsedDate.toDate();
 
 }
 exports.parseDateTime = parseDateTime;
