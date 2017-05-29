@@ -404,18 +404,31 @@ function getFullAddressesData(namesList) {
 
 function insertTours(numberOfTours) {
 
-  const sqlInsertTour = ' INSERT IGNORE INTO tour(num) VALUES(?) ; ';
+  return new Promise((resolve, reject) => {
 
-  for (let i = 0; i < numberOfTours; ++i) {
-
-    const insert = mysql.format(sqlInsertTour, i);
+    const sqlInsertTour = ' INSERT IGNORE INTO tour(num) VALUES(?) ; ';
 
     let dbCon = mysql.createConnection(common.serverConfig.db);
 
-    query(insert, dbCon)
-      .then(() => { dbCon.end(); });
+    let promises = [];
 
-  }
+    for (let i = 0; i < numberOfTours; ++i) {
+
+      const insert = mysql.format(sqlInsertTour, i);
+
+      promises.push(query(insert, dbCon));
+
+    }
+
+    Promise.all(promises)
+      .then(() => {
+
+        dbCon.end();
+        resolve();
+
+      });
+
+  });
 
 }
 
