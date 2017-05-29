@@ -4,7 +4,7 @@ const async = require('async');
 const common = require('./common.js');
 const db = require('./db.js');
 const FeatureCollection = require('./FeatureCollection.js');
-const manageTours = require('./multipleFile.js');
+const manageTours = require('./manageTours.js');
 const osrm = require('./osrm.js');
 const utils = require('./utils.js');
 
