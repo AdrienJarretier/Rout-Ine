@@ -195,7 +195,7 @@ function updateBenef(benef, dbCon) {
 
     console.log(JSON.stringify(benef.deliveries[0], null, 2));
 
-    utils.parseDateTime(benef.deliveries[0]);
+    console.log(utils.parseDateTime(benef.deliveries[0]));
 
     updateAddress(benef.address, dbCon)
       .then((addressId) => {
