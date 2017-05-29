@@ -52,6 +52,10 @@ app.get('/bestFromGa', function(req, res) {
   res.render('bestFromGa');
 })
 
+app.get('/tourComputing', function(req, res) {
+  res.render('tourComputing');
+})
+
 app.get('/uploadPlanning', function(req, res) {
   res.render('uploadPlanning');
 })
