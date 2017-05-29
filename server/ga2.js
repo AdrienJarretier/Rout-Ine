@@ -31,7 +31,7 @@ exports.start = function(params, socket) {
   // }
   // const MAX_ELEMENTS = params.maxStops - MIN_ELEMENTS;
 
-   const MAX_ELEMENTS = Infinity;
+  const MAX_ELEMENTS = Infinity;
 
   console.log('starting ga');
 
@@ -792,7 +792,7 @@ exports.start = function(params, socket) {
       //   .then(db.getFullAddressesData)
 
       db.getFullAddressesData()
-      .then((addressesGeoJson) => {
+        .then((addressesGeoJson) => {
 
           // la premiere adresse est le depart, c'est l'adresse du ccas,
           // elle est positionne en 1ere position par la fonction getAddresses du module db
