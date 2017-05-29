@@ -47,7 +47,7 @@ function fillDb(tours) {
 
     let tour = tours[i];
 
-    common.writeFile(TARGET_DIRECTORY + '/tourTrip' + i + '.js', JSON.stringify(
+    common.writeFile(TARGET_DIRECTORY + '/tourTrip' + i + '.json', JSON.stringify(
       tour.trip.trips[0], null, 2));
 
     // common.writeJson(TARGET_DIRECTORY+'/tourTrip' + i + '.json', tour.trip.trips[0]);
@@ -65,7 +65,7 @@ function fillDb(tours) {
     // }
 
 
-    common.writeFile(TARGET_DIRECTORY + '/tourAddresses' + i + '.js', JSON.stringify(
+    common.writeFile(TARGET_DIRECTORY + '/tourAddresses' + i + '.json', JSON.stringify(
       tour.addresses, null, 2));
     // common.writeJson('tourAddresses' + i + '.json', tour.addresses);
 
