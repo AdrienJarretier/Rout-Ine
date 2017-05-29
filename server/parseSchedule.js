@@ -192,6 +192,8 @@ function updateBenef(benef, dbCon) {
 
   return new Promise((resolve, reject) => {
 
+  console.log(JSON.stringify(benef.deliveries, null, 2));
+
     updateAddress(benef.address, dbCon)
       .then((addressId) => {
 
