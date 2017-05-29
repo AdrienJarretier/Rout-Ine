@@ -2,6 +2,7 @@ const common = require('./common.js');
 const csvParse = require('csv-parse');
 const geocode = require('./geocode.js');
 const mysql = require('mysql');
+const utils = require('./utils.js');
 
 class Address {
 
@@ -192,7 +193,9 @@ function updateBenef(benef, dbCon) {
 
   return new Promise((resolve, reject) => {
 
-  console.log(JSON.stringify(benef.deliveries, null, 2));
+    console.log(JSON.stringify(benef.deliveries[0], null, 2));
+
+    utils.parseDateTime(benef.deliveries[0]);
 
     updateAddress(benef.address, dbCon)
       .then((addressId) => {
