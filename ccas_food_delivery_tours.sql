@@ -37,6 +37,9 @@ CREATE TABLE `address` (
   `special` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+INSERT INTO `address` (`label`, `town`, `lat`, `lng`, `special`) VALUES
+('2 Avenue Colonel Teyssier', '81000 Albi', 43.9249975, 2.1499286, 'Centre Communal d''Action Sociale');
+
 -- --------------------------------------------------------
 
 --
