@@ -8,7 +8,8 @@ const TARGET_DIRECTORY = common.serverConfig.resultsFolder;
 
 function fillDb(tours) {
 
-  db.insertTours(tours.length)
+  db.clearTourAssignments()
+    .then(db.insertTours(tours.length))
     .then(() => {
 
       for (let i in tours) {

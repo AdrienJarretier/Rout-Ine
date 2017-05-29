@@ -432,11 +432,31 @@ function insertTours(numberOfTours) {
 
 }
 
-function assignAddressToTour(addressId, tourNum, indexIntour, dbCon) {
+function clearTourAssignments() {
 
   return new Promise((resolve, reject) => {
 
-    console.log('assignAddressToTour');
+    const sqlDeleteAssignments =
+      ' DELETE FROM tour_assignment ; ';
+
+    let dbCon = mysql.createConnection(common.serverConfig.db);
+
+    query(sqlDeleteAssignments, dbCon)
+      .then((v) => {
+
+        dbCon.end();
+
+        resolve(v);
+
+      });
+
+  });
+
+}
+
+function assignAddressToTour(addressId, tourNum, indexIntour, dbCon) {
+
+  return new Promise((resolve, reject) => {
 
     const sqlInsertTourAssignment =
       ' INSERT INTO tour_assignment(address_id, tour_num, index_in_tour) ' +
@@ -469,6 +489,7 @@ function query(statement, dbCon) {
 
 exports.assignAddressToTour = assignAddressToTour;
 exports.ccasAddress = ccasAddress;
+exports.clearTourAssignments = clearTourAssignments;
 exports.extractNamesList = extractNamesList;
 exports.getAddresses = getAddresses;
 exports.getFullAddressesData = getFullAddressesData;
