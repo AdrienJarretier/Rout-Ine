@@ -12,6 +12,7 @@
     "async": "^2.3.0",
     "body-parser": "^1.17.2",
     "csv-parse": "^1.2.0",
+    "ejs": "^2.5.6",
     "express": "^4.15.2",
     "iconv-lite": "^0.4.17",
     "mysql": "^2.13.0",
