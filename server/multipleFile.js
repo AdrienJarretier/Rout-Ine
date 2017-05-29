@@ -4,7 +4,7 @@ const common = require('./common.js');
 
 const TARGET_DIRECTORY = common.serverConfig.resultsFolder;
 
-common.readFile('gaResults/bestTours.json')
+common.readFile('gaResults/bestTours2017-5-29_11-18-14.json')
   .then((content) => {
 
     let object = JSON.parse(content);

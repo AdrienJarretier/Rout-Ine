@@ -1,33 +1,4 @@
 
+gerer la tournée exterieur Albi
 
-le planning de livraison peut se présenter simplement sous la forme d'une liste de noms
-avec
-
-    db.extractNamesList('listeDeNoms.csv')
-      .then(db.getFullAddressesData)
-
-on peut filtrer
-
-enregistrer un planning, pour un jour donné, quelles adresses doivent etre livrées
-Il faut savoir pour une date donnée, quelles beneficiaires à livrer, avec éventuellement des annotaiton si celles ci ne peuvent pas etre fixé d'une semaine à l'autre
-
-
-
-
-
-
-
-
-donner la possibilité de faire des simulations, cad :
-  - parametrer le jour du planning à calculer
-  - parametrer le temps d'arret (actuellement 3 min pour albi)
-  - afficher le temps d'arret et surtout en fonction de la duree max d'un trajet afficher le temps d'arret max / adresse possible
-  - parametrer le nombre de trajets et/ou pour une duree max par trajet et d'un temps d'arret afficher le nombre minimum de tajets à prévoir
-
-
-
-si aucun fichier présent de meilleur resultat corriger le crash
-
-
-
-taille pop : 168
+centre ville à livrer en priorité (avant 9h), départ à 7h donc 2h pour livrer centre ville
