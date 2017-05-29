@@ -497,6 +497,42 @@ function getNumberOfTours() {
 
 
 
+
+function getTour(tourNum, deliveryDate) {
+
+  return new Promise((resolve, reject) => {
+
+    const selectTourOnDate =
+      ' SELECT * ' +
+      ' FROM beneficiary_delivery_date ' +
+      ' INNER JOIN beneficiary ON beneficiary.id = beneficiary_delivery_date.beneficiary_id ' +
+      ' INNER JOIN address ON address.id = beneficiary.address_id ' +
+      ' INNER JOIN tour_assignment ON address.id = tour_assignment.address_id ' +
+      ' WHERE date = ? ' +
+      ' AND tour_num = ? ' +
+      ' ORDER BY `tour_assignment`.`index_in_tour` ASC ; ';
+
+    const tourOnDate = mysql.format(selectTourOnDate, [deliveryDate, tourNum]);
+
+    let dbCon = mysql.createConnection(common.serverConfig.db);
+
+    query(tourOnDate, dbCon)
+      .then((rows) => {
+
+        dbCon.end();
+
+        resolve(rows);
+
+      });
+
+  });
+
+}
+
+getTour(0, '2017-04-24')
+  .then((r) => { console.log(r); });
+
+
 function query(statement, dbCon) {
 
   return new Promise((resolve, reject) => {
@@ -520,6 +556,5 @@ exports.clearTourAssignments = clearTourAssignments;
 exports.extractNamesList = extractNamesList;
 exports.getAddresses = getAddresses;
 exports.getFullAddressesData = getFullAddressesData;
-exports.getNumberOfTours = getNumberOfTours;
 exports.insertTours = insertTours;
 exports.query = query;

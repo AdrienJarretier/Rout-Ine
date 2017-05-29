@@ -50,25 +50,6 @@ function fillDb(tours) {
 exports.fillDb = fillDb;
 
 
-function getTour(tourNum, deliveryDate) {
-
-  return new Promise((resolve, reject) => {
-
-    let selectTourOnDate =
-      ' SELECT * ' +
-      ' FROM beneficiary_delivery_date ' +
-      ' INNER JOIN beneficiary ON beneficiary.id = beneficiary_delivery_date.beneficiary_id ' +
-      ' INNER JOIN address ON address.id = beneficiary.address_id ' +
-      ' INNER JOIN tour_assignment ON address.id = tour_assignment.address_id ' +
-      ' WHERE date = ? ' +
-      ' AND tour_num = ? ' +
-      ' ORDER BY `tour_assignment`.`index_in_tour` ASC ; ';
-
-  });
-
-}
-
-
 // function get(tourNum) {
 
 //   return new Promise((resolve, reject) => {
