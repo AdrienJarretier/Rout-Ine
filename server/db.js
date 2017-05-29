@@ -432,6 +432,24 @@ function insertTours(numberOfTours) {
 
 }
 
+function assignAddressToTour(addressId, tourNum, indexIntour, dbCon) {
+
+  return new Promise((resolve, reject) => {
+
+    console.log('assignAddressToTour');
+
+    const sqlInsertTourAssignment =
+      ' INSERT INTO tour_assignment(address_id, tour_num, index_in_tour) ' +
+      ' VALUES(?,?,?) ; ';
+
+    const insertTourAssignment = mysql.format(sqlInsertTourAssignment, [addressId, tourNum, indexIntour]);
+
+    resolve(query(insertTourAssignment, dbCon));
+
+  });
+
+}
+
 function query(statement, dbCon) {
 
   return new Promise((resolve, reject) => {
@@ -449,6 +467,7 @@ function query(statement, dbCon) {
 
 }
 
+exports.assignAddressToTour = assignAddressToTour;
 exports.ccasAddress = ccasAddress;
 exports.extractNamesList = extractNamesList;
 exports.getAddresses = getAddresses;
