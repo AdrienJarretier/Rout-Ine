@@ -50,6 +50,17 @@ function fillDb(tours) {
 exports.fillDb = fillDb;
 
 
+// function getTour(tourNum, deliveryDate) {
+
+//   return new Promise((resolve, reject) => {
+
+
+
+//   });
+
+// }
+
+
 // function get(tourNum) {
 
 //   return new Promise((resolve, reject) => {
