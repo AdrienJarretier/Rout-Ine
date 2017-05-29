@@ -36,6 +36,14 @@ app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x
 const config = common.serverConfig;
 
 
+
+
+// sert le contenu statique de ../client, c.a.d les pages web.
+app.use(express.static(__dirname + '/../client/statics'));
+
+
+
+
 app.get('/', function(req, res) {
   res.render('index');
 })
@@ -44,8 +52,12 @@ app.get('/bestFromGa', function(req, res) {
   res.render('bestFromGa');
 })
 
-// sert le contenu statique de ../client, c.a.d les pages web.
-app.use(express.static(__dirname + '/../client'));
+app.get('/uploadPlanning', function(req, res) {
+  res.render('uploadPlanning');
+})
+
+
+
 
 // repondre aux requetes get sur l'url /beneficiaries
 app.get('/beneficiaries', function(req, res) {
