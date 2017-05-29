@@ -4,7 +4,7 @@
     "host": "localhost",
     "user": "root",
     "password": "mysql",
-    "database": "ccas_beneficiariestmp"
+    "database": "ccas_food_delivery_tours"
   },
   "osrm": {
     "protocol": "http",
