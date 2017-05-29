@@ -246,15 +246,40 @@ function updateBenef(benef, dbCon) {
           })
           .then((benefId) => {
 
-            console.log(JSON.stringify(benef.deliveries[0], null, 2));
+            let promises = [];
 
-            console.log(utils.parseDateTime(benef.deliveries[0]));
+            promises.push(updatePhones(benefId, benef.phones, dbCon));
+            promises.push(insertDeliveries(benefId, benef.deliveries, dbCon));
 
-            resolve(updatePhones(benefId, benef.phones, dbCon));
+            resolve(Promise.all(promises));
 
           });
 
       });
+
+  });
+
+}
+
+function insertDeliveries(benefId, deliveriesDates, dbCon) {
+
+  return new Promise((resolve, reject) => {
+
+    const sqlInsertDelivery = ' INSERT IGNORE INTO beneficiary_delivery_date(beneficiary_id, date) \n' +
+      ' VALUES(?, ?) ; ';
+
+    let promises = [];
+
+    for (let d of deliveriesDates) {
+
+      let parsedDate = utils.parseDateTime(d);
+      const insertDelivery = mysql.format(sqlInsertDelivery, [benefId, parsedDate]);
+
+      promises.push(dbQuery(insertDelivery, dbCon));
+
+    }
+
+    resolve(Promise.all(promises));
 
   });
 
