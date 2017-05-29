@@ -38,11 +38,16 @@ function readFile(file, encoding) {
             reject(err);
           else {
 
-            let buf = iconv.decode(fileContent, encoding);
+            if (encoding) {
 
-            let str = iconv.encode(buf, 'utf8');
+              let buf = iconv.decode(fileContent, encoding);
 
-            resolve(str);
+              let str = iconv.encode(buf, 'utf8');
+
+              resolve(str);
+
+            } else
+              resolve(fileContent);
 
           }
 
