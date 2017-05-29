@@ -529,8 +529,8 @@ function getTour(tourNum, deliveryDate) {
 
 }
 
-getTour(0, '2017-04-24')
-  .then((r) => { console.log(r); });
+// getTour(0, '2017-04-24')
+//   .then((r) => { console.log(r); });
 
 
 function query(statement, dbCon) {
