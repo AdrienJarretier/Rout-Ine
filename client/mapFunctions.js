@@ -22,8 +22,10 @@ function addressesMarkers(waypoints, addresses, color) {
 
   function markerMaker(waypoint, address_index) {
 
-    let lat = waypoint.location[1];
-    let lng = waypoint.location[0];
+    let address_coords = addresses.features[address_index].geometry.coordinates;
+
+    let lat = address_coords[1];
+    let lng = address_coords[0];
 
     let marker = L.marker([lat, lng], {
       icon: new L.AwesomeNumberMarkers({
