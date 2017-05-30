@@ -36,6 +36,9 @@
 
         $('#inputSchedule').change(function() {
 
+          $('#importSuccess').hide();
+          $('#importError').hide();
+
           let schedule = this.files[0];
 
           let reader = new FileReader();
