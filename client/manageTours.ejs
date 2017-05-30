@@ -29,44 +29,40 @@
 
         $.get('listResults', function(dates) {
 
-          if (dates.length == 0) {
 
-            $('#errorNoData').show();
-          } else {
+          $('#datesDropwdownMenu').show();
 
-            $('#datesDropwdownMenu').show();
+          for (let i in dates) {
 
-            for (let i in dates) {
+            let d = dates[i].date;
 
-              let d = dates[i];
+            console.log(d);
 
-              let time = d.time.replace('-', 'h');
-              time = time.replace(/-.*/, '');
+            let localeDate = (new Date(d)).toLocaleDateString();
 
-              let link = $('<a href="#">').text('otenu le ' + d.date + ' à ' + time);
+            let link = $('<a href="#">').text('tournée de ' + localeDate);
 
-              link.click(function() {
+            // link.click(function() {
 
-                $('#dropdownMenu1').text(link.text());
+            //   $('#dropdownMenu1').text(link.text());
 
-                link.parent().siblings().each(function(index) {
-                  $(this).css('background-color', '');
-                });
+            //   link.parent().siblings().each(function(index) {
+            //     $(this).css('background-color', '');
+            //   });
 
-                link.parent().css('background-color', 'rgb(200,255,200)');
+            //   link.parent().css('background-color', 'rgb(200,255,200)');
 
-                $.post('bestFromGa', d, displayBest);
+            //   $.post('bestFromGa', d, displayBest);
 
-              });
+            // });
 
-              $('#datesDropwdownMenu ul').append($('<li>').append(link));
-
-            }
-
-            $.post('bestFromGa', dates[dates.length - 1], displayBest);
-            $('#datesDropwdownMenu ul li').last().css('background-color', 'rgb(200,255,200)');
+            $('#datesDropwdownMenu ul').append($('<li>').append(link));
 
           }
+
+          // $.post('bestFromGa', dates[dates.length - 1], displayBest);
+          // $('#datesDropwdownMenu ul li').last().css('background-color', 'rgb(200,255,200)');
+
 
         });
 

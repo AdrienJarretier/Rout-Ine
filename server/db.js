@@ -495,6 +495,32 @@ function getNumberOfTours() {
 }
 
 
+function getFuturesDeliveriesDates() {
+
+  return new Promise((resolve, reject) => {
+
+    const sqlSelectFutureDates =
+      ' SELECT DISTINCT date ' +
+      ' FROM beneficiary_delivery_date ' +
+      ' WHERE date > CURDATE()' +
+      ' ORDER BY date ASC ';
+
+    let dbCon = mysql.createConnection(common.serverConfig.db);
+
+    query(sqlSelectFutureDates, dbCon)
+      .then((v) => {
+
+        dbCon.end();
+
+        resolve(v);
+
+      });
+
+  });
+
+}
+
+
 
 
 
@@ -556,6 +582,7 @@ exports.clearTourAssignments = clearTourAssignments;
 exports.extractNamesList = extractNamesList;
 exports.getAddresses = getAddresses;
 exports.getFullAddressesData = getFullAddressesData;
+exports.getFuturesDeliveriesDates = getFuturesDeliveriesDates;
 exports.getNumberOfTours = getNumberOfTours;
 exports.insertTours = insertTours;
 exports.query = query;
