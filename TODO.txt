@@ -3,4 +3,4 @@ gerer la tournée exterieur Albi
 
 centre ville à livrer en priorité (avant 9h), départ à 7h donc 2h pour livrer centre ville
 
-retirer les liense sur les h1
+http://expressjs.com/en/resources/middleware/session.html
