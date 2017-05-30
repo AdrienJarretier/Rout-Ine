@@ -52,8 +52,8 @@ app.get('/', function(req, res) {
   res.render('index');
 })
 
-app.get('/bestFromGa', function(req, res) {
-  res.render('bestFromGa');
+app.get('/manageTours', function(req, res) {
+  res.render('manageTours');
 })
 
 app.get('/tourComputing', function(req, res) {
