@@ -114,8 +114,10 @@ app.get('/testTournee', function(req, res) {
 
 app.get('/listResults', function(req, res) {
 
-  common.getResultsDates()
+  db.getFuturesDeliveriesDates()
     .then((dates) => {
+
+      console.log(dates);
 
       res.send(dates);
 
