@@ -19,6 +19,8 @@
 
       $(document).ready(function() {
 
+        $('nav #manageToursLink').addClass('active');
+
         $('#error').hide();
         $('#errorNoData').hide();
         $('#datesDropwdownMenu').hide();
@@ -157,7 +159,7 @@
   %>
       <div id="error" class="alert alert-danger" role="alert">Une erreur inconnue s'est produite, se référer aux logs serveur</div>
       <div class="container-fluid">
-        <div class="row">
+        <div class="row" id="main">
           <div class="col-xs-3">
             <div id="errorNoData" class="alert alert-danger" role="alert">Aucun résultat, lancer un <a href="tourComputing">Calcul des tournées</a></div>
             <div id="datesDropwdownMenu" class="dropdown">
