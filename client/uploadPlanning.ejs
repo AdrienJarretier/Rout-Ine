@@ -27,6 +27,10 @@
       // execute le javascript quand la page est completement chargee
       $(document).ready(function() {
 
+        $('#importSchedule').prop("disabled", true);
+        $('#importSuccess').hide();
+        $('#importError').hide();
+
         const csvParse = require('csv-parse');
 
         $('#inputSchedule').change(function() {
@@ -97,6 +101,40 @@
 
         });
 
+        $('#importSchedule').click(function() {
+
+          var form = $('#formSchedule')[0];
+
+          // Create an FormData object
+          var data = new FormData(form);
+
+          $.ajax({
+            type: "POST",
+            enctype: 'multipart/form-data',
+            url: "scheduleUpload",
+            data: data,
+            processData: false,
+            contentType: false,
+            cache: false,
+            timeout: 600000,
+            success: function(data) {
+
+              console.log("SUCCESS : ", data);
+              $('#importSuccess').show();
+              $('#importSchedule').prop("disabled", true);
+
+            },
+            error: function(e) {
+
+              // $("#result").text(e.responseText);
+              console.log("ERROR : ", e);
+              $('#importError').show();
+              // $("#btnSubmit").prop("disabled", false);
+
+            }
+          });
+
+        });
 
       });
       </script>
@@ -107,12 +145,14 @@
       <div class="container">
         <div class="row">
           <div class="col-xs-12">
-            <form id='formSchedule'>
+            <form id='formSchedule' enctype='multipart/form-data' method='post'>
               <div class="form-group">
                 <label for="inputSchedule">Sélection du planning</label>
                 <input type="file" id="inputSchedule" name="inputSchedule">
               </div>
-              <button id="importSchedule" class="btn btn-success" type="button" disabled>Importer</button>
+              <button id="importSchedule" class="btn btn-success" type="button">Importer</button>
+              <div id="importError" class="alert alert-danger" role="alert">Erreur pendant l'import</div>
+              <div id="importSuccess" class="alert alert-success" role="alert">Planning importé avec succès</div>
             </form>
           </div>
         </div>

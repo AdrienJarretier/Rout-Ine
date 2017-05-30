@@ -10,6 +10,7 @@ Third, strict mode prohibits some syntax likely to be defined in future versions
 var bodyParser = require('body-parser');
 const common = require('./common.js');
 const express = require('express');
+var multer = require('multer')
 const mysql = require('mysql');
 /*
   chargement des différents modules :
@@ -23,6 +24,7 @@ const ga2 = require('./ga2.js');
 const testTournee = require('./testTournee.js');
 
 
+var upload = multer({ dest: 'uploads/' });
 
 let app = express();
 // The app object conventionally denotes the Express application
@@ -225,3 +227,14 @@ app.get('/downloadTrip', function(req, res) {
   sendTour(req, res, 'tourTrip');
 
 });
+
+
+
+app.post('/scheduleUpload', upload.single('inputSchedule'), function(req, res, next) {
+
+  console.log(req.file);
+  console.log(req.body);
+
+  res.send('ok');
+
+})
