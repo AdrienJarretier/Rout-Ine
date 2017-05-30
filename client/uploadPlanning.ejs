@@ -85,7 +85,11 @@
 
                 });
 
-                console.log(allDates);
+                let firstDate = $('<strong>').text(allDates[0]).css('color', 'black');
+                let lastdate = $('<strong>').text(allDates[allDates.length - 1]).css('color', 'black');
+
+                $('#importSchedule').prop("disabled", false);
+                $('#importSchedule').text('Importer le planning du ').append(firstDate).append(' au ').append(lastdate);
 
               });
 
@@ -108,7 +112,7 @@
                 <label for="inputSchedule">Sélection du planning</label>
                 <input type="file" id="inputSchedule" name="inputSchedule">
               </div>
-              <button id="startGa" class="btn btn-success" type="button">Valider l'importation</button>
+              <button id="importSchedule" class="btn btn-success" type="button" disabled>Importer</button>
             </form>
           </div>
         </div>
