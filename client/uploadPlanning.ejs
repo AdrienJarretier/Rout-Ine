@@ -28,8 +28,9 @@
       $(document).ready(function() {
 
         $('#importSchedule').prop("disabled", true);
-        $('#importSuccess').hide();
         $('#importError').hide();
+        $('#importOngoing').hide();
+        $('#importSuccess').hide();
 
         const csvParse = require('csv-parse');
 
@@ -103,6 +104,9 @@
 
         $('#importSchedule').click(function() {
 
+          $('#importSchedule').prop("disabled", true);
+          $('#importOngoing').show();
+
           var form = $('#formSchedule')[0];
 
           // Create an FormData object
@@ -120,8 +124,8 @@
             success: function(data) {
 
               console.log("SUCCESS : ", data);
+              $('#importOngoing').hide();
               $('#importSuccess').show();
-              $('#importSchedule').prop("disabled", true);
 
             },
             error: function(e) {
@@ -129,6 +133,7 @@
               // $("#result").text(e.responseText);
               console.log("ERROR : ", e);
               $('#importError').show();
+              $('#importOngoing').hide();
               // $("#btnSubmit").prop("disabled", false);
 
             }
@@ -151,6 +156,7 @@
                 <input type="file" id="inputSchedule" name="inputSchedule">
               </div>
               <button id="importSchedule" class="btn btn-success" type="button">Importer</button>
+              <div id="importOngoing" class="alert alert-info" role="alert">Import en cours...</div>
               <div id="importError" class="alert alert-danger" role="alert">Erreur pendant l'import</div>
               <div id="importSuccess" class="alert alert-success" role="alert">Planning importé avec succès</div>
             </form>

@@ -208,29 +208,36 @@ let updateBenefsQ = async.queue(function(task, callback) {
 
 }, 1);
 
-function getAllBeneficiariesFromDb(beneficiariesList) {
+function updateBeneficiariesFromScheduleList(beneficiariesList) {
 
-  let dbCon = mysql.createConnection(common.serverConfig.db);
+  return new Promise((resolve, reject) => {
 
-  for (let name in beneficiariesList.beneficiaries) {
+    let dbCon = mysql.createConnection(common.serverConfig.db);
 
-    let benef = beneficiariesList.beneficiaries[name];
+    for (let name in beneficiariesList.beneficiaries) {
 
-    updateBenefsQ.push({ benef: benef, dbCon: dbCon }, function(values) {
+      let benef = beneficiariesList.beneficiaries[name];
 
-      // console.log(values);
+      updateBenefsQ.push({ benef: benef, dbCon: dbCon }, function(values) {
 
-    });
+        // console.log(values);
 
-  }
+      });
 
-  updateBenefsQ.drain = function() {
-    console.log('all items have been processed');
-    dbCon.end();
-  };
+    }
+
+    updateBenefsQ.drain = function() {
+
+      dbCon.end();
+      resolve('all beneficiaries have been processed');
+    };
+
+  })
 
 }
 
-common.readFile('exampleTours/tournées_CCAS_par_dateShort.csv', 'windows-1252')
-  .then(utils.parseSchedule)
-  .then(getAllBeneficiariesFromDb);
+exports.updateBeneficiariesFromScheduleList = updateBeneficiariesFromScheduleList;
+
+// common.readFile('exampleTours/tournées_CCAS_par_dateShort.csv', 'windows-1252')
+//   .then(utils.parseSchedule)
+//   .then(getAllBeneficiariesFromDb);
