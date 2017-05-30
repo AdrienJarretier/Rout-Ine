@@ -27,6 +27,8 @@
       // execute le javascript quand la page est completement chargee
       $(document).ready(function() {
 
+        $('nav #uploadPlanningLink').addClass('active');
+
         $('#importSchedule').prop("disabled", true);
         $('#importError').hide();
         $('#importOngoing').hide();
@@ -151,7 +153,7 @@
   <body>
     <%- include('partials/header.ejs', INC_OPT) %>
       <div class="container">
-        <div class="row">
+        <div class="row main-upload-planning" id="main">
           <div class="col-xs-12">
             <form id='formSchedule' enctype='multipart/form-data' method='post'>
               <div class="form-group">
