@@ -134,7 +134,7 @@ function parseDateTime(dateTimeString) {
     month: matches_array[2],
     date: matches_array[1],
     toDate: function() {
-      let d = new Date(this.year, parseInt(this.month)-1, this.date)
+      let d = new Date(this.year, parseInt(this.month) - 1, this.date)
       return d.toLocaleDateString();
     }
   };
@@ -143,3 +143,84 @@ function parseDateTime(dateTimeString) {
 
 }
 exports.parseDateTime = parseDateTime;
+
+
+
+
+class Address {
+
+  constructor(parsedLine) {
+
+    this.label = parsedLine[1].replace(/^\s*0\s*,\s*/g, '');
+    this.town = parsedLine[3];
+
+  }
+
+}
+
+class Beneficiary {
+
+  constructor(parsedLine) {
+
+    this.name = parsedLine[0];
+    this.address = new Address(parsedLine);
+    this.address_additional = parsedLine[2];
+    this.phones = [parsedLine[4]];
+    this.deliveries = [];
+
+    this.addDelivery(parsedLine);
+
+    this.note = parsedLine[6];
+
+  }
+
+  addDelivery(parsedLine) {
+
+    this.deliveries.push(parsedLine[5]);
+
+  }
+
+}
+
+class BeneficiariesList {
+
+  constructor(parsedSchedule) {
+
+    this.beneficiaries = {};
+
+    for (let parsedLine of parsedSchedule) {
+
+      let benef = this.beneficiaries[parsedLine[0]];
+
+      if (benef)
+        benef.addDelivery(parsedLine);
+      else
+        this.beneficiaries[parsedLine[0]] = new Beneficiary(parsedLine);
+
+    }
+
+  }
+
+}
+
+function parseSchedule(schedule) {
+
+  return new Promise((resolve, reject) => {
+
+    const csvParse = require('csv-parse');
+
+    let options = {
+      delimiter: ";",
+      from: 2
+    }
+
+    csvParse(schedule, options, function(err, output) {
+
+      resolve(new BeneficiariesList(output));
+
+    });
+
+  });
+}
+exports.parseSchedule = parseSchedule;
+
