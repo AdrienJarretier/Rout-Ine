@@ -486,7 +486,7 @@ function getNumberOfTours() {
 
         dbCon.end();
 
-        resolve(v[0]['max(tour_num)']);
+        resolve(v[0]['max(tour_num)'] + 1);
 
       });
 
@@ -556,5 +556,6 @@ exports.clearTourAssignments = clearTourAssignments;
 exports.extractNamesList = extractNamesList;
 exports.getAddresses = getAddresses;
 exports.getFullAddressesData = getFullAddressesData;
+exports.getNumberOfTours = getNumberOfTours;
 exports.insertTours = insertTours;
 exports.query = query;

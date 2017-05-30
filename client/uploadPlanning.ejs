@@ -1,26 +1,19 @@
 <!DOCTYPE html>
 <html lang="fr">
+<%
 
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-  <title>Localisation bénéficiaires - Calcul des tournées</title>
-  <script src='csv-parse.js'></script>
-  <script src="jquery-latest.min.js"></script>
-  <script type="text/javascript" src="utils.js"></script>
-  <script src="/socket.io/socket.io.js"></script>
-  <!-- Leaflet -->
-  <link rel="stylesheet" href="leaflet/leaflet.css">
-  <script src="leaflet/leaflet.js"></script>
-  <!-- -->
-  <!-- Bootstrap -->
-  <link href="bootstrap-3.3.7-dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
-  <!-- -->
-  <link rel="stylesheet" href="style.css">
-  <script src='common.js'></script>
-  <script src='mapFunctions.js'></script>
+  const GLOBAL_TITLE = 'Rout-Ine';
+
+  const INC_OPT = {
+    globalTitle: GLOBAL_TITLE,
+    title: 'Importation Planning'
+  };
+%>
+
+  <head>
+    <%-
+        include('partials/head.ejs', INC_OPT)
+      %>
   <script type="text/javascript">
   'use strict';
   /*
@@ -64,10 +57,7 @@
 </head>
 
 <body>
-  <header>
-    <h1><a href="index.html">Importer un planning</a></h1>
-    <%- include('nav.ejs') %>
-  </header>
+    <%- include('partials/header.ejs', INC_OPT) %>
   <div class="container">
     <div class="row">
       <div class="col-xs-12">
