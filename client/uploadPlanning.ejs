@@ -14,62 +14,105 @@
     <%-
         include('partials/head.ejs', INC_OPT)
       %>
-  <script type="text/javascript">
-  'use strict';
-  /*
-  Strict mode makes several changes to normal JavaScript semantics.
-  First, strict mode eliminates some JavaScript silent errors by changing them to throw errors.
-  Second, strict mode fixes mistakes that make it difficult for JavaScript engines to perform optimizations:
-  strict mode code can sometimes be made to run faster than identical code that's not strict mode.
-  Third, strict mode prohibits some syntax likely to be defined in future versions of ECMAScript.
-  */
+      <script type="text/javascript">
+      'use strict';
+      /*
+      Strict mode makes several changes to normal JavaScript semantics.
+      First, strict mode eliminates some JavaScript silent errors by changing them to throw errors.
+      Second, strict mode fixes mistakes that make it difficult for JavaScript engines to perform optimizations:
+      strict mode code can sometimes be made to run faster than identical code that's not strict mode.
+      Third, strict mode prohibits some syntax likely to be defined in future versions of ECMAScript.
+      */
 
-  // execute le javascript quand la page est completement chargee
-  $(document).ready(function() {
+      // execute le javascript quand la page est completement chargee
+      $(document).ready(function() {
 
-    const csvParse = require('csv-parse');
+        const csvParse = require('csv-parse');
 
-    $('#inputSchedule').change(function() {
+        $('#inputSchedule').change(function() {
 
-      let schedule = this.files[0];
+          let schedule = this.files[0];
 
-      let reader = new FileReader();
+          let reader = new FileReader();
 
-      reader.readAsText(schedule, 'Windows-1252');
+          reader.readAsText(schedule, 'Windows-1252');
 
-      reader.onloadend = function() {
+          reader.onloadend = function() {
 
-        utils.parseSchedule(reader.result)
-        .then((beneficiariesList) => {
+            utils.parseSchedule(reader.result)
+              .then((beneficiariesList) => {
 
-          console.log(beneficiariesList);
+                let allDates = [];
+
+                for (let name in beneficiariesList.beneficiaries) {
+
+                  let benef = beneficiariesList.beneficiaries[name];
+
+                  for (let d of benef.deliveries) {
+
+                    allDates.push(utils.parseDateTime(d));
+
+                  }
+
+                }
+
+                allDates.sort((a, b) => {
+
+                  let parse = function(dateString) {
+
+                    var regexp = /(.*)\/(.*)\/(.*)/;
+                    var matches_array = dateString.match(regexp);
+
+                    let parsedDate = {
+                      year: matches_array[3],
+                      month: matches_array[2],
+                      date: matches_array[1]
+                    };
+
+                    return parsedDate;
+
+                  }
+
+                  let aParsed = parse(a);
+                  let bParsed = parse(b);
+
+                  if (aParsed.year != bParsed.year)
+                    return aParsed.year - bParsed.year;
+                  else if (aParsed.month != bParsed.month)
+                    return aParsed.month - bParsed.month;
+                  else
+                    return aParsed.date - bParsed.date;
+
+                });
+
+                console.log(allDates);
+
+              });
+
+          };
 
         });
 
-      };
 
-    });
+      });
+      </script>
+  </head>
 
-
-  });
-  </script>
-</head>
-
-<body>
+  <body>
     <%- include('partials/header.ejs', INC_OPT) %>
-  <div class="container">
-    <div class="row">
-      <div class="col-xs-12">
-        <form id='formSchedule'>
-          <div class="form-group">
-            <label for="inputSchedule">Sélection du planning</label>
-            <input type="file" id="inputSchedule" name="inputSchedule">
+      <div class="container">
+        <div class="row">
+          <div class="col-xs-12">
+            <form id='formSchedule'>
+              <div class="form-group">
+                <label for="inputSchedule">Sélection du planning</label>
+                <input type="file" id="inputSchedule" name="inputSchedule">
+              </div>
+              <button id="startGa" class="btn btn-success" type="button">Valider l'importation</button>
+            </form>
           </div>
-          <button id="startGa" class="btn btn-success" type="button">Valider l'importation</button>
-        </form>
+        </div>
       </div>
-    </div>
-  </div>
-</body>
+  </body>
 
 </html>
