@@ -1,86 +1,11 @@
 const async = require('async');
 const common = require('./common.js');
-const csvParse = require('csv-parse');
 const db = require('./db.js');
 const geocode = require('./geocode.js');
 const mysql = require('mysql');
 const utils = require('./utils.js');
 
 const dbQuery = db.query;
-
-class Address {
-
-  constructor(parsedLine) {
-
-    this.label = parsedLine[1].replace(/^\s*0\s*,\s*/g, '');
-    this.town = parsedLine[3];
-
-  }
-
-}
-
-class Beneficiary {
-
-  constructor(parsedLine) {
-
-    this.name = parsedLine[0];
-    this.address = new Address(parsedLine);
-    this.address_additional = parsedLine[2];
-    this.phones = [parsedLine[4]];
-    this.deliveries = [];
-
-    this.addDelivery(parsedLine);
-
-    this.note = parsedLine[6];
-
-  }
-
-  addDelivery(parsedLine) {
-
-    this.deliveries.push(parsedLine[5]);
-
-  }
-
-}
-
-class BeneficiariesList {
-
-  constructor(parsedSchedule) {
-
-    this.beneficiaries = {};
-
-    for (let parsedLine of parsedSchedule) {
-
-      let benef = this.beneficiaries[parsedLine[0]];
-
-      if (benef)
-        benef.addDelivery(parsedLine);
-      else
-        this.beneficiaries[parsedLine[0]] = new Beneficiary(parsedLine);
-
-    }
-
-  }
-
-}
-
-function parseSchedule(schedule) {
-
-  return new Promise((resolve, reject) => {
-
-    let options = {
-      delimiter: ";",
-      from: 2
-    }
-
-    csvParse(schedule, options, function(err, output) {
-
-      resolve(new BeneficiariesList(output));
-
-    });
-
-  });
-}
 
 function updateAddress(address, dbCon) {
 
@@ -307,5 +232,5 @@ function getAllBeneficiariesFromDb(beneficiariesList) {
 }
 
 common.readFile('exampleTours/tournées_CCAS_par_dateShort.csv', 'windows-1252')
-  .then(parseSchedule)
+  .then(utils.parseSchedule)
   .then(getAllBeneficiariesFromDb);

@@ -39,11 +39,10 @@
 
       reader.onloadend = function() {
 
-        csvParse(reader.result, {
-          delimiter: ";"
-        }, function(err, output) {
+        utils.parseSchedule(reader.result)
+        .then((beneficiariesList) => {
 
-          console.log(output);
+          console.log(beneficiariesList);
 
         });
 
