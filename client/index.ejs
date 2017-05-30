@@ -1,25 +1,25 @@
 <!DOCTYPE html>
 <html>
+  <%
 
-<head>
-  <meta charset="UTF-8">
-  <title>Localisation bénéficiaires</title>
-  <script src="jquery-latest.min.js"></script>
-  <!-- Bootstrap -->
-  <link href="bootstrap-3.3.7-dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
-  <!-- -->
-  <link rel="stylesheet" href="style.css">
-</head>
+  const GLOBAL_TITLE = 'Rout-Ine';
 
-<body>
-  <header>
-    <h1>RoutIne</h1>
-    <h1>Route-Ine</h1>
-    <h1>Rout-Ine</h1>
-    <h1>Root-In</h1>
-    <%- include('nav.ejs') %>
-  </header>
-</body>
+  const INC_OPT = {
+    globalTitle: '',
+    title: GLOBAL_TITLE
+  };
+%>
+
+    <head>
+      <%-
+        include('partials/head.ejs', INC_OPT)
+      %>
+    </head>
+
+    <body>
+      <%-
+          include('partials/header.ejs', INC_OPT)
+        %>
+    </body>
 
 </html>

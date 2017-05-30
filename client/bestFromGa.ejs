@@ -1,195 +1,183 @@
 <!DOCTYPE html>
 <html>
+<%
 
-<head>
-  <meta charset="UTF-8">
-  <title>Localisation bénéficiaires - Meilleur résultat</title>
-  <script type="text/javascript" src="utils.js"></script>
-  <script type="text/javascript" src="jquery-latest.min.js"></script>
-  <!-- Leaflet -->
-  <link rel="stylesheet" href="leaflet/leaflet.css">
-  <script src="leaflet/leaflet.js"></script>
-  <!-- -->
-  <!-- awesome-numbered-marker -->
-  <link rel="stylesheet" href="Leaflet.awesome-numbered-marker-master/src/leaflet_awesome_number_markers.css" />
-  <script src="Leaflet.awesome-numbered-marker-master/src/leaflet_awesome_number_markers.js"></script>
-  <!--  -->
-  <!-- groupedlayercontrol -->
-  <script src='leaflet-groupedlayercontrol-0.6.0/dist/leaflet.groupedlayercontrol.min.js'></script>
-  <link rel="stylesheet" href="leaflet-groupedlayercontrol-0.6.0/dist/leaflet.groupedlayercontrol.min.css">
-  <!--  -->
-  <!-- Bootstrap -->
-  <link href="bootstrap-3.3.7-dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
-  <!-- -->
-  <link rel="stylesheet" href="style.css" />
-  <script src='common.js'></script>
-  <script src='mapFunctions.js'></script>
-  <script>
-  'use strict';
+  const GLOBAL_TITLE = 'Rout-Ine';
 
-  $(document).ready(function() {
+  const INC_OPT = {
+    globalTitle: GLOBAL_TITLE,
+    title: 'Gestion des tournées'
+  };
+%>
 
-    $('#error').hide();
-    $('#errorNoData').hide();
-    $('#datesDropwdownMenu').hide();
+  <head>
+    <%-
+        include('partials/head.ejs', INC_OPT)
+      %>
+      <script>
+      'use strict';
 
-    let map = initMap();
+      $(document).ready(function() {
 
-    $.get('listResults', function(dates) {
+        $('#error').hide();
+        $('#errorNoData').hide();
+        $('#datesDropwdownMenu').hide();
 
-      if (dates.length == 0) {
+        let map = initMap();
 
-        $('#errorNoData').show();
-      } else {
+        $.get('listResults', function(dates) {
 
-        $('#datesDropwdownMenu').show();
+          if (dates.length == 0) {
 
-        for (let i in dates) {
+            $('#errorNoData').show();
+          } else {
 
-          let d = dates[i];
+            $('#datesDropwdownMenu').show();
 
-          let time = d.time.replace('-', 'h');
-          time = time.replace(/-.*/, '');
+            for (let i in dates) {
 
-          let link = $('<a href="#">').text('otenu le ' + d.date + ' à ' + time);
+              let d = dates[i];
 
-          link.click(function() {
+              let time = d.time.replace('-', 'h');
+              time = time.replace(/-.*/, '');
 
-            $('#dropdownMenu1').text(link.text());
+              let link = $('<a href="#">').text('otenu le ' + d.date + ' à ' + time);
 
-            link.parent().siblings().each(function(index) {
-              $(this).css('background-color', '');
-            });
+              link.click(function() {
 
-            link.parent().css('background-color', 'rgb(200,255,200)');
+                $('#dropdownMenu1').text(link.text());
 
-            $.post('bestFromGa', d, displayBest);
+                link.parent().siblings().each(function(index) {
+                  $(this).css('background-color', '');
+                });
 
+                link.parent().css('background-color', 'rgb(200,255,200)');
+
+                $.post('bestFromGa', d, displayBest);
+
+              });
+
+              $('#datesDropwdownMenu ul').append($('<li>').append(link));
+
+            }
+
+            $.post('bestFromGa', dates[dates.length - 1], displayBest);
+            $('#datesDropwdownMenu ul li').last().css('background-color', 'rgb(200,255,200)');
+
+          }
+
+        });
+
+        let routes = [];
+        let controls = [];
+
+        function cleanMap() {
+
+          routes.forEach(function(layer) {
+            map.removeLayer(layer);
           });
 
-          $('#datesDropwdownMenu ul').append($('<li>').append(link));
+          controls.forEach(function(control) {
+            map.removeControl(control);
+          });
 
+          $('#infos').empty();
         }
 
-        $.post('bestFromGa', dates[dates.length - 1], displayBest);
-        $('#datesDropwdownMenu ul li').last().css('background-color', 'rgb(200,255,200)');
+        function displayBest(bestResult) {
 
-      }
+          if (bestResult.trips) {
 
-    });
+            let markersColors = ["darkred", "blue", "green", "orange", "black", "purple"];
 
-    let routes = [];
-    let controls = [];
+            let tours = bestResult.trips;
 
-    function cleanMap() {
+            cleanMap();
 
-      routes.forEach(function(layer) {
-        map.removeLayer(layer);
-      });
+            fillResultsInfo('#infos', bestResult, markersColors);
 
-      controls.forEach(function(control) {
-        map.removeControl(control);
-      });
-
-      $('#infos').empty();
-    }
-
-    function displayBest(bestResult) {
-
-      if (bestResult.trips) {
-
-        let markersColors = ["darkred", "blue", "green", "orange", "black", "purple"];
-
-        let tours = bestResult.trips;
-
-        cleanMap();
-
-        fillResultsInfo('#infos', bestResult, markersColors);
-
-        let groupTours = 'Tournées',
-          groupMarkers = 'Adresses';
-        let overlayMaps = {
-          [groupTours]: {},
-          [groupMarkers]: {}
-        };
-
-        for (let i in tours) {
-
-          let tour = tours[i];
-
-          let routeLayer = L.geoJSON(tour.trip.trips[0].geometry);
-          routeLayer.setStyle(function(feature) {
-            return {
-              color: markersColors[i]
+            let groupTours = 'Tournées',
+              groupMarkers = 'Adresses';
+            let overlayMaps = {
+              [groupTours]: {},
+              [groupMarkers]: {}
             };
-          }).addTo(map);
 
-          routes.push(routeLayer);
+            for (let i in tours) {
 
-          console.log(tour);
+              let tour = tours[i];
 
-          let markers = addressesMarkers(tour.trip.waypoints, tour.addresses, markersColors[i]);
+              let routeLayer = L.geoJSON(tour.trip.trips[0].geometry);
+              routeLayer.setStyle(function(feature) {
+                return {
+                  color: markersColors[i]
+                };
+              }).addTo(map);
 
-          routes.push(markers);
+              routes.push(routeLayer);
 
-          overlayMaps[groupTours][markersColors[i]] = routeLayer;
-          overlayMaps[groupMarkers][markersColors[i]] = markers;
+              console.log(tour);
 
-        }
+              let markers = addressesMarkers(tour.trip.waypoints, tour.addresses, markersColors[i]);
 
-        var options = {
-          // Make the "trips" group exclusive (use radio inputs)
-          // exclusiveGroups: [groupName]
+              routes.push(markers);
+
+              overlayMaps[groupTours][markersColors[i]] = routeLayer;
+              overlayMaps[groupMarkers][markersColors[i]] = markers;
+
+            }
+
+            var options = {
+              // Make the "trips" group exclusive (use radio inputs)
+              // exclusiveGroups: [groupName]
+            };
+
+            let groupControl = L.control.groupedLayers(null, overlayMaps, options);
+
+            groupControl.addTo(map);
+
+            controls.push(groupControl);
+
+          } else {
+
+            $('#error').show();
+
+          }
+
+
         };
 
-        let groupControl = L.control.groupedLayers(null, overlayMaps, options);
+      });
+      </script>
+  </head>
 
-        groupControl.addTo(map);
-
-        controls.push(groupControl);
-
-      } else {
-
-        $('#error').show();
-
-      }
-
-
-    };
-
-  });
-  </script>
-</head>
-
-<body>
-  <header>
-    <h1><a href="/">Meilleur résultat</a></h1>
-    <%- include('nav.ejs') %>
-  </header>
-  <div id="error" class="alert alert-danger" role="alert">Une erreur inconnue s'est produite, se référer aux logs serveur</div>
-  <div class="container-fluid">
-    <div class="row">
-      <div class="col-xs-3">
-        <div id="errorNoData" class="alert alert-danger" role="alert">Aucun résultat, lancer un <a href="uploadPlanning.html">Calcul des tournées</a></div>
-        <div id="datesDropwdownMenu" class="dropdown">
-          <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-            Sélection du résultat
-            <span class="caret"></span>
-          </button>
-          <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-          </ul>
+  <body>
+    <%-
+    include('partials/header.ejs', INC_OPT)
+  %>
+      <div id="error" class="alert alert-danger" role="alert">Une erreur inconnue s'est produite, se référer aux logs serveur</div>
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-xs-3">
+            <div id="errorNoData" class="alert alert-danger" role="alert">Aucun résultat, lancer un <a href="uploadPlanning.html">Calcul des tournées</a></div>
+            <div id="datesDropwdownMenu" class="dropdown">
+              <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                Sélection du résultat
+                <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+              </ul>
+            </div>
+          </div>
+          <div class="col-xs-6">
+            <div id="map"></div>
+          </div>
+          <div class="col-xs-3">
+            <p id="infos">
+            </p>
+          </div>
         </div>
       </div>
-      <div class="col-xs-6">
-        <div id="map"></div>
-      </div>
-      <div class="col-xs-3">
-        <p id="infos">
-        </p>
-      </div>
-    </div>
-  </div>
-</body>
+  </body>
 
 </html>

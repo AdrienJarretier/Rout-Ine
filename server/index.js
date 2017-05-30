@@ -202,6 +202,17 @@ function sendTour(req, res, baseFileName) {
 
 }
 
+app.get('/getNumberOfTours', function(req, res) {
+
+  db.getNumberOfTours()
+    .then((numberOfTours) => {
+
+      res.send({ numberOfTours: numberOfTours });
+
+    });
+
+});
+
 app.get('/downloadAddresses', function(req, res) {
 
   sendTour(req, res, 'tourAddresses');
