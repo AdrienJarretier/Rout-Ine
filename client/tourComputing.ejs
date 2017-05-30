@@ -36,8 +36,8 @@
 
         let socket = io.connect();
 
-        $('#startGa').prop("disabled", false);;
-        $('#stopGa').prop("disabled", true);;
+        $('#startGa').prop("disabled", false);
+        $('#stopGa').prop("disabled", true);
 
         $('#startGa').click(function() {
 
@@ -69,8 +69,8 @@
 
           $('#infos').empty();
 
-          $('#startGa').prop("disabled", true);;
-          $('#stopGa').prop("disabled", false);;
+          $('#startGa').prop("disabled", true);
+          $('#stopGa').prop("disabled", false);
 
 
         });
@@ -78,8 +78,8 @@
 
         socket.on('stopped', function() {
 
-          $('#startGa').prop("disabled", false);;
-          $('#stopGa').prop("disabled", true);;
+          $('#startGa').prop("disabled", false);
+          $('#stopGa').prop("disabled", true);
 
         });
 
