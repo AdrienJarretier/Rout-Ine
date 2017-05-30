@@ -21,7 +21,9 @@ const mysql = require('mysql');
 const db = require('./db.js');
 const osrm = require('./osrm.js');
 const ga2 = require('./ga2.js');
+const parseSchedule = require('./parseSchedule.js');
 const testTournee = require('./testTournee.js');
+const utils = require('./utils.js');
 
 
 var upload = multer({ dest: 'uploads/' });
@@ -232,9 +234,14 @@ app.get('/downloadTrip', function(req, res) {
 
 app.post('/scheduleUpload', upload.single('inputSchedule'), function(req, res, next) {
 
-  console.log(req.file);
-  console.log(req.body);
+  common.readFile(req.file.path, 'windows-1252')
+    .then(utils.parseSchedule)
+    .then(parseSchedule.updateBeneficiariesFromScheduleList)
+    .then((msg) => {
 
-  res.send('ok');
+      console.log(msg);
+      res.send('ok');
+
+    });
 
 })
