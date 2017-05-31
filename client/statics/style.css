@@ -52,3 +52,21 @@ header {
 #map {
     height: 600px;
 }
+
+.list-group {
+    max-height: 600px;
+    overflow-y: scroll;
+}
+
+.list-group li {
+    border: none;
+    background-color: #aed581;
+}
+
+
+/*
+.list-group li:nth-child(even) .panel {
+
+    background-color: #d7eac1;
+
+}*/
