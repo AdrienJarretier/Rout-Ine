@@ -58,7 +58,7 @@ header {
     overflow-y: scroll;
 }
 
-.list-group li {
+#addressesListGroup > li {
     border: none;
     background-color: #aed581;
 }
