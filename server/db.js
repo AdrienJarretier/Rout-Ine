@@ -561,16 +561,19 @@ function getTour(tourNum, deliveryDate) {
   return new Promise((resolve, reject) => {
 
     const selectTourOnDate =
-      ' SELECT * ' +
-      ' FROM beneficiary_delivery_date ' +
-      ' INNER JOIN beneficiary ON beneficiary.id = beneficiary_delivery_date.beneficiary_id ' +
-      ' INNER JOIN address ON address.id = beneficiary.address_id ' +
-      ' INNER JOIN tour_assignment ON address.id = tour_assignment.address_id ' +
-      ' WHERE date = ? ' +
-      ' AND tour_num = ? ' +
+      // ' SELECT beneficiary_id, name, birthdate, address_additional, diet, note, address.id as address_id, label, town, lat, lng, index_in_tour \n ' +
+      ' SELECT name \n ' +
+      ' FROM beneficiary_delivery_date \n ' +
+      ' INNER JOIN beneficiary ON beneficiary.id = beneficiary_delivery_date.beneficiary_id \n ' +
+      ' INNER JOIN address ON address.id = beneficiary.address_id \n ' +
+      ' INNER JOIN tour_assignment ON address.id = tour_assignment.address_id \n ' +
+      ' WHERE date = ? \n ' +
+      ' AND tour_num = ? \n ' +
       ' ORDER BY `tour_assignment`.`index_in_tour` ASC ; ';
 
     const tourOnDate = mysql.format(selectTourOnDate, [deliveryDate, tourNum]);
+
+    console.log(tourOnDate);
 
     let dbCon = mysql.createConnection(common.serverConfig.db);
 
@@ -579,7 +582,14 @@ function getTour(tourNum, deliveryDate) {
 
         dbCon.end();
 
-        resolve(rows);
+        let names = [];
+
+        for (let r of rows)
+          names.push(r.name);
+
+        console.log(names);
+
+        resolve(getFullAddressesData(names));
 
       });
 
@@ -587,8 +597,8 @@ function getTour(tourNum, deliveryDate) {
 
 }
 
-// getTour(0, '2017-04-24')
-//   .then((r) => { console.log(r); });
+getTour(0, '2017-04-24')
+  .then((r) => { console.log(r); });
 
 
 function query(statement, dbCon) {
