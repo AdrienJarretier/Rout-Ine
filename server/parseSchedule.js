@@ -238,6 +238,6 @@ function updateBeneficiariesFromScheduleList(beneficiariesList) {
 
 exports.updateBeneficiariesFromScheduleList = updateBeneficiariesFromScheduleList;
 
-// common.readFile('exampleTours/tournées_CCAS_par_dateShort.csv', 'windows-1252')
+// common.readFile('exampleTours/Edition_des_tournees_par_semaine.csv', 'windows-1252')
 //   .then(utils.parseSchedule)
 //   .then(getAllBeneficiariesFromDb);
