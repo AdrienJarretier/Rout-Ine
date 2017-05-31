@@ -30,28 +30,19 @@ function readFile(file, encoding) {
 
       } else {
 
-        fs.readFile(fd, (encoding ? null : 'utf8'), (err, fileContent) => {
+        let fileContent = fs.readFileSync(fd, (encoding ? null : 'utf8'));
+        fs.close(fd);
 
-          fs.close(fd);
+        if (encoding) {
 
-          if (err)
-            reject(err);
-          else {
+          let buf = iconv.decode(fileContent, encoding);
 
-            if (encoding) {
+          let str = iconv.encode(buf, 'utf8');
 
-              let buf = iconv.decode(fileContent, encoding);
+          resolve(str);
 
-              let str = iconv.encode(buf, 'utf8');
-
-              resolve(str);
-
-            } else
-              resolve(fileContent);
-
-          }
-
-        });
+        } else
+          resolve(fileContent);
 
       }
     });
@@ -62,35 +53,20 @@ function writeFile(file, content, append) {
 
   return new Promise((resolve, reject) => {
 
-    fs.open(file, (append ? 'a' : 'w'), (err, fd) => {
+    let fd = fs.openSync(file, (append ? 'a' : 'w'));
 
-      if (err) {
+    fs.writeFileSync(fd, content);
+    console.log('written');
+    fs.close(fd);
+    resolve();
 
-        reject(err);
-
-      } else {
-
-        fs.writeFile(fd, content, 'utf8', (err) => {
-
-          if (err) {
-            reject(err);
-          } else {
-
-            fs.close(fd);
-            resolve();
-          }
-
-        });
-
-      }
-    });
   });
 
 }
 
 function writeJson(file, object) {
 
-  return writeFile(file, JSON.stringify(object, null, 2));
+  return writeFile(file, JSON.stringify(object, null, 1));
 }
 
 
@@ -108,10 +84,14 @@ function log(type, msgObject) {
   return readFile(logFile)
     .then((content) => {
 
+        console.log('read log file');
+
         return JSON.parse(content);
 
       },
       (err) => {
+
+        console.log('errr');
 
         return {};
 
@@ -122,13 +102,11 @@ function log(type, msgObject) {
 
       let dateTimeString = currentDate.toLocaleDateString() + '_' + currentDate.toLocaleTimeString() + '.' + currentDate.getMilliseconds();
 
+
+      console.log(dateTimeString);
       logObject[dateTimeString] = msgObject;
 
-      console.log(logObject);
-
-      let logString = JSON.stringify(logObject, null, 1);
-
-      return writeFile(logFile, logString, false);
+      return writeJson(logFile, logObject);
 
     });
 
