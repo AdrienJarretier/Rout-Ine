@@ -87,9 +87,26 @@
 
           console.log(fullAddressesData);
 
-          for (let addr of fullAddressesData.features) {
+          for (let i = 1; i < fullAddressesData.features.length; ++i) {
 
-            $('#beneficiariesTable').append($('<tr>').append($('<td>').text(JSON.stringify(addr, null, 2))));
+            let addr = fullAddressesData.features[i].properties;
+
+            let textParts = {
+              address: addr.label + ', ' + addr.town,
+              beneficiaries: addr.beneficiaries,
+              tour: addr.tour
+            };
+
+            let panel = $('<div class="panel panel-info">');
+            let panelHeading = $('<div class="panel-heading">').text(textParts.address);
+
+            // let bodyText = (addr.proeprtiesspecial ? )
+
+            let panelBody = $('<div class="panel-body">').text(JSON.stringify(textParts.beneficiaries) + JSON.stringify(textParts.tour));
+
+            panel.append(panelHeading).append(panelBody);
+
+            $('.list-group').append($('<li class="list-group-item">').append(panel));
 
           }
 
@@ -214,8 +231,8 @@
             <div id="map"></div>
           </div>
           <div class="col-xs-4">
-            <table id="beneficiariesTable">
-            </table>
+            <ul class="list-group">
+            </ul>
           </div>
         </div>
       </div>
