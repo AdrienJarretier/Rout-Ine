@@ -253,8 +253,38 @@ app.post('/tabletLogsUpload', upload.single('file'), function(req, res, next) {
   common.readFile(req.file.path)
     .then((msg) => {
 
-      console.log(msg);
-      res.send('ok');
+      writeFile(common.serverConfig.logs.dir + '/' + common.serverConfig.logs.tablets, msg, true)
+        .then(res.send('ok'))
+
+    });
+
+});
+
+app.get('/logs', function(req, res) {
+
+  common.getLogsList()
+    .then((list) => {
+
+      let promisesReadLogs = [];
+
+      for (let logFile of list) {
+
+        let logPath = common.serverConfig.logs.dir + '/' + logFile;
+
+        promisesReadLogs.push(common.readFile(logPath));
+
+      }
+
+      Promise.all(promisesReadLogs)
+        .then((logsContents) => {
+
+          res.send(logsContents);
+
+        }, (e) => {
+
+          console.log(e);
+
+        });
 
     });
 

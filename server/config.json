@@ -15,6 +15,7 @@
   "logs": {
     "dir": "logs",
     "errors": "errors.log",
-    "infos": "infos.log"
+    "infos": "infos.log",
+    "tablets": "tablets.log"
   }
 }

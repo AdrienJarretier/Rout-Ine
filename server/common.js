@@ -142,7 +142,35 @@ exports.logInfo = logInfo;
 
 
 
+function getLogsList() {
 
+  return new Promise((resolve, reject) => {
+
+    fs.readdir(serverConfig.logs.dir, (err, files) => {
+
+      if (err) throw err;
+
+      let logKeys = Object.keys(serverConfig.logs);
+
+      let realLogFiles = [];
+
+      for (let k of logKeys) {
+
+        if (files.indexOf(serverConfig.logs[k]) != -1)
+          realLogFiles.push(serverConfig.logs[k]);
+
+      }
+
+      console.log(realLogFiles);
+
+      resolve(realLogFiles);
+
+    });
+
+  });
+
+}
+exports.getLogsList = getLogsList;
 
 function getResultsDates() {
 
@@ -178,7 +206,7 @@ function getResultsDates() {
 
       resolve(dateTimes);
 
-    })
+    });
 
   });
 }
