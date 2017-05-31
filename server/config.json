@@ -16,6 +16,7 @@
     "dir": "logs",
     "errors": "errors.log",
     "infos": "infos.log",
-    "tablets": "tablets.log"
+    "tablets": "tablets.log",
+    "access": "access.log"
   }
 }
