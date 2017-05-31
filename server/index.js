@@ -46,6 +46,21 @@ const config = common.serverConfig;
 app.use(express.static(__dirname + '/../client/statics'));
 
 
+app.all('*', function(req, res, next) {
+
+  let accessInfos = {
+
+    ip: req.ip,
+    method: req.method,
+    path: req.path,
+    query: req.query
+
+  };
+
+  // console.log(JSON.stringify(accessInfos, null, 2));
+  common.log('access', accessInfos)
+    .then(next);
+})
 
 
 app.get('/', function(req, res) {
@@ -278,7 +293,17 @@ app.get('/logs', function(req, res) {
       Promise.all(promisesReadLogs)
         .then((logsContents) => {
 
-          res.send(logsContents);
+          let logs = {};
+
+          for (let i in list) {
+
+            let logFile = list[i];
+
+            logs[logFile] = JSON.parse(logsContents[i]);
+
+          }
+
+          res.send(logs);
 
         }, (e) => {
 

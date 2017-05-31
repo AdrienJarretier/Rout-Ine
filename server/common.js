@@ -94,35 +94,58 @@ function writeJson(file, object) {
 }
 
 
-
 /**
  * writes current date time in logfile then logs the given information
  *
- * @param {String} info information to write in logfile
+ * @param {String} type The type of log, see config.json logs
+ * @param {Object} object with custom informations to write, stringified before writing
  *
  */
+function log(type, msgObject) {
+
+  let logFile = serverConfig.logs.dir + '/' + serverConfig.logs[type];
+
+  return readFile(logFile)
+    .then((content) => {
+
+        return JSON.parse(content);
+
+      },
+      (err) => {
+
+        return {};
+
+      })
+    .then((logObject) => {
+
+      let currentDate = new Date();
+
+      let dateTimeString = currentDate.toLocaleDateString() + '_' + currentDate.toLocaleTimeString() + '.' + currentDate.getMilliseconds();
+
+      logObject[dateTimeString] = msgObject;
+
+      console.log(logObject);
+
+      let logString = JSON.stringify(logObject, null, 1);
+
+      return writeFile(logFile, logString, false);
+
+    });
+
+}
+exports.log = log;
+
+
 function writeInLog(info) {
 
-  let currentDate = new Date();
-
-  let dateTimeString = currentDate.toLocaleDateString() + '_' + currentDate.toLocaleTimeString();
-
-  let logFile = serverConfig.logs.dir + '/' + serverConfig.logs.errors;
-
-  return writeFile(logFile, dateTimeString + ' : ' + info + '\n', true);
+  return log('errors', info);
 }
 exports.writeInLog = writeInLog;
 
 
 function logError(errorMsg) {
 
-  const LOG_FILE = serverConfig.logs.dir + '/' + serverConfig.logs.errors;
-
-  let currentDate = new Date();
-
-  let dateTimeString = currentDate.toLocaleDateString() + '_' + currentDate.toLocaleTimeString();
-
-  return writeFile(LOG_FILE, dateTimeString + ' : ' + errorMsg + '\n', true);
+  return log('errors', info);
 }
 exports.logError = logError;
 
@@ -130,13 +153,7 @@ exports.logError = logError;
 
 function logInfo(info) {
 
-  const LOG_FILE = serverConfig.logs.dir + '/' + serverConfig.logs.infos;
-
-  let currentDate = new Date();
-
-  let dateTimeString = currentDate.toLocaleDateString() + '_' + currentDate.toLocaleTimeString();
-
-  return writeFile(LOG_FILE, dateTimeString + ' : ' + info + '\n', true);
+  return log('infos', info);
 }
 exports.logInfo = logInfo;
 
@@ -160,8 +177,6 @@ function getLogsList() {
           realLogFiles.push(serverConfig.logs[k]);
 
       }
-
-      console.log(realLogFiles);
 
       resolve(realLogFiles);
 
