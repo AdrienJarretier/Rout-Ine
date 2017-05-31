@@ -49,10 +49,14 @@ function extractNamesList(csvFile) {
  */
 function getAddresses() {
 
-  const sqlSelectAddresses = ' SELECT distinct a.id, a.label, a.town, a.lat, a.lng \n' +
+  const sqlSelectAddresses = ' SELECT distinct a.id, a.label, a.town, a.lat, a.lng, tour_assignment.index_in_tour, tour.* \n' +
     ' FROM address a \n' +
+    ' INNER JOIN tour_assignment ON a.id = tour_assignment.address_id \n' +
+    ' INNER JOIN tour ON tour.num = tour_assignment.tour_num \n' +
     ' RIGHT JOIN beneficiary ON a.id=beneficiary.address_id \n' +
     ' WHERE a.id IS NOT NULL;';
+
+  console.log(sqlSelectAddresses);
 
   return new Promise((resolve, reject) => {
 
