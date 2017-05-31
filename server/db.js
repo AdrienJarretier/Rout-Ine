@@ -49,14 +49,15 @@ function extractNamesList(csvFile) {
  */
 function getAddresses() {
 
-  const sqlSelectAddresses = ' SELECT distinct a.id, a.label, a.town, a.lat, a.lng, tour_assignment.index_in_tour, tour.* \n' +
+  const sqlSelectAddresses =
+    ' SELECT distinct a.id, a.label, a.town, a.lat, a.lng, tour_assignment.index_in_tour, tour.* \n' +
     ' FROM address a \n' +
     ' INNER JOIN tour_assignment ON a.id = tour_assignment.address_id \n' +
     ' INNER JOIN tour ON tour.num = tour_assignment.tour_num \n' +
     ' RIGHT JOIN beneficiary ON a.id=beneficiary.address_id \n' +
     ' WHERE a.id IS NOT NULL;';
 
-  console.log(sqlSelectAddresses);
+  // console.log(sqlSelectAddresses);
 
   return new Promise((resolve, reject) => {
 
@@ -240,7 +241,8 @@ function getBenefs(address, dbCon, names) {
 
         if (err) throw err
 
-        let phonesRequests = 0;
+        // let phonesRequests = 0;
+        let promises = [];
 
         // si il n'y a aucun beneficiaire a cette adresses on renvoie la liste vide
         if (rows.length == 0) {
@@ -250,20 +252,38 @@ function getBenefs(address, dbCon, names) {
         // pour chaque beneficiaire on ajoute la liste de leurs num de telephone
         for (let benefRow of rows) {
 
-          getPhones(benefRow, dbCon).then((phones) => {
+          promises.push(
+            getDeliveriesDates(benefRow, dbCon)
+            .then((dates) => {
 
-            benefRow.phones = [];
+              benefRow.deliveriesDates = dates;
 
-            // on ajoute chaque numero a la list des numero du beneficiaire
-            for (let phone of phones) {
-              benefRow.phones.push(phone.phone_number)
-            }
+            }));
 
-            if (++phonesRequests == rows.length)
-              resolve(rows);
 
-          });
+          promises.push(
+            getPhones(benefRow, dbCon)
+            .then((phones) => {
+
+              benefRow.phones = [];
+
+              // on ajoute chaque numero a la list des numero du beneficiaire
+              for (let phone of phones) {
+                benefRow.phones.push(phone.phone_number)
+              }
+
+              // if (++phonesRequests == rows.length)
+              //   resolve(rows);
+
+            }));
         }
+
+        Promise.all(promises).
+        then(() => {
+
+          resolve(rows);
+
+        });
 
       });
 
@@ -271,7 +291,16 @@ function getBenefs(address, dbCon, names) {
 
 }
 
+function getDeliveriesDates(benefRow, dbCon) {
 
+  const sqlSelectDeliveriesDates = ' SELECT date \n ' +
+    ' FROM beneficiary_delivery_date \n ' +
+    ' WHERE beneficiary_id = ? ; ';
+
+  const selectDeliveriesDates = mysql.format(sqlSelectDeliveriesDates, [benefRow.id]);
+
+  return query(selectDeliveriesDates, dbCon);
+}
 
 /**
  * Retourne une promesse qui
