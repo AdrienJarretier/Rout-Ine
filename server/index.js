@@ -246,4 +246,16 @@ app.post('/scheduleUpload', upload.single('inputSchedule'), function(req, res, n
 
     });
 
-})
+});
+
+app.post('/tabletLogsUpload', upload.single('file'), function(req, res, next) {
+
+  common.readFile(req.file.path)
+    .then((msg) => {
+
+      console.log(msg);
+      res.send('ok');
+
+    });
+
+});
