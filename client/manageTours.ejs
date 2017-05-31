@@ -87,6 +87,12 @@
 
           console.log(fullAddressesData);
 
+          for (let addr of fullAddressesData.features) {
+
+            $('#beneficiariesTable').append($('<tr>').append($('<td>').text(JSON.stringify(addr, null, 2))));
+
+          }
+
         });
 
         let routes = [];
@@ -208,6 +214,8 @@
             <div id="map"></div>
           </div>
           <div class="col-xs-4">
+            <table id="beneficiariesTable">
+            </table>
           </div>
         </div>
       </div>
