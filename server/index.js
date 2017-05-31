@@ -64,7 +64,7 @@ app.all('*', function(req, res, next) {
 
 
 app.get('/', function(req, res) {
-  res.render('index');
+  res.render('manageTours');
 })
 
 app.get('/manageTours', function(req, res) {
