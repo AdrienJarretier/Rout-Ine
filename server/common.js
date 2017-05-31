@@ -84,14 +84,10 @@ function log(type, msgObject) {
   return readFile(logFile)
     .then((content) => {
 
-        console.log('read log file');
-
         return JSON.parse(content);
 
       },
       (err) => {
-
-        console.log('errr');
 
         return {};
 
@@ -102,8 +98,6 @@ function log(type, msgObject) {
 
       let dateTimeString = currentDate.toLocaleDateString() + '_' + currentDate.toLocaleTimeString() + '.' + currentDate.getMilliseconds();
 
-
-      console.log(dateTimeString);
       logObject[dateTimeString] = msgObject;
 
       return writeJson(logFile, logObject);
