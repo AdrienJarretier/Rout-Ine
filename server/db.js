@@ -216,7 +216,7 @@ function ccasAddress() {
  */
 function getBenefs(address, dbCon, names) {
 
-  const sqlSelectBenef = ' SELECT id, name, birthdate, address_additional \n' +
+  const sqlSelectBenef = ' SELECT * \n' +
     ' FROM beneficiary \n' +
     ' WHERE address_id = ? ';
 
