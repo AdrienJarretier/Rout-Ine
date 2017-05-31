@@ -17,45 +17,47 @@
       <script>
       'use strict';
 
-      let tourDates;
+      $(document).ready(function() {
 
-      function fillDatesDropdown(displayOld) {
+        let tourDates;
 
-        $('#datesDropwdownMenu ul').empty();
+        function fillDatesDropdown(displayOld) {
 
-        for (let i in tourDates) {
+          $('#datesDropwdownMenu ul').empty();
 
-          let d = tourDates[i].date;
+          for (let i in tourDates) {
 
-          let date = new Date(d);
+            let d = tourDates[i].date;
 
-          if (displayOld || date > new Date()) {
+            let date = new Date(d);
 
-            let link = $('<a href="#">').text('tournée de ' + date.toLocaleDateString());
+            if (displayOld || date > new Date()) {
 
-            link.click(function() {
+              let link = $('<a href="#">').text('tournée de ' + date.toLocaleDateString());
 
-              $('#dropdownMenu1').text(link.text());
+              link.click(function() {
 
-              link.parent().siblings().each(function(index) {
-                $(this).css('background-color', '');
+                $('#dropdownMenu1').text(link.text());
+
+                link.parent().siblings().each(function(index) {
+                  $(this).css('background-color', '');
+                });
+
+                link.parent().css('background-color', 'rgb(200,255,200)');
+
+                console.log(d);
+
+                // $.post('bestFromGa', d, displayBest);
+
               });
 
-              link.parent().css('background-color', 'rgb(200,255,200)');
+              $('#datesDropwdownMenu ul').append($('<li>').append(link));
 
-              // $.post('bestFromGa', d, displayBest);
-
-            });
-
-            $('#datesDropwdownMenu ul').append($('<li>').append(link));
+            }
 
           }
 
         }
-
-      }
-
-      $(document).ready(function() {
 
         $('nav #manageToursLink').addClass('active');
 
@@ -79,9 +81,11 @@
 
           fillDatesDropdown($('#displayOld').prop('checked'));
 
-          // $.post('bestFromGa', dates[dates.length - 1], displayBest);
-          // $('#datesDropwdownMenu ul li').last().css('background-color', 'rgb(200,255,200)');
+        });
 
+        $.get('beneficiaries', function(fullAddressesData) {
+
+          console.log(fullAddressesData);
 
         });
 
