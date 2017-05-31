@@ -68,15 +68,12 @@
 
                 allDates.sort((a, b) => {
 
-                  let parse = function(dateString) {
-
-                    var regexp = /(.*)\/(.*)\/(.*)/;
-                    var matches_array = dateString.match(regexp);
+                  let parse = function(dateObject) {
 
                     let parsedDate = {
-                      year: matches_array[3],
-                      month: matches_array[2],
-                      date: matches_array[1]
+                      year: dateObject.getFullYear(),
+                      month: dateObject.getMonth(),
+                      date: dateObject.getDate()
                     };
 
                     return parsedDate;
@@ -95,8 +92,8 @@
 
                 });
 
-                let firstDate = $('<strong>').text(allDates[0]).css('color', 'black');
-                let lastdate = $('<strong>').text(allDates[allDates.length - 1]).css('color', 'black');
+                let firstDate = $('<strong>').text(allDates[0].toLocaleDateString()).css('color', 'black');
+                let lastdate = $('<strong>').text(allDates[allDates.length - 1].toLocaleDateString()).css('color', 'black');
 
                 $('#importSchedule').prop("disabled", false);
                 $('#importSchedule').text('Importer le planning du ').append(firstDate).append(' au ').append(lastdate);

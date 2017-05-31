@@ -135,7 +135,7 @@ function parseDateTime(dateTimeString) {
     date: matches_array[1],
     toDate: function() {
       let d = new Date(this.year, parseInt(this.month) - 1, this.date)
-      return d.toLocaleDateString();
+      return d;
     }
   };
 
