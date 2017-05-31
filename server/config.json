@@ -8,7 +8,7 @@
   },
   "osrm": {
     "protocol": "http",
-    "ip": "10.1.0.205",
+    "ip": "10.0.0.2",
     "port": 5000
   },
   "resultsFolder": "gaResults",

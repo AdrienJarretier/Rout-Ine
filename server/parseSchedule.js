@@ -185,6 +185,7 @@ function insertDeliveries(benefId, deliveriesDates, dbCon) {
     for (let d of deliveriesDates) {
 
       let parsedDate = utils.parseDateTime(d);
+      console.log(parsedDate);
       const insertDelivery = mysql.format(sqlInsertDelivery, [benefId, parsedDate]);
 
       promises.push(dbQuery(insertDelivery, dbCon));
