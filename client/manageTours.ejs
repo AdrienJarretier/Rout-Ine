@@ -98,15 +98,26 @@
             };
 
             let panel = $('<div class="panel panel-info">');
-            let panelHeading = $('<div class="panel-heading">').text(textParts.address);
+            let panelHeading = $('<div class="panel-heading">').html(textParts.address + '<br> tournée : ' + (textParts.tour.num + 1));
 
-            // let bodyText = (addr.proeprtiesspecial ? )
+            let benefsListGroup = $('<ul class="list-group" >');
 
-            let panelBody = $('<div class="panel-body">').text(JSON.stringify(textParts.beneficiaries) + JSON.stringify(textParts.tour));
+            for (let benef of textParts.beneficiaries) {
+
+              let grouItemText =
+                benef.name +
+                '<br>' + benef.address_additional +
+                '<br>' + benef.note;
+
+              let groupItem = $('<li class="list-group-item">').html(grouItemText);
+              benefsListGroup.append(groupItem);
+
+            }
+            let panelBody = $('<div class="panel-body">').append(benefsListGroup);
 
             panel.append(panelHeading).append(panelBody);
 
-            $('.list-group').append($('<li class="list-group-item">').append(panel));
+            $('#addressesListGroup').append($('<li class="list-group-item">').append(panel));
 
           }
 
@@ -231,7 +242,7 @@
             <div id="map"></div>
           </div>
           <div class="col-xs-4">
-            <ul class="list-group">
+            <ul class="list-group" id="addressesListGroup">
             </ul>
           </div>
         </div>
