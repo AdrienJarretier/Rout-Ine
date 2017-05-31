@@ -52,12 +52,12 @@ function getAddresses() {
   const sqlSelectAddresses =
     ' SELECT distinct a.id, a.label, a.town, a.lat, a.lng, tour_assignment.index_in_tour, tour.* \n' +
     ' FROM address a \n' +
-    ' INNER JOIN tour_assignment ON a.id = tour_assignment.address_id \n' +
-    ' INNER JOIN tour ON tour.num = tour_assignment.tour_num \n' +
+    ' LEFT JOIN tour_assignment ON a.id = tour_assignment.address_id \n' +
+    ' LEFT JOIN tour ON tour.num = tour_assignment.tour_num \n' +
     ' RIGHT JOIN beneficiary ON a.id=beneficiary.address_id \n' +
     ' WHERE a.id IS NOT NULL;';
 
-  // console.log(sqlSelectAddresses);
+  console.log(sqlSelectAddresses);
 
   return new Promise((resolve, reject) => {
 
@@ -89,8 +89,10 @@ function getAddressesFromNames(names) {
   return new Promise((resolve, reject) => {
 
     const sql =
-      ' SELECT distinct a.id, a.label, a.town, a.lat, a.lng \n' +
+      ' SELECT distinct a.id, a.label, a.town, a.lat, a.lng, tour_assignment.index_in_tour, tour.* \n' +
       ' FROM address a \n' +
+      ' LEFT JOIN tour_assignment ON a.id = tour_assignment.address_id \n' +
+      ' LEFT JOIN tour ON tour.num = tour_assignment.tour_num \n' +
       ' RIGHT JOIN beneficiary ON a.id=beneficiary.address_id \n' +
       ' WHERE a.id IS NOT NULL \n' +
       ' AND beneficiary.name like ?;';

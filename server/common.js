@@ -56,7 +56,7 @@ function writeFile(file, content, append) {
     let fd = fs.openSync(file, (append ? 'a' : 'w'));
 
     fs.writeFileSync(fd, content);
-    console.log('written');
+
     fs.close(fd);
     resolve();
 
