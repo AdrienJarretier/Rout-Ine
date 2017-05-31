@@ -207,14 +207,19 @@ function parseSchedule(schedule) {
 
   return new Promise((resolve, reject) => {
 
+      console.log(schedule);
+
     const csvParse = require('csv-parse');
 
     let options = {
       delimiter: ";",
-      from: 2
+      from: 2,
+      skip_empty_lines: true
     }
 
     csvParse(schedule, options, function(err, output) {
+
+      console.log(output[0]);
 
       resolve(new BeneficiariesList(output));
 

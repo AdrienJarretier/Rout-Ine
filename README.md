@@ -23,7 +23,7 @@ installation globales de ces modules :
 utilisation :
 
 ```bash
-watchify utils.js -o ../client/utils.js -s utils -v
+watchify utils.js -o ../client/statics/utils.js -s utils -v
 ```
 
 ### Démarrer le serveur
