@@ -502,7 +502,6 @@ function getFuturesDeliveriesDates() {
     const sqlSelectFutureDates =
       ' SELECT DISTINCT date ' +
       ' FROM beneficiary_delivery_date ' +
-      ' WHERE date > CURDATE()' +
       ' ORDER BY date ASC ';
 
     let dbCon = mysql.createConnection(common.serverConfig.db);

@@ -17,30 +17,21 @@
       <script>
       'use strict';
 
-      $(document).ready(function() {
+      let tourDates;
 
-        $('nav #manageToursLink').addClass('active');
+      function fillDatesDropdown(displayOld) {
 
-        $('#error').hide();
-        $('#errorNoData').hide();
-        $('#datesDropwdownMenu').hide();
+        $('#datesDropwdownMenu ul').empty();
 
-        let map = initMap();
+        for (let i in tourDates) {
 
-        $.get('listResults', function(dates) {
+          let d = tourDates[i].date;
 
+          let date = new Date(d);
 
-          $('#datesDropwdownMenu').show();
+          if (displayOld || date > new Date()) {
 
-          for (let i in dates) {
-
-            let d = dates[i].date;
-
-            console.log(d);
-
-            let localeDate = (new Date(d)).toLocaleDateString();
-
-            let link = $('<a href="#">').text('tournée de ' + localeDate);
+            let link = $('<a href="#">').text('tournée de ' + date.toLocaleDateString());
 
             link.click(function() {
 
@@ -59,6 +50,34 @@
             $('#datesDropwdownMenu ul').append($('<li>').append(link));
 
           }
+
+        }
+
+      }
+
+      $(document).ready(function() {
+
+        $('nav #manageToursLink').addClass('active');
+
+        $('#error').hide();
+        $('#errorNoData').hide();
+
+        $('#displayOld').change(() => {
+
+          let checked = $('#displayOld').prop('checked');
+
+          fillDatesDropdown(checked);
+
+
+        });
+
+        let map = initMap();
+
+        $.get('listResults', function(dates) {
+
+          tourDates = dates;
+
+          fillDatesDropdown($('#displayOld').prop('checked'));
 
           // $.post('bestFromGa', dates[dates.length - 1], displayBest);
           // $('#datesDropwdownMenu ul li').last().css('background-color', 'rgb(200,255,200)');
@@ -157,14 +176,24 @@
       <div class="container-fluid">
         <div class="row" id="main">
           <div class="col-xs-3">
-            <div id="errorNoData" class="alert alert-danger" role="alert">Aucun résultat, lancer un <a href="tourComputing">Calcul des tournées</a></div>
-            <div id="datesDropwdownMenu" class="dropdown">
-              <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                Sélection du résultat
-                <span class="caret"></span>
-              </button>
-              <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-              </ul>
+            <div class="row">
+              <div class="col-xs-12">
+                <label for="displayOld">Voir anciennes </label>
+                <input type="checkbox" id="displayOld">
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-xs-12">
+                <div id="errorNoData" class="alert alert-danger" role="alert">Aucun résultat, lancer un <a href="tourComputing">Calcul des tournées</a></div>
+                <div id="datesDropwdownMenu" class="dropdown">
+                  <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                    Sélection tournée
+                    <span class="caret"></span>
+                  </button>
+                  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                  </ul>
+                </div>
+              </div>
             </div>
           </div>
           <div class="col-xs-6">
