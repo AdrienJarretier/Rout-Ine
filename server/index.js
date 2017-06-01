@@ -192,9 +192,22 @@ server.listen(config.port, function() {
   console.log('listening on *:' + config.port);
 });
 
+let schedulePath;
+
 io.on('connection', function(socket) {
 
   console.log('connection');
+
+  socket.on('parseSchedule', function() {
+
+    common.readFile(schedulePath, 'windows-1252')
+      .then(utils.parseSchedule)
+      .then((beneficiariesList) => {
+        return parseSchedule.updateBeneficiariesFromScheduleList(beneficiariesList, socket);
+      });
+
+  });
+
 
   socket.on('start', function(params) {
 
@@ -253,14 +266,9 @@ app.get('/downloadTrip', function(req, res) {
 
 app.post('/scheduleUpload', upload.single('inputSchedule'), function(req, res, next) {
 
-  common.readFile(req.file.path, 'windows-1252')
-    .then(utils.parseSchedule)
-    .then(parseSchedule.updateBeneficiariesFromScheduleList)
-    .then((msg) => {
+  schedulePath = req.file.path;
 
-      res.send('ok');
-
-    });
+  res.send('ok');
 
 });
 

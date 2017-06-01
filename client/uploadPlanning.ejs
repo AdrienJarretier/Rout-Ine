@@ -125,16 +125,25 @@
             timeout: 600000,
             success: function(data) {
 
-              console.log("SUCCESS : ", data);
-              $('#importOngoing').hide();
-              $('#importSuccess').show();
+              console.log("received : ", data);
 
               let socket = io.connect();
 
+              socket.emit('parseSchedule');
+
               socket.on('percent', function(value) {
 
-                $('#importOngoing > .progress-bar').css('width', value + '%');
-                $('#importOngoing > .progress-bar > .sr-only').text(value + '% Complete');
+                console.log('received percent');
+
+                $('#importOngoing .progress-bar').css('width', value + '%');
+                $('#importOngoing .progress-bar > .sr-only').text(value + '% Complete');
+
+              });
+
+              socket.on('scheduleProcessed', function(value) {
+
+                $('#importOngoing').hide();
+                $('#importSuccess').show();
 
               });
 
