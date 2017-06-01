@@ -277,7 +277,28 @@ app.post('/tabletLogsUpload', upload.single('file'), function(req, res, next) {
   common.readFile(req.file.path)
     .then((msg) => {
 
-      common.writeFile(common.serverConfig.logs.dir + '/' + common.serverConfig.logs.tablets, msg, true)
+      console.log(msg);
+
+      let logFile = common.serverConfig.logs.dir + '/' + common.serverConfig.logs.tablets;
+
+      common.readFile(logFile)
+        .then((content) => {
+
+            return JSON.parse(content);
+
+          },
+          (err) => {
+
+            return {};
+
+          })
+        .then((logObject) => {
+
+          Object.assign(logObject, JSON.parse(msg));
+
+          return common.writeJson(logFile, logObject);
+
+        })
         .then(res.send('ok'))
 
     });

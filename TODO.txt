@@ -6,3 +6,9 @@ centre ville à livrer en priorité (avant 9h), départ à 7h donc 2h pour livre
 http://expressjs.com/en/resources/middleware/session.html
 
 generer les tournées depuis la base de données
+
+
+
+nouvel onglet pour visualiser les logs tablette
+
+barre de recherche beneficiaires
