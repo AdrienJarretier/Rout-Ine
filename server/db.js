@@ -221,7 +221,7 @@ function ccasAddress() {
  *
  * @returns {Promise} la promesse de retourner le tableau contenant les beneficiaires.
  */
-function getBenefs(address, dbCon, names) {
+function getBenefs(address_id, dbCon, names) {
 
   const sqlSelectBenef = ' SELECT * \n' +
     ' FROM beneficiary \n' +
@@ -230,9 +230,9 @@ function getBenefs(address, dbCon, names) {
   let selectBenef;
 
   if (names == undefined)
-    selectBenef = mysql.format(sqlSelectBenef + ';', [address.id]);
+    selectBenef = mysql.format(sqlSelectBenef + ';', [address_id]);
   else
-    selectBenef = mysql.format(sqlSelectBenef + ' AND name in (?);', [address.id, names]);
+    selectBenef = mysql.format(sqlSelectBenef + ' AND name in (?);', [address_id, names]);
 
   // console.log(selectBenef);
 
@@ -388,7 +388,7 @@ function getFullAddressesData(namesList) {
 
           // recuperons les beneficiares a cette adresse
           // quand on a la reponse alors on peut recuperer les numeros de telephone
-          getBenefs(address, dbCon, namesList)
+          getBenefs(address.id, dbCon, namesList)
             .then((benefsRows) => {
 
               // console.log(benefsRows);

@@ -83,34 +83,73 @@
 
         // });
 
-        $.get('logs', function(logs) {
+        function searchIdInSortedFeatures(featuresArray, id) {
 
-          let reportLogs = logs['tablets.log'];
+          let searchOrder; // +1 or -1
+          let k; // search start
 
-          console.log(reportLogs);
+          if (id < featuresArray.length) {
 
-          for (let logDate in reportLogs) {
+            k = id;
 
-            let d = new Date(logDate);
-            let dateStr = d.toLocaleString();
+            if (featuresArray[k].id < id)
+              searchOrder = 1;
+            else
+              searchOrder = -1;
 
-            console.log(dateStr);
-
-            let panel = $('<div class="panel panel-info">');
-            let panelHeading = $('<div class="panel-heading">').html(dateStr);
-
-            let bodyText =
-              'identifiant tablette : ' + reportLogs[logDate].uuid +
-              '<br> tournée : ' + reportLogs[logDate].tour_number +
-              '<br> <strong>' + reportLogs[logDate].message + '</strong>';
-
-            let panelBody = $('<div class="panel-body">').append(bodyText);
-
-            panel.append(panelHeading).append(panelBody);
-
-            $('#reportsLogsListGroup').append($('<li class="list-group-item">').append(panel));
-
+          } else {
+            searchOrder = -1;
+            k = featuresArray.length - 1;
           }
+
+          while (featuresArray[k].id != id && 0 < k && k < featuresArray.length - 1)
+            k += searchOrder;
+
+          if (featuresArray[k].id == id)
+            return featuresArray[k]
+          else
+            return -1;
+
+        }
+
+        $.get('beneficiaries', function(fullAddressesData) {
+
+          fullAddressesData.features.sort((a, b) => {
+            return a.id - b.id;
+          });
+
+          console.log(fullAddressesData.features);
+
+          $.get('logs', function(logs) {
+
+            let reportLogs = logs['tablets.log'];
+
+            console.log(reportLogs);
+
+            for (let logDate in reportLogs) {
+
+              let d = new Date(logDate);
+              let dateStr = d.toLocaleString();
+
+              let panel = $('<div class="panel panel-info">');
+              let panelHeading = $('<div class="panel-heading">').html(dateStr);
+
+              let address = searchIdInSortedFeatures(fullAddressesData.features, reportLogs[logDate].address_id);
+
+              let bodyText = (address != -1 ? address : 'erreur avec l\'adresse') +
+                '<br> identifiant tablette : ' + reportLogs[logDate].uuid +
+                '<br> tournée : ' + reportLogs[logDate].tour_number +
+                '<br> <strong>' + reportLogs[logDate].message + '</strong>';
+
+              let panelBody = $('<div class="panel-body">').append(bodyText);
+
+              panel.append(panelHeading).append(panelBody);
+
+              $('#reportsLogsListGroup').append($('<li class="list-group-item">').append(panel));
+
+            }
+
+          });
 
         });
 
