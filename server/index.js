@@ -194,6 +194,8 @@ server.listen(config.port, function() {
 
 io.on('connection', function(socket) {
 
+  console.log('connection');
+
   socket.on('start', function(params) {
 
     ga2.start(params, socket);
@@ -256,7 +258,6 @@ app.post('/scheduleUpload', upload.single('inputSchedule'), function(req, res, n
     .then(parseSchedule.updateBeneficiariesFromScheduleList)
     .then((msg) => {
 
-      console.log(msg);
       res.send('ok');
 
     });
