@@ -37,10 +37,6 @@ class AddressFeature {
   get coordinates() {
     return this.geometry.coordinates;
   }
-
-  setWaypointIndex(w_ind) {
-    this.properties.waypoint_index = w_ind;
-  }
 }
 
 // exporte la definition de la classe
