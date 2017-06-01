@@ -118,13 +118,9 @@
             return a.id - b.id;
           });
 
-          console.log(fullAddressesData.features);
-
           $.get('logs', function(logs) {
 
             let reportLogs = logs['tablets.log'];
-
-            console.log(reportLogs);
 
             for (let logDate in reportLogs) {
 
@@ -136,7 +132,7 @@
 
               let address = searchIdInSortedFeatures(fullAddressesData.features, reportLogs[logDate].address_id);
 
-              let bodyText = (address != -1 ? address : 'erreur avec l\'adresse') +
+              let bodyText = (address != -1 ? address.properties.label : 'erreur avec l\'adresse') +
                 '<br> identifiant tablette : ' + reportLogs[logDate].uuid +
                 '<br> tournée : ' + reportLogs[logDate].tour_number +
                 '<br> <strong>' + reportLogs[logDate].message + '</strong>';
