@@ -79,6 +79,10 @@ app.get('/uploadPlanning', function(req, res) {
   res.render('uploadPlanning');
 })
 
+app.get('/tabletsLogs', function(req, res) {
+  res.render('tabletsLogs');
+})
+
 
 
 
