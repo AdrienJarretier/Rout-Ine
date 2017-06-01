@@ -171,8 +171,6 @@ class Beneficiary {
     else
       this.birthdate = null;
 
-    console.log(this.birthdate);
-
     this.address = new Address(parsedLine);
     this.address_additional = parsedLine[3];
     this.phones = [];
