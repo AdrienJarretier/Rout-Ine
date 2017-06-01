@@ -57,8 +57,6 @@ function getAddresses() {
     ' RIGHT JOIN beneficiary ON a.id=beneficiary.address_id \n' +
     ' WHERE a.id IS NOT NULL;';
 
-  console.log(sqlSelectAddresses);
-
   return new Promise((resolve, reject) => {
 
     let dbCon = mysql.createConnection(config.db);
@@ -101,8 +99,6 @@ function getAddressesFromNames(names) {
     let notFound = 0;
 
     let addresses = [];
-
-    console.log(names.length + ' beneficiaries');
 
     // la variable i est simplement utilisee pour garantir le maintient de lo'rdre initial des adresses
     // on utilise alors une variable 'offset' pour eviter les cases vides quand l'adresses est deja dans notre tableau

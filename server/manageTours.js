@@ -118,9 +118,9 @@ function getRoute(tourNum, deliveryDate) {
 
 }
 
-getRoute(0, '2017-04-24')
-  .then((files) => {
+// getRoute(0, '2017-04-24')
+//   .then((files) => {
 
-    console.log(files);
+//     console.log(files);
 
-  });
+//   });
