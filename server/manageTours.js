@@ -117,6 +117,60 @@ function getRoute(tourNum, deliveryDate) {
   });
 
 }
+exports.getRoute = getRoute;
+
+/**
+ * A partir des adresses de la bdd et de la date de livraison donnee
+ * Construit la route de la tourn ee exterieure a albi avec osrm
+ *
+ * @deliveryDate {Date} la date de livraison
+ *
+ */
+function getOutsideTour(deliveryDate) {
+
+  return new Promise((resolve, reject) => {
+
+    const TOUR_FILE = TARGET_DIRECTORY + '/tourTripOutside.json';
+    const ADDRESSES_FILE = TARGET_DIRECTORY + '/tourAddressesOutside.json';
+
+    db.getOutsideAddresses(deliveryDate)
+      .then((addressesColl) => {
+
+        let oReq = new osrm.OsrmRequest('trip', true);
+
+        oReq.setFromAddresses(addressesColl);
+
+        let madeUrl = oReq.makeUrl();
+
+        request(madeUrl, (error, response, body) => {
+
+          if (error) {
+            console.log('error:', error); // Print the error if one occurred
+            console.log('statusCode:', response.statusCode); // Print the response status code if a response was received
+          } else {
+
+            // console.log('response from ' + service + ' service');
+            // console.log(body);
+            let parsedBody = JSON.parse(body);
+
+            let route = parsedBody.trips[0];
+
+            common.writeFile(TOUR_FILE, JSON.stringify(route,
+              null, 1));
+
+            resolve([TOUR_FILE, ADDRESSES_FILE]);
+
+          }
+        });
+
+        common.writeFile(ADDRESSES_FILE, JSON.stringify(
+          addressesColl, null, 1));
+
+      });
+
+  });
+
+}
 
 // getRoute(0, '2017-04-24')
 //   .then((files) => {

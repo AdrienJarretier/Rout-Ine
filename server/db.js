@@ -600,6 +600,52 @@ function getTour(tourNum, deliveryDate) {
 exports.getTour = getTour;
 
 
+
+
+/**
+ * Requete la bdd pour obtenir le detail complet des adresses hors albi a livrer pour la date donnee
+ *
+ * @deliveryDate {Date} la date de livraison
+ *
+ * @returns {Promise} identique a getFullAddressesData mais avec uniquement les adresses exterieures a albi correspondants a la date de livraison
+ */
+function getOutsideAddresses(deliveryDate) {
+
+  return new Promise((resolve, reject) => {
+
+    const sqlSelectNamesOutsideAlbiOnDate =
+      ' SELECT name \n ' +
+      ' FROM beneficiary_delivery_date \n ' +
+      ' INNER JOIN beneficiary ON beneficiary.id = beneficiary_delivery_date.beneficiary_id \n ' +
+      ' INNER JOIN address ON address.id = beneficiary.address_id \n ' +
+      ' WHERE date = ? \n ' +
+      ' AND town NOT LIKE ? \n ; ';
+
+    const selectNamesOutsideAlbiOnDate = mysql.format(selectTourOnDate, [deliveryDate, '%Albi%']);
+
+    let dbCon = mysql.createConnection(common.serverConfig.db);
+
+    query(selectNamesOutsideAlbiOnDate, dbCon)
+      .then((rows) => {
+
+        dbCon.end();
+
+        let names = [];
+
+        for (let r of rows)
+          names.push(r.name);
+
+        resolve(getFullAddressesData(names));
+
+      });
+
+  });
+
+}
+exports.getOutsideAddresses = getOutsideAddresses;
+
+
+
 function query(statement, dbCon) {
 
   return new Promise((resolve, reject) => {
