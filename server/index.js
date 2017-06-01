@@ -136,8 +136,6 @@ app.get('/listResults', function(req, res) {
   db.getFuturesDeliveriesDates()
     .then((dates) => {
 
-      console.log(dates);
-
       res.send(dates);
 
     });
