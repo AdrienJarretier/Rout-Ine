@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+<%
+
+  const GLOBAL_TITLE = 'Rout-Ine';
+
+  const INC_OPT = {
+    globalTitle: GLOBAL_TITLE,
+    title: 'Rapports livreurs'
+  };
+%>
+
+  <head>
+    <%-
+        include('partials/head.ejs', INC_OPT)
+      %>
+      <script>
+      'use strict';
+
+      $(document).ready(function() {
+
+        // let tourDates;
+
+        // function fillDatesDropdown(displayOld) {
+
+        //   $('#datesDropwdownMenu ul').empty();
+
+        //   for (let i in tourDates) {
+
+        //     let d = tourDates[i].date;
+
+        //     let date = new Date(d);
+
+        //     if (displayOld || date > new Date()) {
+
+        //       let link = $('<a href="#">').text('tournée de ' + date.toLocaleDateString());
+
+        //       link.click(function() {
+
+        //         $('#dropdownMenu1').text(link.text());
+
+        //         link.parent().siblings().each(function(index) {
+        //           $(this).css('background-color', '');
+        //         });
+
+        //         link.parent().css('background-color', 'rgb(200,255,200)');
+
+        //         console.log(d);
+
+        //         // $.post('bestFromGa', d, displayBest);
+
+        //       });
+
+        //       $('#datesDropwdownMenu ul').append($('<li>').append(link));
+
+        //     }
+
+        //   }
+
+        // }
+
+        $('nav #tabletsLogs').addClass('active');
+
+        // $('#error').hide();
+        // $('#errorNoData').hide();
+
+        // $('#displayOld').change(() => {
+
+        //   let checked = $('#displayOld').prop('checked');
+
+        //   fillDatesDropdown(checked);
+
+
+        // });
+
+        // let map = initMap();
+
+        // $.get('listResults', function(dates) {
+
+        //   tourDates = dates;
+
+        //   fillDatesDropdown($('#displayOld').prop('checked'));
+
+        // });
+
+        // $.get('beneficiaries', function(fullAddressesData) {
+
+        //   console.log(fullAddressesData);
+
+        //   for (let i = 1; i < fullAddressesData.features.length; ++i) {
+
+        //     let addr = fullAddressesData.features[i].properties;
+
+        //     let textParts = {
+        //       address: addr.label + ', ' + addr.town,
+        //       beneficiaries: addr.beneficiaries,
+        //       tour: addr.tour
+        //     };
+
+        //     let panel = $('<div class="panel panel-info">');
+        //     let panelHeading = $('<div class="panel-heading">').html(textParts.address + '<br> tournée : ' + (textParts.tour.num + 1));
+
+        //     let benefsListGroup = $('<ul class="list-group" >');
+
+        //     for (let benef of textParts.beneficiaries) {
+
+        //       let grouItemText =
+        //         benef.name +
+        //         '<br>' + benef.address_additional +
+        //         '<br>' + benef.note;
+
+        //       let groupItem = $('<li class="list-group-item">').html(grouItemText);
+        //       benefsListGroup.append(groupItem);
+
+        //     }
+        //     let panelBody = $('<div class="panel-body">').append(benefsListGroup);
+
+        //     panel.append(panelHeading).append(panelBody);
+
+        //     $('#addressesListGroup').append($('<li class="list-group-item">').append(panel));
+
+        //   }
+
+        // });
+
+        // let routes = [];
+        // let controls = [];
+
+        // function cleanMap() {
+
+        //   routes.forEach(function(layer) {
+        //     map.removeLayer(layer);
+        //   });
+
+        //   controls.forEach(function(control) {
+        //     map.removeControl(control);
+        //   });
+
+        //   $('#infos').empty();
+        // }
+
+        // function displayBest(bestResult) {
+
+        //   if (bestResult.trips) {
+
+        //     let markersColors = ["darkred", "blue", "green", "orange", "black", "purple"];
+
+        //     let tours = bestResult.trips;
+
+        //     cleanMap();
+
+        //     fillResultsInfo('#infos', bestResult, markersColors);
+
+        //     let groupTours = 'Tournées',
+        //       groupMarkers = 'Adresses';
+        //     let overlayMaps = {
+        //       [groupTours]: {},
+        //       [groupMarkers]: {}
+        //     };
+
+        //     for (let i in tours) {
+
+        //       let tour = tours[i];
+
+        //       let routeLayer = L.geoJSON(tour.trip.trips[0].geometry);
+        //       routeLayer.setStyle(function(feature) {
+        //         return {
+        //           color: markersColors[i]
+        //         };
+        //       }).addTo(map);
+
+        //       routes.push(routeLayer);
+
+        //       console.log(tour);
+
+        //       let markers = addressesMarkers(tour.trip.waypoints, tour.addresses, markersColors[i]);
+
+        //       routes.push(markers);
+
+        //       overlayMaps[groupTours][markersColors[i]] = routeLayer;
+        //       overlayMaps[groupMarkers][markersColors[i]] = markers;
+
+        //     }
+
+        //     var options = {
+        //       // Make the "trips" group exclusive (use radio inputs)
+        //       // exclusiveGroups: [groupName]
+        //     };
+
+        //     let groupControl = L.control.groupedLayers(null, overlayMaps, options);
+
+        //     groupControl.addTo(map);
+
+        //     controls.push(groupControl);
+
+        //   } else {
+
+        //     $('#error').show();
+
+        //   }
+
+
+        // };
+
+      });
+      </script>
+  </head>
+
+  <body>
+    <%-
+    include('partials/header.ejs', INC_OPT)
+  %>
+      <!-- <div id="error" class="alert alert-danger" role="alert">Une erreur inconnue s'est produite, se référer aux logs serveur</div> -->
+      <div class="container-fluid">
+        <div class="row" id="main">
+          <div class="col-xs-2">
+            <!--             <div class="row">
+              <div class="col-xs-12">
+                <label for="displayOld">Voir anciennes </label>
+                <input type="checkbox" id="displayOld">
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-xs-12">
+                <div id="errorNoData" class="alert alert-danger" role="alert">Aucun résultat, lancer un <a href="tourComputing">Calcul des tournées</a></div>
+                <div id="datesDropwdownMenu" class="dropdown">
+                  <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                    Sélection tournée
+                    <span class="caret"></span>
+                  </button>
+                  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <p id="infos">
+              </p>
+            </div> -->
+          </div>
+          <div class="col-xs-6">
+            <!-- <div id="map"></div> -->
+          </div>
+          <div class="col-xs-4">
+            <!--          <ul class="list-group" id="addressesListGroup">
+            </ul> -->
+          </div>
+        </div>
+      </div>
+  </body>
+
+</html>
