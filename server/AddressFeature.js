@@ -10,7 +10,6 @@ class AddressFeature {
       label: address.label,
       town: address.town,
       beneficiaries: [],
-      waypoint_index: 0, // index de cette adresse dans le trajet, obtenu par osrm
       tour: {
         num: address.num,
         index_in_tour: address.index_in_tour

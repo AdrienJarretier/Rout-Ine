@@ -3,6 +3,8 @@
 const common = require('./common.js');
 const db = require('./db.js');
 const mysql = require('mysql');
+const osrm = require('./osrm.js');
+const request = require('request');
 
 const TARGET_DIRECTORY = common.serverConfig.resultsFolder;
 
@@ -72,89 +74,53 @@ exports.fillDb = fillDb;
  */
 function getRoute(tourNum, deliveryDate) {
 
-  db.getTour(0, '2017-04-24')
-    .then((r) => {
+  return new Promise((resolve, reject) => {
 
-      console.log(JSON.stringify(r, null, 1));
+    const TOUR_FILE = TARGET_DIRECTORY + '/tourTrip' + tourNum + '.json';
+    const ADDRESSES_FILE = TARGET_DIRECTORY + '/tourAddresses' + tourNum + '.json';
 
-    });
+    db.getTour(tourNum, deliveryDate)
+      .then((addressesColl) => {
+
+        let oReq = new osrm.OsrmRequest('route', true);
+
+        oReq.setFromAddresses(addressesColl);
+
+        let madeUrl = oReq.makeUrl();
+
+        request(madeUrl, (error, response, body) => {
+
+          if (error) {
+            console.log('error:', error); // Print the error if one occurred
+            console.log('statusCode:', response.statusCode); // Print the response status code if a response was received
+          } else {
+
+            // console.log('response from ' + service + ' service');
+            // console.log(body);
+            let parsedBody = JSON.parse(body);
+
+            let route = parsedBody.routes[0];
+
+            common.writeFile(TOUR_FILE, JSON.stringify(route,
+              null, 1));
+
+            resolve([TOUR_FILE, ADDRESSES_FILE]);
+
+          }
+        });
+
+        common.writeFile(ADDRESSES_FILE, JSON.stringify(
+          addressesColl, null, 1));
+
+      });
+
+  });
 
 }
 
-//   return new Promise((resolve, reject) => {
+getRoute(0, '2017-04-24')
+  .then((files) => {
 
-//     db.extractNamesList(tourFile)
-//       .then(db.getFullAddressesData)
-//       .then((featCollection) => {
+    console.log(files);
 
-//         let testTrips = {
-//           original: {},
-//           osrmTrip: {},
-//           filled: 0,
-//           addresses: featCollection
-//         };
-
-//         function requestToOsrm(service) {
-//           let oReq = new osrm.OsrmRequest(service, true);
-
-//           oReq.setFromAddresses(featCollection);
-
-//           let madeUrl = oReq.makeUrl();
-
-//           request(madeUrl, (error, response, body) => {
-
-//             if (error) {
-//               console.log('error:', error); // Print the error if one occurred
-//               console.log('statusCode:', response.statusCode); // Print the response status code if a response was received
-//             } else {
-
-//               // console.log('response from ' + service + ' service');
-//               let parsedBody = JSON.parse(body);
-
-//               // l'objet route retourne par osrm, nom different selon le service
-//               let route = {};
-
-//               if (service == 'route') {
-//                 testTrips.original = parsedBody;
-//                 route = parsedBody.routes[0];
-
-//               } else if (service == 'trip') {
-
-//                 testTrips.osrmTrip = parsedBody;
-//                 route = parsedBody.trips[0];
-//               }
-
-//               if (++testTrips.filled == 2) {
-
-//                 resolve(testTrips);
-//               }
-
-//               console.log('');
-//               console.log('** ' + service + ' service **');
-//               console.log('distance : ' + Math.ceil(route.distance / 10) / 100 +
-//                 ' km');
-
-//               let h = Math.floor(route.duration / 3600);
-//               let m = Math.ceil((route.duration % 3600) / 60);
-//               console.log('duration : ' + h + 'h ' + m);
-
-
-//               m += 3 * featCollection.features.length;
-//               h += Math.floor(m / 60);
-//               m %= 60;
-//               console.log('duration (3 min / address) : ' + h + 'h ' + m);
-
-//             }
-//           });
-//         }
-
-//         requestToOsrm('route');
-//         requestToOsrm('trip');
-
-//       })
-//       .catch((reason) => {
-//         reject('rejected ' + tourFile + ' : ' + reason);
-//       });
-
-//   });
-// }
+  });

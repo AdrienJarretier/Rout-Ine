@@ -563,7 +563,7 @@ function getFuturesDeliveriesDates() {
  * @param {Integer} tourNum le numero de la tournee demandee base sur 0
  * @deliveryDate {Date} la date de livraison
  *
- * @returns {Promise} identique a getFullAddressesData mais avec uniquement les adresses correspondants a la tournee demandee
+ * @returns {Promise} identique a getFullAddressesData mais avec uniquement les adresses correspondants a la tournee demandee et dans l'ordre de leur position dans la tournee
  */
 function getTour(tourNum, deliveryDate) {
 
@@ -601,6 +601,7 @@ function getTour(tourNum, deliveryDate) {
   });
 
 }
+exports.getTour = getTour;
 
 
 function query(statement, dbCon) {
