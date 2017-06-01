@@ -122,7 +122,7 @@ exports.currentDateTimeString = currentDateTimeString;
 
 function parseDateTime(dateTimeString) {
 
-  console.log(dateTimeString);
+  // console.log(dateTimeString);
 
   var regexp = /(.*)\/(.*)\/(.*)/;
   var matches_array = dateTimeString.match(regexp);

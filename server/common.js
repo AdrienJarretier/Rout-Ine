@@ -35,8 +35,6 @@ function readFile(file, encoding) {
 
         if (encoding) {
 
-          console.log('decoding');
-
           let str = iconv.decode(fileContent, encoding);
 
           // let str = iconv.encode(buf, 'utf8');

@@ -185,7 +185,9 @@ function insertDeliveries(benefId, deliveriesDates, dbCon) {
     for (let d of deliveriesDates) {
 
       let parsedDate = utils.parseDateTime(d);
-      console.log(parsedDate);
+
+      // console.log(parsedDate);
+
       const insertDelivery = mysql.format(sqlInsertDelivery, [benefId, parsedDate]);
 
       promises.push(dbQuery(insertDelivery, dbCon));
@@ -209,19 +211,23 @@ let updateBenefsQ = async.queue(function(task, callback) {
 
 }, 1);
 
-function updateBeneficiariesFromScheduleList(beneficiariesList) {
+function updateBeneficiariesFromScheduleList(beneficiariesList, socket) {
 
   return new Promise((resolve, reject) => {
 
     let dbCon = mysql.createConnection(common.serverConfig.db);
 
-    for (let name in beneficiariesList.beneficiaries) {
+    let names = Object.keys(beneficiariesList.beneficiaries);
+
+    for (let i in names) {
+
+      let name = names[i];
 
       let benef = beneficiariesList.beneficiaries[name];
 
       updateBenefsQ.push({ benef: benef, dbCon: dbCon }, function(values) {
 
-        // console.log(values);
+        socket.emit('percent', Math.round(i * 100 / names.length));
 
       });
 
@@ -230,6 +236,9 @@ function updateBeneficiariesFromScheduleList(beneficiariesList) {
     updateBenefsQ.drain = function() {
 
       dbCon.end();
+
+      socket.emit('scheduleProcessed');
+
       resolve('all beneficiaries have been processed');
     };
 
