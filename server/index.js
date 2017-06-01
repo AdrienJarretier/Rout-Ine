@@ -348,3 +348,9 @@ app.get('/logs', function(req, res) {
     });
 
 });
+
+app.get('/taletLogsFullInfos', function(req, res) {
+
+
+
+});
