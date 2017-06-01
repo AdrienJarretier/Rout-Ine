@@ -168,7 +168,15 @@ class Beneficiary {
     this.birthday = parsedLine[1];
     this.address = new Address(parsedLine);
     this.address_additional = parsedLine[3];
-    this.phones = [parsedLine[5], parsedLine[6]];
+    this.phones = [];
+
+    for (let i = 5; i <= 6; ++i) {
+
+      if (parsedLine[i] != '')
+        this.phones.push(parsedLine[i]);
+
+    }
+
     this.deliveries = [];
 
     this.addDelivery(parsedLine);
@@ -210,7 +218,13 @@ function parseSchedule(schedule) {
 
   return new Promise((resolve, reject) => {
 
-      // console.log(schedule);
+    // console.log(schedule);
+
+    // console.log(typeof(schedule));
+
+    schedule = schedule.replace(/\s*\n/g, '\n');
+
+    // console.log(schedule);
 
     const csvParse = require('csv-parse');
 
@@ -231,4 +245,3 @@ function parseSchedule(schedule) {
   });
 }
 exports.parseSchedule = parseSchedule;
-
