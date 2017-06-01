@@ -35,9 +35,11 @@ function readFile(file, encoding) {
 
         if (encoding) {
 
-          let buf = iconv.decode(fileContent, encoding);
+          console.log('decoding');
 
-          let str = iconv.encode(buf, 'utf8');
+          let str = iconv.decode(fileContent, encoding);
+
+          // let str = iconv.encode(buf, 'utf8');
 
           resolve(str);
 
@@ -96,7 +98,8 @@ function log(type, msgObject) {
 
       let currentDate = new Date();
 
-      let dateTimeString = currentDate.toLocaleDateString() + '_' + currentDate.toLocaleTimeString() + '.' + currentDate.getMilliseconds();
+      let dateTimeString = currentDate.toLocaleDateString() + '_' + currentDate.toLocaleTimeString() + '.' +
+        currentDate.getMilliseconds();
 
       logObject[dateTimeString] = msgObject;
 
