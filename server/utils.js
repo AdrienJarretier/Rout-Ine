@@ -122,7 +122,9 @@ exports.currentDateTimeString = currentDateTimeString;
 
 function parseDateTime(dateTimeString) {
 
-  var regexp = /(.*)\/(.*)\/(.*) /;
+  console.log(dateTimeString);
+
+  var regexp = /(.*)\/(.*)\/(.*)/;
   var matches_array = dateTimeString.match(regexp);
 
   // console.log(matches_array);
@@ -151,8 +153,8 @@ class Address {
 
   constructor(parsedLine) {
 
-    this.label = parsedLine[1].replace(/^\s*0\s*,\s*/g, '');
-    this.town = parsedLine[3];
+    this.label = parsedLine[2].replace(/^\s*0\s*,\s*/g, '');
+    this.town = parsedLine[4];
 
   }
 
@@ -163,20 +165,21 @@ class Beneficiary {
   constructor(parsedLine) {
 
     this.name = parsedLine[0];
+    this.birthday = parsedLine[1];
     this.address = new Address(parsedLine);
-    this.address_additional = parsedLine[2];
-    this.phones = [parsedLine[4]];
+    this.address_additional = parsedLine[3];
+    this.phones = [parsedLine[5], parsedLine[6]];
     this.deliveries = [];
 
     this.addDelivery(parsedLine);
 
-    this.note = parsedLine[6];
+    this.note = parsedLine[8];
 
   }
 
   addDelivery(parsedLine) {
 
-    this.deliveries.push(parsedLine[5]);
+    this.deliveries.push(parsedLine[7]);
 
   }
 
@@ -207,19 +210,19 @@ function parseSchedule(schedule) {
 
   return new Promise((resolve, reject) => {
 
-      console.log(schedule);
+      // console.log(schedule);
 
     const csvParse = require('csv-parse');
 
     let options = {
       delimiter: ";",
-      from: 2,
+      from: 1,
       skip_empty_lines: true
     }
 
     csvParse(schedule, options, function(err, output) {
 
-      console.log(output[0]);
+      // console.log(output[0]);
 
       resolve(new BeneficiariesList(output));
 
