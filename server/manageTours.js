@@ -6,6 +6,19 @@ const mysql = require('mysql');
 
 const TARGET_DIRECTORY = common.serverConfig.resultsFolder;
 
+/**
+ * efface les affectation d'adresses aux tournees
+ * puis appelles insertTours qui va rajouter les tournees manquantes
+ *
+ * puis enfin pour chaque adresse de chaque tournee enregistre dans la bdd
+ * a quelle tournee l'adresse est affectee et a quelle position elle est
+ *
+ * @params {Array} tours un tableau d'objets {
+ *                                        trip: trip,
+ *                                        addresses: featColl
+ *                                     }
+ *
+ */
 function fillDb(tours) {
 
   db.clearTourAssignments()
@@ -16,8 +29,8 @@ function fillDb(tours) {
 
         let tour = tours[i];
 
-        common.writeFile(TARGET_DIRECTORY + '/tourTrip' + i + '.json', JSON.stringify(
-          tour.trip.trips[0], null, 2));
+        // common.writeFile(TARGET_DIRECTORY + '/tourTrip' + i + '.json', JSON.stringify(
+        //   tour.trip.trips[0], null, 2));
 
         let dbCon = mysql.createConnection(common.serverConfig.db);
 
@@ -39,8 +52,8 @@ function fillDb(tours) {
         Promise.all(promises)
           .then(() => { dbCon.end(); });
 
-        common.writeFile(TARGET_DIRECTORY + '/tourAddresses' + i + '.json', JSON.stringify(
-          tour.addresses, null, 2));
+        // common.writeFile(TARGET_DIRECTORY + '/tourAddresses' + i + '.json', JSON.stringify(
+        //   tour.addresses, null, 2));
 
       }
 
@@ -49,8 +62,24 @@ function fillDb(tours) {
 
 exports.fillDb = fillDb;
 
+/**
+ * A partir des adresses de la tournee demandee, obtenues avec db.getTour
+ * Construit la route avec osrm
+ *
+ * @param {Integer} tourNum le numero de la tournee demandee base sur 0
+ * @deliveryDate {Date} la date de livraison
+ *
+ */
+function getRoute(tourNum, deliveryDate) {
 
-// function get(tourNum) {
+  db.getTour(0, '2017-04-24')
+    .then((r) => {
+
+      console.log(JSON.stringify(r, null, 1));
+
+    });
+
+}
 
 //   return new Promise((resolve, reject) => {
 

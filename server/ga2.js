@@ -193,10 +193,10 @@ exports.start = function(params, socket) {
           console.log('best partition found : ');
           console.log(bestPartition);
 
-          common.writeJson(common.serverConfig.resultsFolder + '/bestTours' + utils.currentDateTimeString() +
-            '.json', bestResult);
-
           manageTours.fillDb(bestResult.trips);
+
+          // common.writeJson(common.serverConfig.resultsFolder + '/bestTours' + utils.currentDateTimeString() +
+          //   '.json', bestResult);
 
           let timeSinceBest = (Date.now() - timeLastBest);
 

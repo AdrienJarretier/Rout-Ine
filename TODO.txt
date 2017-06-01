@@ -12,3 +12,5 @@ generer les tournées depuis la base de données
 nouvel onglet pour visualiser les logs tablette
 
 barre de recherche beneficiaires
+
+rajouter tables pour modifications utilisateurs ce qui permettre de revenir en arriere, enregistrer dateTime de modification pour pouvoir reculer
