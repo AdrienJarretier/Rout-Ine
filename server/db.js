@@ -557,7 +557,14 @@ function getFuturesDeliveriesDates() {
 
 
 
-
+/**
+ * Requete la bdd pour obtenir le detail complet des adresses de la tournee tourNum pour la date donnee
+ *
+ * @param {Integer} tourNum le numero de la tournee demandee base sur 0
+ * @deliveryDate {Date} la date de livraison
+ *
+ * @returns {Promise} identique a getFullAddressesData mais avec uniquement les adresses correspondants a la tournee demandee
+ */
 function getTour(tourNum, deliveryDate) {
 
   return new Promise((resolve, reject) => {
@@ -575,8 +582,6 @@ function getTour(tourNum, deliveryDate) {
 
     const tourOnDate = mysql.format(selectTourOnDate, [deliveryDate, tourNum]);
 
-    console.log(tourOnDate);
-
     let dbCon = mysql.createConnection(common.serverConfig.db);
 
     query(tourOnDate, dbCon)
@@ -589,8 +594,6 @@ function getTour(tourNum, deliveryDate) {
         for (let r of rows)
           names.push(r.name);
 
-        console.log(names);
-
         resolve(getFullAddressesData(names));
 
       });
@@ -598,9 +601,6 @@ function getTour(tourNum, deliveryDate) {
   });
 
 }
-
-// getTour(0, '2017-04-24')
-//   .then((r) => { console.log(JSON.stringify(r, null, 1)); });
 
 
 function query(statement, dbCon) {
