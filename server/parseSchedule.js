@@ -123,10 +123,10 @@ function updateBenef(benef, dbCon) {
             if (rows.length == 0) {
 
               const sqlInsertBenef =
-                ' INSERT INTO beneficiary(name, address_additional, address_id, note) \n' +
-                ' VALUES(?,?,?,?) ; ';
+                ' INSERT INTO beneficiary(name, birthdate, address_additional, address_id, note) \n' +
+                ' VALUES(?,?,?,?,?) ; ';
 
-              const insertBenef = mysql.format(sqlInsertBenef, [benef.name, benef.address_additional,
+              const insertBenef = mysql.format(sqlInsertBenef, [benef.name, benef.birthdate, benef.address_additional,
                 addressId, benef.note
               ]);
 
@@ -140,10 +140,11 @@ function updateBenef(benef, dbCon) {
             } else {
 
               const sqlUpdateBenef = ' UPDATE beneficiary \n' +
-                ' SET address_additional = ?, note = ? \n' +
+                ' SET birthdate = ?, address_additional = ?, note = ? \n' +
                 ' WHERE id = ? ; ';
 
-              const updateBenef = mysql.format(sqlUpdateBenef, [benef.address_additional, benef.note,
+              const updateBenef = mysql.format(sqlUpdateBenef, [benef.birthdate, benef.address_additional,
+                benef.note,
                 rows[0].id
               ]);
 
@@ -184,7 +185,7 @@ function insertDeliveries(benefId, deliveriesDates, dbCon) {
 
     for (let d of deliveriesDates) {
 
-      let parsedDate = utils.parseDateTime(d);
+      let parsedDate = utils.parseDateTime(d, 20);
 
       // console.log(parsedDate);
 

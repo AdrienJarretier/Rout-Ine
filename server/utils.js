@@ -120,7 +120,7 @@ function currentDateTimeString() {
 }
 exports.currentDateTimeString = currentDateTimeString;
 
-function parseDateTime(dateTimeString) {
+function parseDateTime(dateTimeString, century) {
 
   // console.log(dateTimeString);
 
@@ -132,7 +132,7 @@ function parseDateTime(dateTimeString) {
   // parseDateTime.match(//);
 
   let parsedDate = {
-    year: matches_array[3],
+    year: century + matches_array[3],
     month: matches_array[2],
     date: matches_array[1],
     toDate: function() {
@@ -165,7 +165,14 @@ class Beneficiary {
   constructor(parsedLine) {
 
     this.name = parsedLine[0];
-    this.birthday = parsedLine[1];
+
+    if (parsedLine[1] != '')
+      this.birthdate = parseDateTime(parsedLine[1], 19);
+    else
+      this.birthdate = null;
+
+    console.log(this.birthdate);
+
     this.address = new Address(parsedLine);
     this.address_additional = parsedLine[3];
     this.phones = [];
