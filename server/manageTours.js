@@ -88,6 +88,8 @@ function getRoute(tourNum, deliveryDate) {
 
         }
 
+        addressesColl.features.push(addressesColl.features[0]);
+
         let oReq = new osrm.OsrmRequest('route', true);
 
         oReq.setFromAddresses(addressesColl);
