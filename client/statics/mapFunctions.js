@@ -21,30 +21,30 @@ function initMap() {
   return map;
 }
 
-function addressesMarkers(waypoints, addresses, color) {
+function addressesMarkers(addresses, color) {
 
   console.log(addresses);
-  console.log(waypoints);
 
   console.log('fsdf');
 
-  function markerMaker(waypoint, address_index) {
+  function markerMaker(address_index) {
 
-    let address_coords = addresses.features[address_index].geometry.coordinates;
+    let address_coords = addresses[address_index].geometry.coordinates;
 
     let lat = address_coords[1];
     let lng = address_coords[0];
 
+    let feature = addresses[address_index];
+
+    let p = feature.properties;
+
     let marker = L.marker([lat, lng], {
       icon: new L.AwesomeNumberMarkers({
-        number: waypoint.waypoint_index,
+        number: p.waypoint_index,
         markerColor: color
       })
     });
 
-    let feature = addresses.features[address_index];
-
-    let p = feature.properties;
     let popContent = p.label + (p.special != undefined ? ', ' + p.special : '') + ', ' + p.town;
 
     for (let b of p.beneficiaries) {
@@ -87,16 +87,12 @@ function addressesMarkers(waypoints, addresses, color) {
 
   let markersLayer = L.layerGroup();
 
-  let index = 0;
+  console.log('addresses :');
+  console.log(addresses);
 
-  for (let i in waypoints) {
+  for (let i in addresses) {
 
-    let w = waypoints[i];
-
-    if (w.waypoint_index == undefined)
-      w.waypoint_index = index++;
-
-    markersLayer.addLayer(markerMaker(w, i));
+    markersLayer.addLayer(markerMaker(i));
   }
 
   return markersLayer;
