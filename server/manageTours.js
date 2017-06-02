@@ -159,6 +159,16 @@ function getOutsideTour(deliveryDate) {
             // console.log('response from ' + service + ' service');
             // console.log(body);
             let parsedBody = JSON.parse(body);
+            // console.log(parsedBody);
+
+            for (let i in addressesColl.features) {
+
+              addressesColl.features[i].setWaypointIndex(parsedBody.waypoints[i].waypoint_index);
+
+            }
+
+            common.writeFile(ADDRESSES_FILE, JSON.stringify(
+              addressesColl, null, 1));
 
             let route = parsedBody.trips[0];
 
@@ -169,9 +179,6 @@ function getOutsideTour(deliveryDate) {
 
           }
         });
-
-        common.writeFile(ADDRESSES_FILE, JSON.stringify(
-          addressesColl, null, 1));
 
       });
 
