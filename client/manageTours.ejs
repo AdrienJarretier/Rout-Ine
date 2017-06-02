@@ -75,15 +75,24 @@
                 for (let n = 0; n < numberOfTours; ++n) {
                   promises.push(requestTrip(n, date));
                 }
+                promises.push(requestTrip('Outside', date));
 
                 Promise.all(promises)
                   .then((tres) => {
 
-                    console.log(tres);
-
-                    let trips = {
-                      
+                    let result = {
+                      trips: [],
+                      addresses: []
                     }
+
+                    for (let t of tres) {
+
+                      result.trips.push(t.trip);
+                      result.addresses.push(t.addresses);
+
+                    }
+
+                    displayBest(result);
 
                     $('#dropdownMenu1').text(link.text());
 
@@ -201,7 +210,7 @@
 
             cleanMap();
 
-            fillResultsInfo('#infos', bestResult, markersColors);
+            // fillResultsInfo('#infos', bestResult, markersColors);
 
             let groupTours = 'Tournées',
               groupMarkers = 'Adresses';
@@ -210,11 +219,13 @@
               [groupMarkers]: {}
             };
 
+            console.log(tours);
+
             for (let i in tours) {
 
               let tour = tours[i];
 
-              let routeLayer = L.geoJSON(tour.trip.trips[0].geometry);
+              let routeLayer = L.geoJSON(tour.geometry);
               routeLayer.setStyle(function(feature) {
                 return {
                   color: markersColors[i]
@@ -225,7 +236,7 @@
 
               console.log(tour);
 
-              let markers = addressesMarkers(tour.trip.waypoints, tour.addresses, markersColors[i]);
+              let markers = addressesMarkers(tour.waypoints, tour.addresses, markersColors[i]);
 
               routes.push(markers);
 

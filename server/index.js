@@ -244,19 +244,17 @@ function sendTour(req, res, fileNum) {
   let now = new Date();
 
   // console.log('req.query');
-  // console.log(req.query);
-
-  if (req.query.deliveryDay)
-    now.setDate(req.query.deliveryDay);
-
-  if (req.query.deliveryMonth)
-    now.setMonth(req.query.deliveryMonth);
 
   if (req.query.deliveryYear)
     now.setFullYear(req.query.deliveryYear);
 
+  if (req.query.deliveryMonth)
+    now.setMonth(req.query.deliveryMonth);
 
-  let dateString = now.getFullYear() + '-' + (now.getMonth() + 1) + '-' + now.getDate();
+  if (req.query.deliveryDay)
+    now.setDate(req.query.deliveryDay);
+
+  let dateString = now.getFullYear() + '-' + (now.getMonth()+1) + '-' + now.getDate();
 
   manageTours.getTourByQueryNum(req.query.num, dateString)
     .then((files) => {
