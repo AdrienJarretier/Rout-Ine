@@ -80,8 +80,6 @@ function getRoute(tourNum, deliveryDate) {
     db.getTour(tourNum, deliveryDate)
       .then((addressesColl) => {
 
-        console.log(addressesColl);
-
         for (let i in addressesColl.features) {
 
           addressesColl.features[i].setWaypointIndex(i);
