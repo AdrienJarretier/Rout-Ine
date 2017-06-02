@@ -163,7 +163,7 @@ function getOutsideTour(deliveryDate) {
             for (let i in addressesColl.features) {
 
               addressesColl.features[i].setWaypointIndex(parsedBody.waypoints[i].waypoint_index);
-              addressesColl.features[i].properties.tour.num = 'Outside';
+              addressesColl.features[i].properties.tour.num = 'Extérieure';
 
             }
 
