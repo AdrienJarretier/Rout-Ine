@@ -22,20 +22,31 @@
         let tourDates;
         let numberOfTours;
 
-        function requestRoute(tourNum, deliveryDate) {
+        function requestTrip(tourNum, deliveryDate) {
 
           return new Promise((resolve, reject) => {
 
-            let sdff = {
+            let params = {
               deliveryDay: deliveryDate.getDate(),
               deliveryMonth: deliveryDate.getMonth(),
               deliveryYear: deliveryDate.getFullYear(),
               num: tourNum
             };
 
-            $.get('downloadTrip', sdff, (res) => {
+            $.get('downloadTrip', params, (trip) => {
 
-              resolve(res);
+              $.get('downloadAddresses', params, (addresses) => {
+
+                let val = {
+
+                  trip: trip,
+                  addresses: addresses
+
+                };
+
+                resolve(val);
+
+              });
 
             })
 
@@ -59,9 +70,20 @@
 
               link.click(function() {
 
-                requestRoute(0, date)
-                  .then((res) => {
+                let promises = [];
 
+                for (let n = 0; n < numberOfTours; ++n) {
+                  promises.push(requestTrip(n, date));
+                }
+
+                Promise.all(promises)
+                  .then((tres) => {
+
+                    console.log(tres);
+
+                    let trips = {
+                      
+                    }
 
                     $('#dropdownMenu1').text(link.text());
 
