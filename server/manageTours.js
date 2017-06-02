@@ -61,6 +61,7 @@ function fillDb(tours) {
 
     });
 }
+exports.fillDb = fillDb;
 
 /**
  * A partir des adresses de la tournee demandee, obtenues avec db.getTour
