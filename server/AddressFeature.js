@@ -13,7 +13,8 @@ class AddressFeature {
       tour: {
         num: address.num,
         index_in_tour: address.index_in_tour
-      }
+      },
+      waypoint_index: (address.index_in_tour ? address.index_in_tour : 0)
     };
 
     if (address.special != undefined)
@@ -37,6 +38,11 @@ class AddressFeature {
   get coordinates() {
     return this.geometry.coordinates;
   }
+
+  setWaypointIndex(w_ind) {
+    this.properties.waypoint_index = w_ind;
+  }
+
 }
 
 // exporte la definition de la classe

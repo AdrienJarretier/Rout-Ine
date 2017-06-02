@@ -80,6 +80,8 @@ function getRoute(tourNum, deliveryDate) {
     db.getTour(tourNum, deliveryDate)
       .then((addressesColl) => {
 
+        console.log(addressesColl);
+
         let oReq = new osrm.OsrmRequest('route', true);
 
         oReq.setFromAddresses(addressesColl);
