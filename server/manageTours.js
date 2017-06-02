@@ -82,6 +82,12 @@ function getRoute(tourNum, deliveryDate) {
 
         console.log(addressesColl);
 
+        for (let i in addressesColl.features) {
+
+          addressesColl.features[i].setWaypointIndex(i);
+
+        }
+
         let oReq = new osrm.OsrmRequest('route', true);
 
         oReq.setFromAddresses(addressesColl);
@@ -175,8 +181,7 @@ function getTourByQueryNum(num, deliveryDate) {
 
   if (num == 'Outside') {
     return getOutsideTour(deliveryDate);
-  }
-  else
+  } else
     return getRoute(num, deliveryDate);
 
 }
