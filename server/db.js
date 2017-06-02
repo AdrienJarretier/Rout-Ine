@@ -632,8 +632,6 @@ function getOutsideAddresses(deliveryDate) {
 
         dbCon.end();
 
-        console.log(rows);
-
         let names = [];
 
         for (let r of rows)
