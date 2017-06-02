@@ -232,9 +232,10 @@
 
               routes.push(routeLayer);
 
+              console.log('bestResult :');
               console.log(bestResult);
 
-              let markers = addressesMarkers(tour.waypoints, bestResult.addresses, markersColors[i]);
+              let markers = addressesMarkers(bestResult.addresses[i].features, markersColors[i]);
 
               routes.push(markers);
 
