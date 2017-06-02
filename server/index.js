@@ -21,6 +21,7 @@ const mysql = require('mysql');
 const db = require('./db.js');
 const osrm = require('./osrm.js');
 const ga2 = require('./ga2.js');
+const manageTours = require('./manageTours.js');
 const parseSchedule = require('./parseSchedule.js');
 const testTournee = require('./testTournee.js');
 const utils = require('./utils.js');
@@ -230,13 +231,26 @@ io.on('connection', function(socket) {
   });
 });
 
-function sendTour(req, res, baseFileName) {
+/**
+ *
+ * @param {Integer} fileNum le numero du fichier, 0 pour route, 1 pour adresses
+ */
+function sendTour(req, res, fileNum) {
 
   let options = {
-    root: __dirname + '/' + common.serverConfig.resultsFolder
+    root: __dirname
   };
 
-  res.sendFile(baseFileName + req.query.num + '.json', options);
+  let now = new Date('2017-04-26');
+
+  let dateString = now.getFullYear() + '-' + (now.getMonth() + 1) + '-' + now.getDate();
+
+  manageTours.getTourByQueryNum(req.query.num, dateString)
+    .then((files) => {
+
+      res.sendFile(files[fileNum], options);
+
+    });
 
 }
 
@@ -253,14 +267,14 @@ app.get('/getNumberOfTours', function(req, res) {
 
 app.get('/downloadAddresses', function(req, res) {
 
-  sendTour(req, res, 'tourAddresses');
+  sendTour(req, res, 1);
 
 });
 
 
 app.get('/downloadTrip', function(req, res) {
 
-  sendTour(req, res, 'tourTrip');
+  sendTour(req, res, 0);
 
 });
 

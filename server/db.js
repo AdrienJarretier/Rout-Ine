@@ -585,6 +585,8 @@ function getTour(tourNum, deliveryDate) {
 
         dbCon.end();
 
+        console.log(tourOnDate);
+
         let names = [];
 
         for (let r of rows)
@@ -621,7 +623,7 @@ function getOutsideAddresses(deliveryDate) {
       ' WHERE date = ? \n ' +
       ' AND town NOT LIKE ? \n ; ';
 
-    const selectNamesOutsideAlbiOnDate = mysql.format(selectTourOnDate, [deliveryDate, '%Albi%']);
+    const selectNamesOutsideAlbiOnDate = mysql.format(sqlSelectNamesOutsideAlbiOnDate, [deliveryDate, '%Albi%']);
 
     let dbCon = mysql.createConnection(common.serverConfig.db);
 
@@ -629,6 +631,8 @@ function getOutsideAddresses(deliveryDate) {
       .then((rows) => {
 
         dbCon.end();
+
+        console.log(rows);
 
         let names = [];
 

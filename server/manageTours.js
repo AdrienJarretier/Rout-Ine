@@ -62,8 +62,6 @@ function fillDb(tours) {
     });
 }
 
-exports.fillDb = fillDb;
-
 /**
  * A partir des adresses de la tournee demandee, obtenues avec db.getTour
  * Construit la route avec osrm
@@ -117,7 +115,6 @@ function getRoute(tourNum, deliveryDate) {
   });
 
 }
-exports.getRoute = getRoute;
 
 /**
  * A partir des adresses de la bdd et de la date de livraison donnee
@@ -171,6 +168,17 @@ function getOutsideTour(deliveryDate) {
   });
 
 }
+
+function getTourByQueryNum(num, deliveryDate) {
+
+  if (num == 'Outside') {
+    return getOutsideTour(deliveryDate);
+  }
+  else
+    return getRoute(num, deliveryDate);
+
+}
+exports.getTourByQueryNum = getTourByQueryNum;
 
 // getRoute(0, '2017-04-24')
 //   .then((files) => {
