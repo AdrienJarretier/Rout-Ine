@@ -241,7 +241,7 @@ function sendTour(req, res, fileNum) {
     root: __dirname
   };
 
-  let now = new Date('2017-04-26');
+  let now = new Date('2017-04-30');
 
   let dateString = now.getFullYear() + '-' + (now.getMonth() + 1) + '-' + now.getDate();
 
