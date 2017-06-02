@@ -1,5 +1,8 @@
 'use strict';
 
+const markersColors = ["orange", "purple", "blue", "green", "red", "black", "darkred", "cadetblue",
+  "lightgreen", "pink"
+];
 
 function initMap() {
 
@@ -19,6 +22,11 @@ function initMap() {
 }
 
 function addressesMarkers(waypoints, addresses, color) {
+
+  console.log(addresses);
+  console.log(waypoints);
+
+  console.log('fsdf');
 
   function markerMaker(waypoint, address_index) {
 

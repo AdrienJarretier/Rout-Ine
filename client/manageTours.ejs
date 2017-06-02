@@ -204,8 +204,6 @@
 
           if (bestResult.trips) {
 
-            let markersColors = ["darkred", "blue", "green", "orange", "black", "purple"];
-
             let tours = bestResult.trips;
 
             cleanMap();
@@ -219,7 +217,7 @@
               [groupMarkers]: {}
             };
 
-            console.log(tours);
+            // console.log(tours);
 
             for (let i in tours) {
 
@@ -234,9 +232,9 @@
 
               routes.push(routeLayer);
 
-              console.log(tour);
+              console.log(bestResult);
 
-              let markers = addressesMarkers(tour.waypoints, tour.addresses, markersColors[i]);
+              let markers = addressesMarkers(tour.waypoints, bestResult.addresses, markersColors[i]);
 
               routes.push(markers);
 
