@@ -585,7 +585,7 @@ function getTour(tourNum, deliveryDate) {
 
         dbCon.end();
 
-        console.log(tourOnDate);
+        // console.log(tourOnDate);
 
         let names = [];
 

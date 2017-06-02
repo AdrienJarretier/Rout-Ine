@@ -20,6 +20,28 @@
       $(document).ready(function() {
 
         let tourDates;
+        let numberOfTours;
+
+        function requestRoute(tourNum, deliveryDate) {
+
+          return new Promise((resolve, reject) => {
+
+            let sdff = {
+              deliveryDay: deliveryDate.getDate(),
+              deliveryMonth: deliveryDate.getMonth(),
+              deliveryYear: deliveryDate.getFullYear(),
+              num: tourNum
+            };
+
+            $.get('downloadTrip', sdff, (res) => {
+
+              resolve(res);
+
+            })
+
+          });
+
+        }
 
         function fillDatesDropdown(displayOld) {
 
@@ -37,17 +59,19 @@
 
               link.click(function() {
 
-                $('#dropdownMenu1').text(link.text());
+                requestRoute(0, date)
+                  .then((res) => {
 
-                link.parent().siblings().each(function(index) {
-                  $(this).css('background-color', '');
-                });
 
-                link.parent().css('background-color', 'rgb(200,255,200)');
+                    $('#dropdownMenu1').text(link.text());
 
-                console.log(d);
+                    link.parent().siblings().each(function(index) {
+                      $(this).css('background-color', '');
+                    });
 
-                // $.post('bestFromGa', d, displayBest);
+                    link.parent().css('background-color', 'rgb(200,255,200)');
+
+                  });
 
               });
 
@@ -79,13 +103,19 @@
 
           tourDates = dates;
 
-          fillDatesDropdown($('#displayOld').prop('checked'));
+          $.get('getNumberOfTours', (res) => {
+
+            numberOfTours = res.numberOfTours;
+
+            fillDatesDropdown($('#displayOld').prop('checked'));
+
+          });
 
         });
 
         $.get('beneficiaries', function(fullAddressesData) {
 
-          console.log(fullAddressesData);
+          // console.log(fullAddressesData);
 
           for (let i = 1; i < fullAddressesData.features.length; ++i) {
 

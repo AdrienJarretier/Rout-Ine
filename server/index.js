@@ -243,8 +243,8 @@ function sendTour(req, res, fileNum) {
 
   let now = new Date();
 
-  console.log('req.query');
-  console.log(req.query);
+  // console.log('req.query');
+  // console.log(req.query);
 
   if (req.query.deliveryDay)
     now.setDate(req.query.deliveryDay);
