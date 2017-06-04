@@ -45,19 +45,26 @@ function extractNamesList(csvFile) {
  * lorsqu'elle est resolue retourne le tableau des adresses se trouvant dans la base de donnees
  * et ayant au moins 1 beneficiaire y habitant
  *
+ * @param {String} minDeliveryDate format 'YYY-MM-DD' see param maxDeliveryDate
+ * @param {String} maxDeliveryDate format 'YYY-MM-DD' if set return addresses to be delivered bettwend min and max delivery date
+ *
  * @returns {Promise} la promesse de retourner le tableau contenant les adresses.
  */
-function getAddresses() {
-
-  const sqlSelectAddresses =
-    ' SELECT distinct a.id, a.label, a.town, a.lat, a.lng, tour_assignment.index_in_tour, tour.* \n' +
-    ' FROM address a \n' +
-    ' LEFT JOIN tour_assignment ON a.id = tour_assignment.address_id \n' +
-    ' LEFT JOIN tour ON tour.num = tour_assignment.tour_num \n' +
-    ' RIGHT JOIN beneficiary ON a.id=beneficiary.address_id \n' +
-    ' WHERE a.id IS NOT NULL;';
+function getAddresses(minDeliveryDate, maxDeliveryDate) {
 
   return new Promise((resolve, reject) => {
+
+    let sqlSelectAddresses =
+      ' SELECT distinct a.id, a.label, a.town, a.lat, a.lng, tour_assignment.index_in_tour, tour.* \n' +
+      ' FROM address a \n' +
+      ' LEFT JOIN tour_assignment ON a.id = tour_assignment.address_id \n' +
+      ' LEFT JOIN tour ON tour.num = tour_assignment.tour_num \n' +
+      ' RIGHT JOIN beneficiary ON a.id=beneficiary.address_id \n' +
+      (maxDeliveryDate ? ' INNER JOIN beneficiary_delivery_date ON beneficiary.id = beneficiary_delivery_date.beneficiary_id ' : '') +
+      ' WHERE a.id IS NOT NULL ' + (maxDeliveryDate ? ' AND date BETWEEN ? AND ? ; ' : ' ; ');
+
+    if (maxDeliveryDate)
+      sqlSelectAddresses = mysql.format(sqlSelectAddresses, [minDeliveryDate, maxDeliveryDate]);
 
     let dbCon = mysql.createConnection(config.db);
     dbCon.query(
@@ -81,6 +88,13 @@ function getAddresses() {
   });
 
 }
+
+// getAddresses('2017-04-27', '2017-04-27')
+//   .then((v) => {
+
+//     console.log(v.length);
+
+//   });
 
 function getAddressesFromNames(names) {
 
