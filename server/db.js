@@ -50,7 +50,7 @@ function extractNamesList(csvFile) {
  *
  * @returns {Promise} la promesse de retourner le tableau contenant les adresses.
  */
-function getAddresses(minDeliveryDate, maxDeliveryDate) {
+function getAddresses(names, minDeliveryDate, maxDeliveryDate) {
 
   return new Promise((resolve, reject) => {
 
@@ -89,24 +89,7 @@ function getAddresses(minDeliveryDate, maxDeliveryDate) {
 
 }
 
-getAllDeliveriesDates()
-  .then((dates) => {
-
-    let lastIndex = dates.length - 1;
-    let firstIndex = lastIndex - 6;
-
-    if (firstIndex < 0)
-      firstIndex = 0;
-
-    getAddresses(dates[firstIndex].d, dates[lastIndex].d)
-      .then((v) => {
-
-        console.log(v.length);
-
-      });
-  });
-
-function getAddressesFromNames(names) {
+function getAddressesFromNames(names, minDeliveryDate, maxDeliveryDate) {
 
   return new Promise((resolve, reject) => {
 
@@ -380,16 +363,6 @@ function getPhones(benefRow, dbCon) {
   });
 }
 
-// extractNamesList('tour1and2.csv')
-//   .then(getFullAddressesData)
-//   .then((featColl) => {
-//     for (let feat of featColl.features) {
-//       console.log('---------------------------------------------------');
-//       console.log(feat);
-//       console.log(feat.properties.beneficiaries);
-//     }
-//   });
-
 /**
  * Retourne une promesse qui
  * lorsqu'elle est resolue retourne le GeoJson des adresses
@@ -399,7 +372,7 @@ function getPhones(benefRow, dbCon) {
  *
  * @returns {Promise} la promesse de retourner une FeatureCollection de AddressFeature.
  */
-function getFullAddressesData(namesList) {
+function getFullAddressesData(namesList, minDeliveryDate, maxDeliveryDate) {
 
   return new Promise((resolve, reject) => {
 
@@ -412,12 +385,13 @@ function getFullAddressesData(namesList) {
 
     if (namesList == undefined)
       addressesFunction = getAddresses;
-    else
+    else {
       addressesFunction = getAddressesFromNames;
+    }
 
     // Lorsque l'on obtient les adresses alors on va pour chaque adresse
     // recuperer les details des beneficiaires du portage de repas y habitant
-    addressesFunction(namesList)
+    addressesFunction(namesList, minDeliveryDate, maxDeliveryDate)
       .then((rows) => {
 
         let dbCon = mysql.createConnection(config.db);

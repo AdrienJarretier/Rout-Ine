@@ -794,57 +794,68 @@ exports.start = function(params, socket) {
       // db.extractNamesList('exampleTours/tour1and2.csv')
       //   .then(db.getFullAddressesData)
 
-      db.getFullAddressesData()
-        .then((addressesGeoJson) => {
 
-          // la premiere adresse est le depart, c'est l'adresse du ccas,
-          // elle est positionne en 1ere position par la fonction getAddresses du module db
-          let startAddress = addressesGeoJson.features[0];
-          let addresses = {
-            albi: new FeatureCollection([startAddress])
-          }
+      db.getAllDeliveriesDates()
+        .then((dates) => {
 
-          for (let i = 1; i < addressesGeoJson.features.length; ++i) {
-            let addr = addressesGeoJson.features[i];
-            if (addr.properties.town == '81000 ALBI') {
-              addresses.albi.push(addr);
-            }
-          }
+          let lastIndex = dates.length - 1;
+          let firstIndex = lastIndex - 6;
 
-          let totalAddresses = addresses.albi.length;
-          // idealNbElementsInSubset = totalAddresses / nbTrips;
+          if (firstIndex < 0)
+            firstIndex = 0;
 
-          return addresses;
+          db.getFullAddressesData(null, dates[firstIndex].d, dates[lastIndex].d)
+            .then((addressesGeoJson) => {
 
-        })
-        .then((addresses) => {
+              // la premiere adresse est le depart, c'est l'adresse du ccas,
+              // elle est positionne en 1ere position par la fonction getAddresses du module db
+              let startAddress = addressesGeoJson.features[0];
+              let addresses = {
+                albi: new FeatureCollection([startAddress])
+              }
 
-          console.log(addresses.albi.length + ' addresses');
-
-          let population = [];
-
-          for (let i = 0; i < POPULATION_SIZE; ++i) {
-
-            console.log('partitioning #' + i);
-
-            randomChunkify(addresses.albi, nbTrips).computeAllTrips()
-              .then((partition) => {
-
-                console.log('partitioning #' + i + ' trip computed, done');
-
-                population.push(partition);
-
-                if (population.length == POPULATION_SIZE) {
-
-                  applyPartitionsFitness(population);
-                  resolve(population);
+              for (let i = 1; i < addressesGeoJson.features.length; ++i) {
+                let addr = addressesGeoJson.features[i];
+                if (addr.properties.town == '81000 ALBI') {
+                  addresses.albi.push(addr);
                 }
+              }
 
-              });
-          }
+              let totalAddresses = addresses.albi.length;
+              // idealNbElementsInSubset = totalAddresses / nbTrips;
+
+              return addresses;
+
+            })
+            .then((addresses) => {
+
+              console.log(addresses.albi.length + ' addresses');
+
+              let population = [];
+
+              for (let i = 0; i < POPULATION_SIZE; ++i) {
+
+                console.log('partitioning #' + i);
+
+                randomChunkify(addresses.albi, nbTrips).computeAllTrips()
+                  .then((partition) => {
+
+                    console.log('partitioning #' + i + ' trip computed, done');
+
+                    population.push(partition);
+
+                    if (population.length == POPULATION_SIZE) {
+
+                      applyPartitionsFitness(population);
+                      resolve(population);
+                    }
+
+                  });
+              }
+
+            });
 
         });
-
     });
   }
 
