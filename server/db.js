@@ -265,7 +265,7 @@ function getBenefs(address_id, dbCon, names) {
         for (let benefRow of rows) {
 
           promises.push(
-            getDeliveriesDates(benefRow, dbCon)
+            getBenefDeliveriesDates(benefRow, dbCon)
             .then((dates) => {
 
               benefRow.deliveriesDates = dates;
@@ -303,7 +303,33 @@ function getBenefs(address_id, dbCon, names) {
 
 }
 
-function getDeliveriesDates(benefRow, dbCon) {
+
+function getAllDeliveriesDates() {
+
+  return new Promise((resolve, reject) => {
+
+    const sqlSelectFutureDates =
+      ' SELECT DISTINCT date ' +
+      ' FROM beneficiary_delivery_date ' +
+      ' ORDER BY date ASC ';
+
+    let dbCon = mysql.createConnection(common.serverConfig.db);
+
+    query(sqlSelectFutureDates, dbCon)
+      .then((v) => {
+
+        dbCon.end();
+
+        resolve(v);
+
+      });
+
+  });
+
+}
+exports.getAllDeliveriesDates = getAllDeliveriesDates;
+
+function getBenefDeliveriesDates(benefRow, dbCon) {
 
   const sqlSelectDeliveriesDates = ' SELECT date \n ' +
     ' FROM beneficiary_delivery_date \n ' +
@@ -540,29 +566,6 @@ function getNumberOfTours() {
 }
 
 
-function getFuturesDeliveriesDates() {
-
-  return new Promise((resolve, reject) => {
-
-    const sqlSelectFutureDates =
-      ' SELECT DISTINCT date ' +
-      ' FROM beneficiary_delivery_date ' +
-      ' ORDER BY date ASC ';
-
-    let dbCon = mysql.createConnection(common.serverConfig.db);
-
-    query(sqlSelectFutureDates, dbCon)
-      .then((v) => {
-
-        dbCon.end();
-
-        resolve(v);
-
-      });
-
-  });
-
-}
 
 
 
@@ -685,7 +688,6 @@ exports.clearTourAssignments = clearTourAssignments;
 exports.extractNamesList = extractNamesList;
 exports.getAddresses = getAddresses;
 exports.getFullAddressesData = getFullAddressesData;
-exports.getFuturesDeliveriesDates = getFuturesDeliveriesDates;
 exports.getNumberOfTours = getNumberOfTours;
 exports.insertTours = insertTours;
 exports.query = query;
