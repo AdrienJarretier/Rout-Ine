@@ -60,7 +60,7 @@ function getAddresses(minDeliveryDate, maxDeliveryDate) {
       ' LEFT JOIN tour_assignment ON a.id = tour_assignment.address_id \n' +
       ' LEFT JOIN tour ON tour.num = tour_assignment.tour_num \n' +
       ' RIGHT JOIN beneficiary ON a.id=beneficiary.address_id \n' +
-      (maxDeliveryDate ? ' INNER JOIN beneficiary_delivery_date ON beneficiary.id = beneficiary_delivery_date.beneficiary_id ' : '') +
+      (maxDeliveryDate ? ' INNER JOIN beneficiary_delivery_date ON beneficiary.id = beneficiary_delivery_date.beneficiary_id \n ' : '') +
       ' WHERE a.id IS NOT NULL ' + (maxDeliveryDate ? ' AND date BETWEEN ? AND ? ; ' : ' ; ');
 
     if (maxDeliveryDate)
@@ -89,12 +89,22 @@ function getAddresses(minDeliveryDate, maxDeliveryDate) {
 
 }
 
-// getAddresses('2017-04-27', '2017-04-27')
-//   .then((v) => {
+getAllDeliveriesDates()
+  .then((dates) => {
 
-//     console.log(v.length);
+    let lastIndex = dates.length - 1;
+    let firstIndex = lastIndex - 6;
 
-//   });
+    if (firstIndex < 0)
+      firstIndex = 0;
+
+    getAddresses(dates[firstIndex].d, dates[lastIndex].d)
+      .then((v) => {
+
+        console.log(v.length);
+
+      });
+  });
 
 function getAddressesFromNames(names) {
 
