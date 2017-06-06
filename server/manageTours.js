@@ -51,7 +51,6 @@ function fillDb(tours) {
           feat.properties.waypoint_index = w_index;
 
           if (j > 0) {
-            // console.log(feat.id, i, w_index);
             addressesToursAssignments.push([feat.id, i, w_index]);
           }
 
@@ -81,6 +80,7 @@ function getRoute(tourNum, deliveryDate) {
 
   return new Promise((resolve, reject) => {
 
+
     const TOUR_FILE = TARGET_DIRECTORY + '/tourTrip' + tourNum + '.json';
     const ADDRESSES_FILE = TARGET_DIRECTORY + '/tourAddresses' + tourNum + '.json';
 
@@ -104,12 +104,8 @@ function getRoute(tourNum, deliveryDate) {
         request(madeUrl, (error, response, body) => {
 
           if (error) {
-            console.log('error:', error); // Print the error if one occurred
-            console.log('statusCode:', response.statusCode); // Print the response status code if a response was received
           } else {
 
-            // console.log('response from ' + service + ' service');
-            // console.log(body);
             let parsedBody = JSON.parse(body);
 
             let route = parsedBody.routes[0];
@@ -157,14 +153,9 @@ function getOutsideTour(deliveryDate) {
         request(madeUrl, (error, response, body) => {
 
           if (error) {
-            console.log('error:', error); // Print the error if one occurred
-            console.log('statusCode:', response.statusCode); // Print the response status code if a response was received
           } else {
 
-            // console.log('response from ' + service + ' service');
-            // console.log(body);
             let parsedBody = JSON.parse(body);
-            // console.log(parsedBody);
 
             for (let i in addressesColl.features) {
 
@@ -205,6 +196,5 @@ exports.getTourByQueryNum = getTourByQueryNum;
 // getRoute(0, '2017-04-24')
 //   .then((files) => {
 
-//     console.log(files);
 
 //   });
