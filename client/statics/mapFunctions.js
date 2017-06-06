@@ -23,9 +23,7 @@ function initMap() {
 
 function addressesMarkers(addresses, color) {
 
-  console.log(addresses);
 
-  console.log('fsdf');
 
   function markerMaker(address_index) {
 
@@ -87,8 +85,6 @@ function addressesMarkers(addresses, color) {
 
   let markersLayer = L.layerGroup();
 
-  console.log('addresses :');
-  console.log(addresses);
 
   for (let i in addresses) {
 

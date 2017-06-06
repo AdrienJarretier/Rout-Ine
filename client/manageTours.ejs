@@ -21,6 +21,7 @@
 
         let tourDates;
         let numberOfTours;
+        let beneficiariesFullAddressesData;
 
         function requestTrip(tourNum, deliveryDate) {
 
@@ -104,6 +105,8 @@
 
                   });
 
+                fillAddressesListGroup(date);
+
               });
 
               $('#datesDropwdownMenu ul').append($('<li>').append(link));
@@ -144,12 +147,13 @@
 
         });
 
-        $.get('beneficiaries', function(fullAddressesData) {
+        function fillAddressesListGroup(date) {
 
+          $('#addressesListGroup').empty();
 
-          for (let i = 1; i < fullAddressesData.features.length; ++i) {
+          for (let i = 1; i < beneficiariesFullAddressesData.features.length; ++i) {
 
-            let addr = fullAddressesData.features[i].properties;
+            let addr = beneficiariesFullAddressesData.features[i].properties;
 
             let textParts = {
               address: addr.label + ', ' + addr.town,
@@ -162,24 +166,60 @@
 
             let benefsListGroup = $('<ul class="list-group" >');
 
+            let displayedBenef = 0;
+
             for (let benef of textParts.beneficiaries) {
 
-              let grouItemText =
-                benef.name +
-                '<br>' + benef.address_additional +
-                '<br>' + benef.note;
+              let foundDate = false;
 
-              let groupItem = $('<li class="list-group-item">').html(grouItemText);
-              benefsListGroup.append(groupItem);
+              if (date) {
+
+                let dateIso = date.toISOString();
+
+                for (let d of benef.deliveriesDates) {
+                  if (d.date == dateIso) {
+                    foundDate = true;
+                    break;
+                  }
+                }
+
+              }
+
+              if (!date || foundDate) {
+
+                let grouItemText =
+                  benef.name +
+                  '<br>' + benef.address_additional +
+                  '<br>' + benef.note;
+
+                let groupItem = $('<li class="list-group-item">').html(grouItemText);
+                benefsListGroup.append(groupItem);
+
+                ++displayedBenef;
+
+              }
 
             }
-            let panelBody = $('<div class="panel-body">').append(benefsListGroup);
 
-            panel.append(panelHeading).append(panelBody);
+            if (!date || displayedBenef > 0) {
 
-            $('#addressesListGroup').append($('<li class="list-group-item">').append(panel));
+              let panelBody = $('<div class="panel-body">').append(benefsListGroup);
+
+              panel.append(panelHeading).append(panelBody);
+
+              $('#addressesListGroup').append($('<li class="list-group-item">').append(panel));
+
+            }
 
           }
+
+        }
+
+        $.get('beneficiaries', function(fullAddressesData) {
+
+          beneficiariesFullAddressesData = fullAddressesData;
+
+          fillAddressesListGroup();
 
         });
 
