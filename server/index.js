@@ -186,6 +186,9 @@ let io = require('socket.io')(server);
 
 // le serveur attend les connexions sur le port 'config.port'
 server.listen(config.port, function() {
+
+  console.log('listening on *:' + common.serverConfig.port);
+
 });
 
 let schedulePath;
@@ -217,8 +220,7 @@ io.on('connection', function(socket) {
 
   });
 
-  socket.on('disconnect', function() {
-  });
+  socket.on('disconnect', function() {});
 });
 
 /**
@@ -243,7 +245,7 @@ function sendTour(req, res, fileNum) {
   if (req.query.deliveryDay)
     now.setDate(req.query.deliveryDay);
 
-  let dateString = now.getFullYear() + '-' + (now.getMonth()+1) + '-' + now.getDate();
+  let dateString = now.getFullYear() + '-' + (now.getMonth() + 1) + '-' + now.getDate();
 
   manageTours.getTourByQueryNum(req.query.num, dateString)
     .then((files) => {
