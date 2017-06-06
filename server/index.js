@@ -58,7 +58,6 @@ app.all('*', function(req, res, next) {
 
   };
 
-  // console.log(JSON.stringify(accessInfos, null, 2));
   common.log('access', accessInfos)
     .then(next);
 })
@@ -110,7 +109,6 @@ app.get('/testTournee', function(req, res) {
 
       promises.push(common.writeJson('tests/tourTrip' + i + '.json', trips[i].osrmTrip.trips[0]));
 
-      // console.log(trips[i].addresses);
 
       for (let j in trips[i].osrmTrip.waypoints) {
 
@@ -125,7 +123,6 @@ app.get('/testTournee', function(req, res) {
     Promise.all(promises)
       .then(() => {
 
-        console.log('sending trips to client');
         res.send(trips);
       });
 
@@ -147,7 +144,6 @@ app.post('/bestFromGa', function(req, res) {
 
   let date = req.body
 
-  console.log(date);
 
   const RESULT_FILE = 'bestTours' + date.date + '_' + date.time + '.json';
 
@@ -162,7 +158,6 @@ app.post('/bestFromGa', function(req, res) {
 
           const logMsg = 'impossible de trouver le fichier ' + RESULT_FILE;
 
-          console.log(logMsg);
           common.writeInLog(logMsg)
             .then(() => {
 
@@ -172,7 +167,6 @@ app.post('/bestFromGa', function(req, res) {
 
         } else {
 
-          console.log(err);
           common.writeInLog(err.Error)
             .then(() => {
 
@@ -192,14 +186,12 @@ let io = require('socket.io')(server);
 
 // le serveur attend les connexions sur le port 'config.port'
 server.listen(config.port, function() {
-  console.log('listening on *:' + config.port);
 });
 
 let schedulePath;
 
 io.on('connection', function(socket) {
 
-  console.log('connection');
 
   socket.on('parseSchedule', function() {
 
@@ -220,14 +212,12 @@ io.on('connection', function(socket) {
 
   socket.on('stop', function() {
 
-    console.log('stopping ga');
 
     ga2.stop();
 
   });
 
   socket.on('disconnect', function() {
-    console.log('disconnected');
   });
 });
 
@@ -243,7 +233,6 @@ function sendTour(req, res, fileNum) {
 
   let now = new Date();
 
-  // console.log('req.query');
 
   if (req.query.deliveryYear)
     now.setFullYear(req.query.deliveryYear);
@@ -255,7 +244,6 @@ function sendTour(req, res, fileNum) {
     now.setDate(req.query.deliveryDay);
 
   let dateString = now.getFullYear() + '-' + (now.getMonth()+1) + '-' + now.getDate();
-  console.log(dateString);
 
   manageTours.getTourByQueryNum(req.query.num, dateString)
     .then((files) => {
@@ -305,7 +293,6 @@ app.post('/tabletLogsUpload', upload.single('file'), function(req, res, next) {
   common.readFile(req.file.path)
     .then((msg) => {
 
-      console.log(msg);
 
       let logFile = common.serverConfig.logs.dir + '/' + common.serverConfig.logs.tablets;
 
@@ -365,7 +352,6 @@ app.get('/logs', function(req, res) {
 
         }, (e) => {
 
-          console.log(e);
 
         });
 

@@ -146,7 +146,6 @@
 
         $.get('beneficiaries', function(fullAddressesData) {
 
-          // console.log(fullAddressesData);
 
           for (let i = 1; i < fullAddressesData.features.length; ++i) {
 
@@ -217,7 +216,6 @@
               [groupMarkers]: {}
             };
 
-            // console.log(tours);
 
             for (let i in tours) {
 
@@ -232,8 +230,6 @@
 
               routes.push(routeLayer);
 
-              console.log('bestResult :');
-              console.log(bestResult);
 
               let markers = addressesMarkers(bestResult.addresses[i].features, markersColors[i]);
 
