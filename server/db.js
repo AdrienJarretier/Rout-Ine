@@ -522,6 +522,25 @@ function clearTourAssignments() {
 
 }
 
+function assignAddressesToTours(addressesToursAssignments, dbCon) {
+
+  return new Promise((resolve, reject) => {
+
+    const sqlInsertToursAssignments =
+      ' INSERT INTO tour_assignment(address_id, tour_num, index_in_tour) ' +
+      ' VALUES ? ; ';
+
+    const insertToursAssignments = mysql.format(sqlInsertToursAssignments, [addressesToursAssignments]);
+
+    console.log(insertToursAssignments);
+
+    resolve(query(insertToursAssignments, dbCon));
+
+  });
+
+}
+exports.assignAddressesToTours = assignAddressesToTours;
+
 function assignAddressToTour(addressId, tourNum, indexIntour, dbCon) {
 
   return new Promise((resolve, reject) => {
