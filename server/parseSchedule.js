@@ -83,6 +83,9 @@ function checkAssignmentTour(address_id, dbCon, lng, lat) {
               Promise.all(promises)
                 .then((precedingAndNext) => {
 
+                  console.log(tourAssignmentClosest);
+                  console.log(precedingAndNext);
+
                   let precedingTourAddress, coordsPreceding, distancePreceding;
 
                   if (precedingAndNext[0][0]) {
@@ -248,14 +251,14 @@ function updateAddress(address, dbCon) {
               dbQuery(insertAddress, dbCon)
                 .then((result) => {
 
-                  if (toursAlreadyComputed)
+                  if (toursAlreadyComputed) {
                     checkAssignmentTour(result.insertId, dbCon, coords.lng, coords.lat)
-                    .then(() => {
+                      .then(() => {
 
-                      resolve(result.insertId);
+                        resolve(result.insertId);
 
-                    });
-                  else
+                      });
+                  } else
                     resolve(result.insertId);
 
                 });
@@ -266,14 +269,14 @@ function updateAddress(address, dbCon) {
         // sinon on recupere l'id de l'adresse trouvee
         else {
 
-          if (toursAlreadyComputed)
+          if (toursAlreadyComputed) {
             checkAssignmentTour(rows[0].id, dbCon, rows[0].lng, rows[0].lat)
-            .then(() => {
+              .then(() => {
 
-              resolve(rows[0].id);
+                resolve(rows[0].id);
 
-            });
-          else
+              });
+          } else
             resolve(rows[0].id);
 
         }
@@ -326,7 +329,6 @@ function updatePhones(benefId, phones, dbCon) {
 //   .then((id) => {
 
 //     dbCon.end();
-//     console.log(id);
 
 //   });
 
@@ -414,7 +416,6 @@ function insertDeliveries(benefId, deliveriesDates, dbCon) {
 
       let parsedDate = utils.parseDateTime(d, 20);
 
-      // console.log(parsedDate);
 
       const insertDelivery = mysql.format(sqlInsertDelivery, [benefId, parsedDate]);
 
@@ -443,15 +444,12 @@ function updateBeneficiariesFromScheduleList(beneficiariesList, socket) {
 
   return new Promise((resolve, reject) => {
 
-    db.getAddresses()
+    db.albiAddresses()
       .then((addresses) => {
-
-        console.log('getNumberOfTours');
 
         db.getNumberOfTours()
           .then((nbTours) => {
 
-            console.log('nbTours : ' + nbTours);
 
             toursAlreadyComputed = nbTours > 0;
 

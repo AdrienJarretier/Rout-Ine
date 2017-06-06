@@ -42,6 +42,50 @@ function extractNamesList(csvFile) {
 
 /**
  * Retourne une promesse qui
+ * lorsqu'elle est resolue retourne le tableau des adresses se trouvant dans Albi
+ * et ayant au moins 1 beneficiaire y habitant avec leur affectation aux tournees
+ *
+ * @returns {Promise} la promesse de retourner le tableau contenant les adresses Albigeoises.
+ */
+function albiAddresses() {
+
+  return new Promise((resolve, reject) => {
+
+    const sqlSelectAlbiAddresses =
+      ' SELECT distinct a.id, a.label, a.town, a.lat, a.lng, tour_assignment.index_in_tour, tour_assignment.tour_num \n' +
+      ' FROM address a \n' +
+      ' LEFT JOIN tour_assignment ON a.id = tour_assignment.address_id \n' +
+      ' RIGHT JOIN beneficiary ON a.id=beneficiary.address_id \n' +
+      ' WHERE a.id IS NOT NULL AND town LIKE ? ; ';
+
+    const selectAlbiAddresses = mysql.format(sqlSelectAlbiAddresses, ['%Albi%']);
+
+    let dbCon = mysql.createConnection(config.db);
+    dbCon.query(
+      selectAlbiAddresses,
+      (err, rows, fields) => {
+
+        if (err) throw err
+
+        dbCon.end();
+
+        ccasAddress()
+          .then((ccasAddress) => {
+
+            rows.unshift(ccasAddress);
+
+            resolve(rows);
+          });
+
+      });
+
+  });
+
+}
+exports.albiAddresses = albiAddresses;
+
+/**
+ * Retourne une promesse qui
  * lorsqu'elle est resolue retourne le tableau des adresses se trouvant dans la base de donnees
  * et ayant au moins 1 beneficiaire y habitant
  *
