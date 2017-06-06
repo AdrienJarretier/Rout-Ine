@@ -7,7 +7,7 @@ const utils = require('./utils.js');
 
 const dbQuery = db.query;
 
-let addressesInDb;
+let addressesInDb = [];
 
 function checkAssignmentTour(address_id, dbCon, lng, lat) {
 
@@ -20,24 +20,28 @@ function checkAssignmentTour(address_id, dbCon, lng, lat) {
 
     const selectTourAssignment = mysql.format(sqlSelectTourAssignment, [address_id]);
 
-    dbQuery(selectAddress, dbCon)
+    dbQuery(selectTourAssignment, dbCon)
       .then((rows) => {
 
         if (rows.length == 0) {
 
           let distances = [];
-          let c1 = [lng, lat];
+          const coordsNewAddress = [lng, lat];
 
           for (let a of addressesInDb) {
 
-            let c2 = [a.lng, a.lat]
+            if (a) {
 
-            let dist = utils.distanceBetween(c1, c2);
+              const c2 = [a.lng, a.lat]
 
-            distances.push({
-              addressId: a.id
-              dist: dist
-            });
+              const dist = utils.distanceBetween(coordsNewAddress, c2);
+
+              distances.push({
+                addressId: a.id
+                dist: dist
+              });
+
+            }
 
           }
 
@@ -48,6 +52,153 @@ function checkAssignmentTour(address_id, dbCon, lng, lat) {
           });
 
           idClosestAddress = distances[0].addressId;
+
+          const selectClosestAddressTourAssignment = mysql.format(sqlSelectTourAssignment, [
+            idClosestAddress
+          ]);
+
+          dbQuery(selectClosestAddressTourAssignment, dbCon)
+            .then((rows) => {
+
+              const tourAssignmentClosest = rows[0];
+
+              const sqlSelectTourAssignmentWithIndex =
+                ' SELECT * ' +
+                ' FROM tour_assignment ' +
+                ' WHERE tour_num = ? AND index_in_tour = ? ; ';
+
+              const selectPreceding = mysql.format(sqlSelectTourAssignmentWithIndex, [
+                tourAssignmentClosest.tour_num, tourAssignmentClosest.index_in_tour - 1
+              ]);
+              const selectNext = mysql.format(sqlSelectTourAssignmentWithIndex, [
+                tourAssignmentClosest.tour_num, tourAssignmentClosest.index_in_tour + 1
+              ]);
+
+              let promises = [];
+
+              promises.push(dbQuery(selectPreceding, dbCon));
+              promises.push(dbQuery(selectNext, dbCon));
+
+              Promise.all(promises)
+                .then((precedingAndNext) => {
+
+                  const precedingTourAddress = addressesInDb[precedingAndNext[0][0].address_id];
+                  const coordsPreceding = [precedingTourAddress.lng, precedingTourAddress.lat];
+                  const distancePreceding = utils.distanceBetween(coordsNewAddress, coordsPreceding);
+
+                  const nextTourAddress = addressesInDb[precedingAndNext[1][0].address_id];
+                  const coordsNext = [nextTourAddress.lng, nextTourAddress.lat];
+                  const distanceNext = utils.distanceBetween(coordsNewAddress, coordsNext);
+
+                  const coordsCCAS = [addressesInDb[0].lng, addressesInDb[0].lat];
+                  const distanceCCAS = utils.distanceBetween(coordsNewAddress, coordsCCAS);
+
+                  const sqlUpdateTourAssignments =
+                    ' UPDATE tour_assignment ' +
+                    ' SET index_in_tour = index_in_tour + 1 ' +
+                    ' WHERE tour_num = ? AND index_in_tour > ? ' +
+                    ' ORDER BY index_in_tour DESC ; ';
+
+                  if (tourAssignmentClosest.index_in_tour == 1) {
+
+                    if (distanceCCAS < distanceNext) {
+
+                      const updateTourAssignments = mysql.format(sqlUpdateTourAssignments, [
+                        tourAssignmentClosest.tour_num, 0
+                      ]);
+
+                      dbQuery(updateTourAssignments, dbCon)
+                        .then(() => {
+
+                          resolve(assignAddressToTour(address_id, tourAssignmentClosest.tour_num,
+                            1, dbCon));
+
+                        });
+
+                    } else {
+
+                      const updateTourAssignments = mysql.format(sqlUpdateTourAssignments, [
+                        tourAssignmentClosest.tour_num, 1
+                      ]);
+
+                      dbQuery(updateTourAssignments, dbCon)
+                        .then(() => {
+
+                          resolve(assignAddressToTour(address_id, tourAssignmentClosest.tour_num,
+                            2, dbCon));
+
+                        });
+
+
+                    }
+
+                    // si next vide, notre adresse est la derniere de la tournee
+                  } else if (precedingAndNext[1].length == 0) {
+
+                    if (distancePreceding < distanceCCAS) {
+
+                      const updateTourAssignments = mysql.format(sqlUpdateTourAssignments, [
+                        tourAssignmentClosest.tour_num, tourAssignmentClosest.index_in_tour - 1
+                      ]);
+
+                      dbQuery(updateTourAssignments, dbCon)
+                        .then(() => {
+
+                          resolve(assignAddressToTour(address_id, tourAssignmentClosest.tour_num,
+                            tourAssignmentClosest.index_in_tour,
+                            dbCon));
+
+                        });
+
+                    } else {
+
+                      resolve(assignAddressToTour(address_id, tourAssignmentClosest.tour_num,
+                        tourAssignmentClosest.index_in_tour + 1,
+                        dbCon));
+
+                    }
+
+                  } else {
+
+                    if (distancePreceding < distanceNext) {
+
+                      const updateTourAssignments = mysql.format(sqlUpdateTourAssignments, [
+                        tourAssignmentClosest.tour_num, tourAssignmentClosest.index_in_tour -
+                        1
+                      ]);
+
+                      dbQuery(updateTourAssignments, dbCon)
+                        .then(() => {
+
+                          resolve(assignAddressToTour(address_id, tourAssignmentClosest.tour_num,
+                            tourAssignmentClosest.index_in_tour,
+                            dbCon));
+
+                        });
+
+
+                    } else {
+
+                      const updateTourAssignments = mysql.format(sqlUpdateTourAssignments, [
+                        tourAssignmentClosest.tour_num, tourAssignmentClosest.index_in_tour
+                      ]);
+
+                      dbQuery(updateTourAssignments, dbCon)
+                        .then(() => {
+
+                          resolve(assignAddressToTour(address_id, tourAssignmentClosest.tour_num,
+                            tourAssignmentClosest.index_in_tour + 1,
+                            dbCon));
+
+                        });
+
+                    }
+
+                  }
+
+                });
+
+            });
 
         }
 
@@ -277,9 +428,15 @@ function updateBeneficiariesFromScheduleList(beneficiariesList, socket) {
   return new Promise((resolve, reject) => {
 
     db.getAddresses()
-      .then((a) => {
+      .then((addresses) => {
 
-        addressesInDb = a;
+        addressesInDb;
+
+        for (let a of addresses) {
+
+          addressesInDb[a.id] = a;
+
+        }
 
         let dbCon = mysql.createConnection(common.serverConfig.db);
 
