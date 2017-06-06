@@ -122,7 +122,7 @@ function checkAssignmentTour(address_id, dbCon, lng, lat) {
                       dbQuery(updateTourAssignments, dbCon)
                         .then(() => {
 
-                          resolve(assignAddressToTour(address_id, tourAssignmentClosest.tour_num,
+                          resolve(db.assignAddressToTour(address_id, tourAssignmentClosest.tour_num,
                             1, dbCon));
 
                         });
@@ -136,7 +136,7 @@ function checkAssignmentTour(address_id, dbCon, lng, lat) {
                       dbQuery(updateTourAssignments, dbCon)
                         .then(() => {
 
-                          resolve(assignAddressToTour(address_id, tourAssignmentClosest.tour_num,
+                          resolve(db.assignAddressToTour(address_id, tourAssignmentClosest.tour_num,
                             2, dbCon));
 
                         });
@@ -156,7 +156,7 @@ function checkAssignmentTour(address_id, dbCon, lng, lat) {
                       dbQuery(updateTourAssignments, dbCon)
                         .then(() => {
 
-                          resolve(assignAddressToTour(address_id, tourAssignmentClosest.tour_num,
+                          resolve(db.assignAddressToTour(address_id, tourAssignmentClosest.tour_num,
                             tourAssignmentClosest.index_in_tour,
                             dbCon));
 
@@ -164,7 +164,7 @@ function checkAssignmentTour(address_id, dbCon, lng, lat) {
 
                     } else {
 
-                      resolve(assignAddressToTour(address_id, tourAssignmentClosest.tour_num,
+                      resolve(db.assignAddressToTour(address_id, tourAssignmentClosest.tour_num,
                         tourAssignmentClosest.index_in_tour + 1,
                         dbCon));
 
