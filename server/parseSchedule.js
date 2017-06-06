@@ -470,7 +470,7 @@ function updateBeneficiariesFromScheduleList(beneficiariesList, socket) {
 
               updateBenefsQ.push({ benef: benef, dbCon: dbCon }, function(values) {
 
-                socket.emit('percent', Math.round(i * 100 / names.length));
+                socket.emit('percent', i * 100 / names.length);
 
               });
 
