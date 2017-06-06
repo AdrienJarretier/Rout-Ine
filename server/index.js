@@ -255,6 +255,7 @@ function sendTour(req, res, fileNum) {
     now.setDate(req.query.deliveryDay);
 
   let dateString = now.getFullYear() + '-' + (now.getMonth()+1) + '-' + now.getDate();
+  console.log(dateString);
 
   manageTours.getTourByQueryNum(req.query.num, dateString)
     .then((files) => {
