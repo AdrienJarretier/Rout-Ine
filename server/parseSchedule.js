@@ -235,6 +235,8 @@ function updateAddress(address, dbCon) {
     dbQuery(selectAddress, dbCon)
       .then((rows) => {
 
+        const regexTownAlbi = /^[0-9 ]*albi[ .]*$/i;
+
         // si l'adresse est nouvelle on insere
         if (rows.length == 0) {
 
@@ -251,7 +253,7 @@ function updateAddress(address, dbCon) {
               dbQuery(insertAddress, dbCon)
                 .then((result) => {
 
-                  if (toursAlreadyComputed) {
+                  if (toursAlreadyComputed && address.town.match(regexTownAlbi)) {
                     checkAssignmentTour(result.insertId, dbCon, coords.lng, coords.lat)
                       .then(() => {
 
@@ -269,7 +271,7 @@ function updateAddress(address, dbCon) {
         // sinon on recupere l'id de l'adresse trouvee
         else {
 
-          if (toursAlreadyComputed) {
+          if (toursAlreadyComputed && address.town.match(regexTownAlbi)) {
             checkAssignmentTour(rows[0].id, dbCon, rows[0].lng, rows[0].lat)
               .then(() => {
 
