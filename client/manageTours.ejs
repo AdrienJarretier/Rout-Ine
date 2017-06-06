@@ -64,7 +64,7 @@
 
             let date = new Date(d);
 
-            if (displayOld || date >= new Date()) {
+            if (displayOld || date.getTime() >= Date.now() - 86400000) {
 
               let link = $('<a href="#">').text('tournée du ' + date.toLocaleDateString());
 
