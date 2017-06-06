@@ -24,7 +24,11 @@ const TARGET_DIRECTORY = common.serverConfig.resultsFolder;
 function fillDb(tours) {
 
   db.clearTourAssignments()
-    .then(db.insertTours(tours.length))
+    .then(() => {
+
+      return db.insertTours(tours.length);
+
+    })
     .then(() => {
 
       for (let i in tours) {
@@ -46,8 +50,10 @@ function fillDb(tours) {
 
           feat.properties.waypoint_index = w_index;
 
-          if (j > 0)
+          if (j > 0) {
+            // console.log(feat.id, i, w_index);
             promises.push(db.assignAddressToTour(feat.id, i, w_index, dbCon));
+          }
 
         }
 
@@ -59,7 +65,8 @@ function fillDb(tours) {
 
       }
 
-    });
+    })
+    ;
 }
 exports.fillDb = fillDb;
 
