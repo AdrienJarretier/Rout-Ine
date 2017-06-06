@@ -7,6 +7,56 @@ const utils = require('./utils.js');
 
 const dbQuery = db.query;
 
+let addressesInDb;
+
+function checkAssignmentTour(address_id, dbCon, lng, lat) {
+
+  return new Promise((resolve, reject) => {
+
+    const sqlSelectTourAssignment =
+      ' SELECT * ' +
+      ' FROM tour_assignment ' +
+      ' WHERE address_id = ? ; ';
+
+    const selectTourAssignment = mysql.format(sqlSelectTourAssignment, [address_id]);
+
+    dbQuery(selectAddress, dbCon)
+      .then((rows) => {
+
+        if (rows.length == 0) {
+
+          let distances = [];
+          let c1 = [lng, lat];
+
+          for (let a of addressesInDb) {
+
+            let c2 = [a.lng, a.lat]
+
+            let dist = utils.distanceBetween(c1, c2);
+
+            distances.push({
+              addressId: a.id
+              dist: dist
+            });
+
+          }
+
+          distances.sort((a, b) => {
+
+            return a.dist - b.dist;
+
+          });
+
+          idClosestAddress = distances[0].addressId;
+
+        }
+
+      });
+
+  });
+
+}
+
 function updateAddress(address, dbCon) {
 
   return new Promise((resolve, reject) => {
@@ -37,7 +87,12 @@ function updateAddress(address, dbCon) {
               dbQuery(insertAddress, dbCon)
                 .then((result) => {
 
-                  resolve(result.insertId);
+                  checkAssignmentTour(result.insertId, dbCon, coords.lng, coords.lat)
+                    .then(() => {
+
+                      resolve(result.insertId);
+
+                    });
 
                 });
 
@@ -47,7 +102,12 @@ function updateAddress(address, dbCon) {
         // sinon on recupere l'id de l'adresse trouvee
         else {
 
-          resolve(rows[0].id);
+          checkAssignmentTour(rows[0].id, dbCon, rows[0].lng, rows[0].lat)
+            .then(() => {
+
+              resolve(rows[0].id);
+
+            });
 
         }
 
@@ -216,34 +276,41 @@ function updateBeneficiariesFromScheduleList(beneficiariesList, socket) {
 
   return new Promise((resolve, reject) => {
 
-    let dbCon = mysql.createConnection(common.serverConfig.db);
+    db.getAddresses()
+      .then((a) => {
 
-    let names = Object.keys(beneficiariesList.beneficiaries);
+        addressesInDb = a;
 
-    for (let i in names) {
+        let dbCon = mysql.createConnection(common.serverConfig.db);
 
-      let name = names[i];
+        let names = Object.keys(beneficiariesList.beneficiaries);
 
-      let benef = beneficiariesList.beneficiaries[name];
+        for (let i in names) {
 
-      updateBenefsQ.push({ benef: benef, dbCon: dbCon }, function(values) {
+          let name = names[i];
 
-        socket.emit('percent', Math.round(i * 100 / names.length));
+          let benef = beneficiariesList.beneficiaries[name];
 
-      });
+          updateBenefsQ.push({ benef: benef, dbCon: dbCon }, function(values) {
 
-    }
+            socket.emit('percent', Math.round(i * 100 / names.length));
 
-    updateBenefsQ.drain = function() {
+          });
 
-      dbCon.end();
+        }
 
-      socket.emit('scheduleProcessed');
+        updateBenefsQ.drain = function() {
 
-      resolve('all beneficiaries have been processed');
-    };
+          dbCon.end();
 
-  })
+          socket.emit('scheduleProcessed');
+
+          resolve('all beneficiaries have been processed');
+        };
+
+      })
+
+  });
 
 }
 
