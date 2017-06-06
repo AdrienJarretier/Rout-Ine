@@ -40,7 +40,7 @@ function fillDb(tours) {
 
         let dbCon = mysql.createConnection(common.serverConfig.db);
 
-        let promises = [];
+        let addressesToursAssignments = [];
 
         for (let j in tour.addresses.features) {
 
@@ -52,12 +52,12 @@ function fillDb(tours) {
 
           if (j > 0) {
             // console.log(feat.id, i, w_index);
-            promises.push(db.assignAddressToTour(feat.id, i, w_index, dbCon));
+            addressesToursAssignments.push([feat.id, i, w_index]);
           }
 
         }
 
-        Promise.all(promises)
+        db.assignAddressesToTours(addressesToursAssignments, dbCon)
           .then(() => { dbCon.end(); });
 
         // common.writeFile(TARGET_DIRECTORY + '/tourAddresses' + i + '.json', JSON.stringify(
@@ -65,8 +65,7 @@ function fillDb(tours) {
 
       }
 
-    })
-    ;
+    });
 }
 exports.fillDb = fillDb;
 
