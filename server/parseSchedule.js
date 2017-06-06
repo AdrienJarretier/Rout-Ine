@@ -438,50 +438,54 @@ function updateBeneficiariesFromScheduleList(beneficiariesList, socket) {
     db.getAddresses()
       .then((addresses) => {
 
+        console.log('getNumberOfTours');
+
         db.getNumberOfTours()
-        then((nbTours) => {
+          .then((nbTours) => {
 
-          toursAlreadyComputed = nbTours > 0;
+            console.log('nbTours : ' + nbTours);
 
-          if (toursAlreadyComputed) {
+            toursAlreadyComputed = nbTours > 0;
 
-            addressesInDb;
+            if (toursAlreadyComputed) {
 
-            for (let a of addresses) {
+              addressesInDb;
 
-              addressesInDb[a.id] = a;
+              for (let a of addresses) {
+
+                addressesInDb[a.id] = a;
+
+              }
+            }
+
+            let dbCon = mysql.createConnection(common.serverConfig.db);
+
+            let names = Object.keys(beneficiariesList.beneficiaries);
+
+            for (let i in names) {
+
+              let name = names[i];
+
+              let benef = beneficiariesList.beneficiaries[name];
+
+              updateBenefsQ.push({ benef: benef, dbCon: dbCon }, function(values) {
+
+                socket.emit('percent', Math.round(i * 100 / names.length));
+
+              });
 
             }
-          }
 
-          let dbCon = mysql.createConnection(common.serverConfig.db);
+            updateBenefsQ.drain = function() {
 
-          let names = Object.keys(beneficiariesList.beneficiaries);
+              dbCon.end();
 
-          for (let i in names) {
+              socket.emit('scheduleProcessed');
 
-            let name = names[i];
+              resolve('all beneficiaries have been processed');
+            };
 
-            let benef = beneficiariesList.beneficiaries[name];
-
-            updateBenefsQ.push({ benef: benef, dbCon: dbCon }, function(values) {
-
-              socket.emit('percent', Math.round(i * 100 / names.length));
-
-            });
-
-          }
-
-          updateBenefsQ.drain = function() {
-
-            dbCon.end();
-
-            socket.emit('scheduleProcessed');
-
-            resolve('all beneficiaries have been processed');
-          };
-
-        });
+          });
 
       });
 

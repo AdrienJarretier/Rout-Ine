@@ -60,7 +60,9 @@ function getAddresses(names, minDeliveryDate, maxDeliveryDate) {
       ' LEFT JOIN tour_assignment ON a.id = tour_assignment.address_id \n' +
       ' LEFT JOIN tour ON tour.num = tour_assignment.tour_num \n' +
       ' RIGHT JOIN beneficiary ON a.id=beneficiary.address_id \n' +
-      (maxDeliveryDate ? ' INNER JOIN beneficiary_delivery_date ON beneficiary.id = beneficiary_delivery_date.beneficiary_id \n ' : '') +
+      (maxDeliveryDate ?
+        ' INNER JOIN beneficiary_delivery_date ON beneficiary.id = beneficiary_delivery_date.beneficiary_id \n ' :
+        '') +
       ' WHERE a.id IS NOT NULL ' + (maxDeliveryDate ? ' AND date BETWEEN ? AND ? ; ' : ' ; ');
 
     if (maxDeliveryDate)
@@ -541,7 +543,10 @@ function getNumberOfTours() {
 
         dbCon.end();
 
-        resolve(v[0]['max(tour_num)'] + 1);
+        if (v[0]['max(tour_num)'] != null)
+          resolve(v[0]['max(tour_num)'] + 1);
+        else
+          resolve(0);
 
       });
 
@@ -624,7 +629,9 @@ function getOutsideAddresses(deliveryDate) {
       ' WHERE date = ? \n ' +
       ' AND town NOT LIKE ? \n ; ';
 
-    const selectNamesOutsideAlbiOnDate = mysql.format(sqlSelectNamesOutsideAlbiOnDate, [deliveryDate, '%Albi%']);
+    const selectNamesOutsideAlbiOnDate = mysql.format(sqlSelectNamesOutsideAlbiOnDate, [deliveryDate,
+      '%Albi%'
+    ]);
 
     let dbCon = mysql.createConnection(common.serverConfig.db);
 
