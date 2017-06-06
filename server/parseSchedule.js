@@ -83,13 +83,21 @@ function checkAssignmentTour(address_id, dbCon, lng, lat) {
               Promise.all(promises)
                 .then((precedingAndNext) => {
 
-                  const precedingTourAddress = addressesInDb[precedingAndNext[0][0].address_id];
-                  const coordsPreceding = [precedingTourAddress.lng, precedingTourAddress.lat];
-                  const distancePreceding = utils.distanceBetween(coordsNewAddress, coordsPreceding);
+                  let precedingTourAddress, coordsPreceding, distancePreceding;
 
-                  const nextTourAddress = addressesInDb[precedingAndNext[1][0].address_id];
-                  const coordsNext = [nextTourAddress.lng, nextTourAddress.lat];
-                  const distanceNext = utils.distanceBetween(coordsNewAddress, coordsNext);
+                  if (precedingAndNext[0][0]) {
+                    precedingTourAddress = addressesInDb[precedingAndNext[0][0].address_id];
+                    coordsPreceding = [precedingTourAddress.lng, precedingTourAddress.lat];
+                    distancePreceding = utils.distanceBetween(coordsNewAddress, coordsPreceding);
+                  }
+
+                  let nextTourAddress, coordsNext, distanceNext;
+
+                  if (precedingAndNext[1][0]) {
+                    nextTourAddress = addressesInDb[precedingAndNext[1][0].address_id];
+                    coordsNext = [nextTourAddress.lng, nextTourAddress.lat];
+                    distanceNext = utils.distanceBetween(coordsNewAddress, coordsNext);
+                  }
 
                   const coordsCCAS = [addressesInDb[0].lng, addressesInDb[0].lat];
                   const distanceCCAS = utils.distanceBetween(coordsNewAddress, coordsCCAS);
@@ -236,8 +244,6 @@ function updateAddress(address, dbCon) {
               const insertAddress = mysql.format(sqlInsertAddress, [address.label, address.town,
                 coords.lat, coords.lng
               ]);
-
-                console.log(insertAddress);
 
               dbQuery(insertAddress, dbCon)
                 .then((result) => {
