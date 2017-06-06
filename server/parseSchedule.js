@@ -8,6 +8,7 @@ const utils = require('./utils.js');
 const dbQuery = db.query;
 
 let addressesInDb = [];
+let toursAlreadyComputed = false;
 
 function checkAssignmentTour(address_id, dbCon, lng, lat) {
 
@@ -37,7 +38,7 @@ function checkAssignmentTour(address_id, dbCon, lng, lat) {
               const dist = utils.distanceBetween(coordsNewAddress, c2);
 
               distances.push({
-                addressId: a.id
+                addressId: a.id,
                 dist: dist
               });
 
@@ -200,7 +201,8 @@ function checkAssignmentTour(address_id, dbCon, lng, lat) {
 
             });
 
-        }
+        } else
+          resolve();
 
       });
 
@@ -238,12 +240,15 @@ function updateAddress(address, dbCon) {
               dbQuery(insertAddress, dbCon)
                 .then((result) => {
 
-                  checkAssignmentTour(result.insertId, dbCon, coords.lng, coords.lat)
+                  if (toursAlreadyComputed)
+                    checkAssignmentTour(result.insertId, dbCon, coords.lng, coords.lat)
                     .then(() => {
 
                       resolve(result.insertId);
 
                     });
+                  else
+                    resolve(result.insertId);
 
                 });
 
@@ -253,12 +258,15 @@ function updateAddress(address, dbCon) {
         // sinon on recupere l'id de l'adresse trouvee
         else {
 
-          checkAssignmentTour(rows[0].id, dbCon, rows[0].lng, rows[0].lat)
+          if (toursAlreadyComputed)
+            checkAssignmentTour(rows[0].id, dbCon, rows[0].lng, rows[0].lat)
             .then(() => {
 
               resolve(rows[0].id);
 
             });
+          else
+            resolve(rows[0].id);
 
         }
 
@@ -430,42 +438,52 @@ function updateBeneficiariesFromScheduleList(beneficiariesList, socket) {
     db.getAddresses()
       .then((addresses) => {
 
-        addressesInDb;
+        db.getNumberOfTours()
+        then((nbTours) => {
 
-        for (let a of addresses) {
+          toursAlreadyComputed = nbTours > 0;
 
-          addressesInDb[a.id] = a;
+          if (toursAlreadyComputed) {
 
-        }
+            addressesInDb;
 
-        let dbCon = mysql.createConnection(common.serverConfig.db);
+            for (let a of addresses) {
 
-        let names = Object.keys(beneficiariesList.beneficiaries);
+              addressesInDb[a.id] = a;
 
-        for (let i in names) {
+            }
+          }
 
-          let name = names[i];
+          let dbCon = mysql.createConnection(common.serverConfig.db);
 
-          let benef = beneficiariesList.beneficiaries[name];
+          let names = Object.keys(beneficiariesList.beneficiaries);
 
-          updateBenefsQ.push({ benef: benef, dbCon: dbCon }, function(values) {
+          for (let i in names) {
 
-            socket.emit('percent', Math.round(i * 100 / names.length));
+            let name = names[i];
 
-          });
+            let benef = beneficiariesList.beneficiaries[name];
 
-        }
+            updateBenefsQ.push({ benef: benef, dbCon: dbCon }, function(values) {
 
-        updateBenefsQ.drain = function() {
+              socket.emit('percent', Math.round(i * 100 / names.length));
 
-          dbCon.end();
+            });
 
-          socket.emit('scheduleProcessed');
+          }
 
-          resolve('all beneficiaries have been processed');
-        };
+          updateBenefsQ.drain = function() {
 
-      })
+            dbCon.end();
+
+            socket.emit('scheduleProcessed');
+
+            resolve('all beneficiaries have been processed');
+          };
+
+        });
+
+      });
 
   });
 
