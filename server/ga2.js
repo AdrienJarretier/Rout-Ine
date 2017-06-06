@@ -20,6 +20,7 @@ exports.start = function(params, socket) {
 
   let nbTrips = params.nbTrips;
   const POPULATION_SIZE = 168;
+  // const POPULATION_SIZE = 16;
   const STOP_TIME = params.stopTime * 60;
 
   // le nombre minimal et max d'elements dans un sous ensemble pour qu'il soit accepté

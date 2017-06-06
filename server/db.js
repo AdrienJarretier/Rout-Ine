@@ -461,6 +461,8 @@ function getFullAddressesData(namesList, minDeliveryDate, maxDeliveryDate) {
 
 function insertTours(numberOfTours) {
 
+  console.log('calling insertTours');
+
   return new Promise((resolve, reject) => {
 
     const sqlInsertTour = ' INSERT IGNORE INTO tour(num) VALUES(?) ; ';
@@ -480,8 +482,13 @@ function insertTours(numberOfTours) {
     Promise.all(promises)
       .then(() => {
 
-        dbCon.end();
-        resolve();
+        dbCon.end(function(err) {
+
+          console.log('resolving insertTours');
+
+          resolve();
+
+        });
 
       });
 
@@ -501,9 +508,13 @@ function clearTourAssignments() {
     query(sqlDeleteAssignments, dbCon)
       .then((v) => {
 
-        dbCon.end();
+        dbCon.end(function(err) {
 
-        resolve(v);
+          console.log('resolving clearTourAssignments');
+
+          resolve(v);
+
+        });
 
       });
 
