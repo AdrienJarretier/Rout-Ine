@@ -182,8 +182,8 @@ function getAddressesFromNames(names, minDeliveryDate, maxDeliveryDate) {
 
     }
 
-    resolve([]);
-
+    if (names.length == 0)
+      resolve([]);
 
   });
 
