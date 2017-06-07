@@ -186,7 +186,12 @@ class Beneficiary {
 
     this.addDelivery(parsedLine);
 
-    this.note = parsedLine[8];
+    this.diet = parsedLine[8];
+
+    this.note = parsedLine[9];
+
+    console.log('parsedLine[9]');
+    console.log(parsedLine[9]);
 
   }
 
