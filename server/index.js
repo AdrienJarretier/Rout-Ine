@@ -12,6 +12,9 @@ const common = require('./common.js');
 const express = require('express');
 var multer = require('multer')
 const mysql = require('mysql');
+
+const passport = require('passport');
+const LdapStrategy = require('passport-ldapauth');
 /*
   chargement des différents modules :
   - express (web framework)
@@ -27,16 +30,38 @@ const testTournee = require('./testTournee.js');
 const utils = require('./utils.js');
 
 
+passport.use(new LdapStrategy(common.LdapStrategy_OPTS,
+  function(user, done) {
+
+    console.log(user.memberOf);
+
+
+
+    return done(null, { fsdfsd: 'opjopj' });
+
+  }
+));
+
+
 var upload = multer({ dest: 'uploads/' });
 
 let app = express();
 // The app object conventionally denotes the Express application
 
-app.set('views', __dirname + '/../client');
-app.set('view engine', 'ejs');
+app.use(passport.initialize());
 
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
+
+app.post('/login', passport.authenticate('ldapauth', { session: false }), function(req, res) {
+  console.log('req');
+  console.log(req.user);
+  res.send({ status: 'ok' });
+});
+
+app.set('views', __dirname + '/../client');
+app.set('view engine', 'ejs');
+
 
 const config = common.serverConfig;
 
