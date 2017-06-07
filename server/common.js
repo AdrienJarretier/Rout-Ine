@@ -18,6 +18,9 @@ var iconv = require('iconv-lite');
 
 const serverConfig = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 
+const LdapStrategy_OPTS = JSON.parse(fs.readFileSync('configLdap.json', 'utf8'));
+exports.LdapStrategy_OPTS = LdapStrategy_OPTS;
+
 function readFile(file, encoding) {
 
   return new Promise((resolve, reject) => {
