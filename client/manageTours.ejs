@@ -296,8 +296,13 @@
 
               routes.push(markers);
 
-              overlayMaps[groupTours][markersColors[i]] = routeLayer;
-              overlayMaps[groupMarkers][markersColors[i]] = markers;
+              let legend = {
+                color: '<i class="layer-control-legend" style="background:' + markersColors[i] + ';"></i>',
+                text: ' Tournée ' + (parseInt(i) + 1)
+              };
+
+              overlayMaps[groupTours][legend.color + legend.text] = routeLayer;
+              overlayMaps[groupMarkers][legend.color + legend.text] = markers;
 
             }
 
