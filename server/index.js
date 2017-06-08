@@ -7,7 +7,7 @@ strict mode code can sometimes be made to run faster than identical code that's 
 Third, strict mode prohibits some syntax likely to be defined in future versions of ECMAScript.
 */
 
-const BYPASS_AUTHENTICATION = false;
+const BYPASS_AUTHENTICATION = true;
 
 var bodyParser = require('body-parser');
 const common = require('./common.js');
@@ -126,9 +126,6 @@ if (!BYPASS_AUTHENTICATION)
  * @param {Integer} fileNum le numero du fichier, 0 pour route, 1 pour adresses
  */
 function sendTour(req, res, fileNum) {
-
-  console.log(req.method);
-  console.log(req.body);
 
   let options = {
     root: __dirname
