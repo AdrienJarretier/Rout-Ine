@@ -122,7 +122,15 @@
 
             let reportLogs = logs['tablets.log'];
 
-            for (let logDate in reportLogs) {
+            let keys = Object.keys(reportLogs);
+
+            keys.sort((a, b) => {
+
+              return (new Date(b)).getTime() - (new Date(a)).getTime();
+
+            });
+
+            for (let logDate of keys) {
 
               let d = new Date(logDate);
               let dateStr = d.toLocaleString();
