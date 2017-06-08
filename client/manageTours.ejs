@@ -256,6 +256,15 @@
 
           console.log(dietsCount);
 
+          $('#dietsSummary thead tr').empty();
+            $('#dietsSummary thead tr').append($('<th>').text('Repas'));
+
+          for(let tourNum in dietsCount) {
+
+            $('#dietsSummary thead tr').append($('<th>').text('Tournée ' + (1+parseInt(tourNum))));
+
+          }
+
         }
 
         $.get('beneficiaries', function(fullAddressesData) {
@@ -407,9 +416,9 @@
 
                   <div class="row">
 <table id="dietsSummary" class="table table-hover">
-<th></th>
-<tr><td>gsdgsg</td><td>gsdgsg</td></tr>
-<tr><td>gsdgsg</td><td>gsdgsg</td></tr>
+<thead><tr></tr></thead>
+<tbody><tr><td>Normaux</td></tr><tr><td>Régimes</td></tr></tbody>
+<tfoot><tr><td>Total</td></tr></tfoot>
 </table>
                   </div>
 
