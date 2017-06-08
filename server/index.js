@@ -7,7 +7,7 @@ strict mode code can sometimes be made to run faster than identical code that's 
 Third, strict mode prohibits some syntax likely to be defined in future versions of ECMAScript.
 */
 
-const BYPASS_AUTHENTICATION = true;
+const BYPASS_AUTHENTICATION = false;
 
 var bodyParser = require('body-parser');
 const common = require('./common.js');
@@ -28,17 +28,22 @@ const manageTours = require('./manageTours.js');
 const parseSchedule = require('./parseSchedule.js');
 const utils = require('./utils.js');
 
-let passport, LdapStrategy;
+const passport = require('passport');
+const LdapStrategy = require('passport-ldapauth');
+
+passport.use('ldap', new LdapStrategy(common.LdapStrategy_OPTS.ldap,
+  function(user, done) {
+
+    console.log('valid');
+    return done(null, user);
+
+  }
+));
 
 if (!BYPASS_AUTHENTICATION) {
 
-  passport = require('passport');
-  LdapStrategy = require('passport-ldapauth');
-
   passport.use('ad', new LdapStrategy(common.LdapStrategy_OPTS.ad,
     function(user, done) {
-
-      console.log('valid');
 
       let memberOfAuthorizedGroup = false;
 
@@ -72,10 +77,10 @@ app.use(session({
   cookie: { secure: false }
 }))
 
+app.use(passport.initialize());
 
 if (!BYPASS_AUTHENTICATION) {
 
-  app.use(passport.initialize());
   app.use(passport.session());
 
   passport.serializeUser(function(user, done) {
@@ -111,6 +116,56 @@ if (!BYPASS_AUTHENTICATION)
 
     res.redirect('/');
   });
+
+
+
+
+
+/**
+ *
+ * @param {Integer} fileNum le numero du fichier, 0 pour route, 1 pour adresses
+ */
+function sendTour(req, res, fileNum) {
+
+  let options = {
+    root: __dirname
+  };
+
+  let now = new Date();
+
+
+  if (req.query.deliveryYear)
+    now.setFullYear(req.query.deliveryYear);
+
+  if (req.query.deliveryMonth)
+    now.setMonth(req.query.deliveryMonth);
+
+  if (req.query.deliveryDay)
+    now.setDate(req.query.deliveryDay);
+
+  let dateString = now.getFullYear() + '-' + (now.getMonth() + 1) + '-' + now.getDate();
+
+  manageTours.getTourByQueryNum(req.query.num, dateString)
+    .then((files) => {
+
+      res.sendFile(files[fileNum], options);
+
+    });
+
+}
+
+app.post('/downloadAddresses', passport.authenticate('ldap', { session: false }), function(req, res) {
+
+  sendTour(req, res, 1);
+
+});
+
+app.post('/downloadTrip', passport.authenticate('ldap', { session: false }), function(req, res) {
+
+  sendTour(req, res, 0);
+
+});
+
 
 
 app.use(express.static(__dirname + '/../client/statics/notSecure'));
@@ -276,38 +331,6 @@ io.on('connection', function(socket) {
   socket.on('disconnect', function() {});
 });
 
-/**
- *
- * @param {Integer} fileNum le numero du fichier, 0 pour route, 1 pour adresses
- */
-function sendTour(req, res, fileNum) {
-
-  let options = {
-    root: __dirname
-  };
-
-  let now = new Date();
-
-
-  if (req.query.deliveryYear)
-    now.setFullYear(req.query.deliveryYear);
-
-  if (req.query.deliveryMonth)
-    now.setMonth(req.query.deliveryMonth);
-
-  if (req.query.deliveryDay)
-    now.setDate(req.query.deliveryDay);
-
-  let dateString = now.getFullYear() + '-' + (now.getMonth() + 1) + '-' + now.getDate();
-
-  manageTours.getTourByQueryNum(req.query.num, dateString)
-    .then((files) => {
-
-      res.sendFile(files[fileNum], options);
-
-    });
-
-}
 
 app.get('/getNumberOfTours', function(req, res) {
 
