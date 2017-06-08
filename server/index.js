@@ -167,6 +167,51 @@ app.post('/downloadTrip', passport.authenticate('ldap', { session: false }), fun
 });
 
 
+app.post('/tabletLogsUpload', upload.single('file'), passport.authenticate('ldap', { session: false }),
+  function(req, res) {
+
+    common.readFile(req.file.path)
+      .then((msg) => {
+
+
+        let logFile = common.serverConfig.logs.dir + '/' + common.serverConfig.logs.tablets;
+
+        common.readFile(logFile)
+          .then((content) => {
+
+              return JSON.parse(content);
+
+            },
+            (err) => {
+
+              return {};
+
+            })
+          .then((logObject) => {
+
+            Object.assign(logObject, JSON.parse(msg));
+
+            return common.writeJson(logFile, logObject);
+
+          })
+          .then(res.send('ok'))
+
+      });
+
+  });
+
+
+app.post('/getNumberOfTours', passport.authenticate('ldap', { session: false }), function(req, res) {
+
+  db.getNumberOfTours()
+    .then((numberOfTours) => {
+
+      res.send({ numberOfTours: numberOfTours });
+
+    });
+
+});
+
 
 app.use(express.static(__dirname + '/../client/statics/notSecure'));
 app.use(express.static(__dirname + '/../client/statics/notSecure/extLibs'));
@@ -363,38 +408,6 @@ app.post('/scheduleUpload', upload.single('inputSchedule'), function(req, res, n
   schedulePath = req.file.path;
 
   res.send('ok');
-
-});
-
-app.post('/tabletLogsUpload', upload.single('file'), function(req, res, next) {
-
-  common.readFile(req.file.path)
-    .then((msg) => {
-
-
-      let logFile = common.serverConfig.logs.dir + '/' + common.serverConfig.logs.tablets;
-
-      common.readFile(logFile)
-        .then((content) => {
-
-            return JSON.parse(content);
-
-          },
-          (err) => {
-
-            return {};
-
-          })
-        .then((logObject) => {
-
-          Object.assign(logObject, JSON.parse(msg));
-
-          return common.writeJson(logFile, logObject);
-
-        })
-        .then(res.send('ok'))
-
-    });
 
 });
 
