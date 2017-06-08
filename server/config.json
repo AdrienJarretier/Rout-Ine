@@ -8,7 +8,7 @@
   },
   "osrm": {
     "protocol": "http",
-    "ip": "10.1.0.205",
+    "ip": "127.0.0.1",
     "port": 5000
   },
   "resultsFolder": "gaResults",
@@ -18,5 +18,6 @@
     "infos": "infos.log",
     "tablets": "tablets.log",
     "access": "access.log"
-  }
+  },
+  "requireLdapAuth": false
 }
