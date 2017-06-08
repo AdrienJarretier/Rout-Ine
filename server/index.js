@@ -26,7 +26,6 @@ const osrm = require('./osrm.js');
 const ga2 = require('./ga2.js');
 const manageTours = require('./manageTours.js');
 const parseSchedule = require('./parseSchedule.js');
-const testTournee = require('./testTournee.js');
 const utils = require('./utils.js');
 
 
@@ -118,40 +117,6 @@ app.get('/beneficiaries', function(req, res) {
     res.send(addressesGeoJson);
   });
 
-});
-
-
-// repondre aux requetes get sur l'url /trip
-app.get('/testTournee', function(req, res) {
-
-  // quand la Promise retournee par getTrip est realisee
-  // on peut envoyer le tableau de donnees au client{
-  testTournee.getAll().then((trips) => {
-
-    let promises = [];
-
-    for (let i in trips) {
-
-      promises.push(common.writeJson('tests/tourTrip' + i + '.json', trips[i].osrmTrip.trips[0]));
-
-
-      for (let j in trips[i].osrmTrip.waypoints) {
-
-        trips[i].addresses.features[j].setWaypointIndex(trips[i].osrmTrip.waypoints[j].waypoint_index);
-
-      }
-
-      promises.push(common.writeJson('tests/tourAddresses' + i + '.json', trips[i].addresses));
-
-    }
-
-    Promise.all(promises)
-      .then(() => {
-
-        res.send(trips);
-      });
-
-  });
 });
 
 app.get('/listResults', function(req, res) {
