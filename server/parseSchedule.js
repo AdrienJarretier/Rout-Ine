@@ -83,9 +83,6 @@ function checkAssignmentTour(address_id, dbCon, lng, lat) {
               Promise.all(promises)
                 .then((precedingAndNext) => {
 
-                  console.log(tourAssignmentClosest);
-                  console.log(precedingAndNext);
-
                   let precedingTourAddress, coordsPreceding, distancePreceding;
 
                   if (precedingAndNext[0][0]) {
