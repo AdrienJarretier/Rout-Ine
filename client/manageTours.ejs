@@ -256,12 +256,52 @@
 
           console.log(dietsCount);
 
-          $('#dietsSummary thead tr').empty();
-          $('#dietsSummary thead tr').append($('<th>').text('Repas'));
+          $('#dietsSummary thead').find("th:gt(0)").remove();
+          $('#dietsSummary tbody').empty();
+          $('#dietsSummary tfoot').find("td:gt(0)").remove();
 
           for (let tourNum in dietsCount) {
 
             $('#dietsSummary thead tr').append($('<th>').text('Tournée ' + (1 + parseInt(tourNum))));
+
+            // for (let i = 0; i < rows.length; ++i) {
+            //   rows[i].append($('<td>').text(dietsCount[dietCode]));
+            // }
+            // rows[rows.length - 1]
+
+            // row.append($('<td>').text(dietsCount[dietCode]));
+
+            // $('#dietsSummary tbody').append(row);
+
+          }
+
+          let dietMapCodeName = {
+            '10': 'Normaux',
+            '20': 'Régimes'
+          };
+
+          let totaux = [];
+          totaux.length = dietsCount.length;
+          totaux.fill(0);
+
+          console.log(totaux);
+
+          for (let dietCode in dietMapCodeName) {
+
+            let row = $('<tr>').append($('<td>').text(dietMapCodeName[dietCode]));
+
+            for (let tourNum in dietsCount) {
+              row.append($('<td>').text(dietsCount[tourNum][dietCode]));
+              totaux[tourNum] += dietsCount[tourNum][dietCode];
+            }
+
+            $('#dietsSummary tbody').append(row);
+
+          }
+
+          for (let total of totaux) {
+
+            $('#dietsSummary tfoot tr').append($('<td>').text(total));
 
           }
 
@@ -409,15 +449,11 @@
             <div class="row">
               <table id="dietsSummary" class="table table-hover">
                 <thead>
-                  <tr></tr>
+                  <tr>
+                    <th>Repas</th>
+                  </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td>Normaux</td>
-                  </tr>
-                  <tr>
-                    <td>Régimes</td>
-                  </tr>
                 </tbody>
                 <tfoot>
                   <tr>
