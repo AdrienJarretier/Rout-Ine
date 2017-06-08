@@ -131,6 +131,8 @@ app.all('*', function(req, res, next) {
   if (!BYPASS_AUTHENTICATION)
     accessInfos.authorized = (req.session.passport && req.session.passport.user ? true + ' (' +
       req.session.passport.user + ')' : false);
+  else
+    accessInfos.authorized = 'authentication disabled';
 
   common.log('access', accessInfos, 1)
     .then(() => {
