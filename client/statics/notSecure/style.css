@@ -68,7 +68,6 @@ header {
     overflow-y: scroll;
 }
 
-
 .layer-control-legend {
     display: inline-block;
     width: 14px;
@@ -84,3 +83,7 @@ header {
     background-color: #d7eac1;
 
 }*/
+
+#dietsSummary tfoot {
+    font-weight: bold;
+}
