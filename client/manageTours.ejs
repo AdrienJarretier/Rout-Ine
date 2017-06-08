@@ -257,11 +257,11 @@
           console.log(dietsCount);
 
           $('#dietsSummary thead tr').empty();
-            $('#dietsSummary thead tr').append($('<th>').text('Repas'));
+          $('#dietsSummary thead tr').append($('<th>').text('Repas'));
 
-          for(let tourNum in dietsCount) {
+          for (let tourNum in dietsCount) {
 
-            $('#dietsSummary thead tr').append($('<th>').text('Tournée ' + (1+parseInt(tourNum))));
+            $('#dietsSummary thead tr').append($('<th>').text('Tournée ' + (1 + parseInt(tourNum))));
 
           }
 
@@ -368,70 +368,69 @@
       <div id="error" class="alert alert-danger" role="alert">Une erreur inconnue s'est produite, se référer aux logs serveur</div>
       <div class="container-fluid">
         <div class="row" id="main">
-
-
-        <div class="col-xs-8">
-
-
-                  <div class="row">
-
-                <div class="col-xs-3">
-                  <div class="row">
-                    <div class="col-xs-12">
-                      <label for="displayOld">Voir anciennes </label>
-                      <input type="checkbox" id="displayOld">
+          <div class="col-xs-8">
+            <div class="row">
+              <div class="col-xs-3">
+                <div class="row">
+                  <div class="col-xs-12">
+                    <label for="displayOld">Voir anciennes </label>
+                    <input type="checkbox" id="displayOld">
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-xs-12">
+                    <div id="errorNoData" class="alert alert-danger" role="alert">Aucun résultat, lancer un <a href="tourComputing">Calcul des tournées</a></div>
+                    <div id="datesDropwdownMenu" class="dropdown">
+                      <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                        Sélection tournée
+                        <span class="caret"></span>
+                      </button>
+                      <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                      </ul>
                     </div>
                   </div>
-                  <div class="row">
-                    <div class="col-xs-12">
-                      <div id="errorNoData" class="alert alert-danger" role="alert">Aucun résultat, lancer un <a href="tourComputing">Calcul des tournées</a></div>
-                      <div id="datesDropwdownMenu" class="dropdown">
-                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                          Sélection tournée
-                          <span class="caret"></span>
-                        </button>
-                        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                        </ul>
-                      </div>
+                </div>
+                <div class="row">
+                  <div class="progress" id="loadTourProgress">
+                    <div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
+                      <span class="sr-only">0% Complete</span>
                     </div>
                   </div>
-                  <div class="row">
-                    <div class="progress" id="loadTourProgress">
-                      <div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
-                        <span class="sr-only">0% Complete</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <p id="infos">
-                    </p>
-                  </div>
                 </div>
-                <div class="col-xs-9">
-                  <div id="map"></div>
+                <div class="row">
+                  <p id="infos">
+                  </p>
                 </div>
-
-                </div>
-
-
-                  <div class="row">
-<table id="dietsSummary" class="table table-hover">
-<thead><tr></tr></thead>
-<tbody><tr><td>Normaux</td></tr><tr><td>Régimes</td></tr></tbody>
-<tfoot><tr><td>Total</td></tr></tfoot>
-</table>
-                  </div>
-
-        </div>
-
-
-                <div class="col-xs-4">
-                  <ul class="list-group" id="addressesListGroup">
-                  </ul>
-                </div>
-
-
-
+              </div>
+              <div class="col-xs-9">
+                <div id="map"></div>
+              </div>
+            </div>
+            <div class="row">
+              <table id="dietsSummary" class="table table-hover">
+                <thead>
+                  <tr></tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Normaux</td>
+                  </tr>
+                  <tr>
+                    <td>Régimes</td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td>Total</td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+          <div class="col-xs-4">
+            <ul class="list-group" id="addressesListGroup">
+            </ul>
+          </div>
         </div>
       </div>
   </body>
