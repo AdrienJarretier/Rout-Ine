@@ -84,14 +84,25 @@ app.set('view engine', 'ejs');
 const config = common.serverConfig;
 
 
-app.get('/login', function(req, res) {
-  res.render('login');
-});
+// app.get('/login', function(req, res) {
+
+//   console.log('req.originalUrl');
+//   console.log(req.originalUrl);
+
+//   res.render('login');
+// });
 
 app.post('/login', passport.authenticate('ldapauth', { session: true }), function(req, res) {
-  // req.session.userAuthorized = true;
+
+  console.log('req.originalUrl');
+  console.log(req.originalUrl);
+
   res.send({ status: 'ok' });
 });
+
+
+app.use(express.static(__dirname + '/../client/statics/notSecure'));
+app.use(express.static(__dirname + '/../client/statics/notSecure/extLibs'));
 
 
 app.all('*', function(req, res, next) {
@@ -113,7 +124,7 @@ app.all('*', function(req, res, next) {
       if (req.session.passport && req.session.passport.user)
         next();
       else
-        res.redirect('login');
+        res.render('login');
 
     });
 });
