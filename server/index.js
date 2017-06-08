@@ -92,12 +92,9 @@ const config = common.serverConfig;
 //   res.render('login');
 // });
 
-app.post('/login', passport.authenticate('ldapauth', { session: true }), function(req, res) {
+app.post('/validateLogin', passport.authenticate('ldapauth', { session: true }), function(req, res) {
 
-  console.log('req.originalUrl');
-  console.log(req.originalUrl);
-
-  res.send({ status: 'ok' });
+  res.redirect('/');
 });
 
 
