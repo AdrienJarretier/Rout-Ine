@@ -122,12 +122,10 @@ exports.currentDateTimeString = currentDateTimeString;
 
 function parseDateTime(dateTimeString, century) {
 
-  // console.log(dateTimeString);
 
   var regexp = /(.*)\/(.*)\/(.*)/;
   var matches_array = dateTimeString.match(regexp);
 
-  // console.log(matches_array);
 
   // parseDateTime.match(//);
 
@@ -190,8 +188,6 @@ class Beneficiary {
 
     this.note = parsedLine[9];
 
-    console.log('parsedLine[9]');
-    console.log(parsedLine[9]);
 
   }
 
@@ -228,13 +224,9 @@ function parseSchedule(schedule) {
 
   return new Promise((resolve, reject) => {
 
-    // console.log(schedule);
-
-    // console.log(typeof(schedule));
 
     schedule = schedule.replace(/\s*\n/g, '\n');
 
-    // console.log(schedule);
 
     const csvParse = require('csv-parse');
 
@@ -246,7 +238,6 @@ function parseSchedule(schedule) {
 
     csvParse(schedule, options, function(err, output) {
 
-      // console.log(output[0]);
 
       resolve(new BeneficiariesList(output));
 
