@@ -10,8 +10,9 @@ Third, strict mode prohibits some syntax likely to be defined in future versions
 var bodyParser = require('body-parser');
 const common = require('./common.js');
 const express = require('express');
-var multer = require('multer')
+var multer = require('multer');
 const mysql = require('mysql');
+const session = require('express-session');
 
 const passport = require('passport');
 const LdapStrategy = require('passport-ldapauth');
@@ -55,14 +56,26 @@ var upload = multer({ dest: 'uploads/' });
 let app = express();
 // The app object conventionally denotes the Express application
 
+app.use(session({
+  secret: 'keyboard cat',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false }
+}))
+
 app.use(passport.initialize());
+app.use(passport.session());
+
+passport.serializeUser(function(user, done) {
+  done(null, user.name);
+});
+
+passport.deserializeUser(function(name, done) {
+  done(null, name);
+});
 
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
-
-app.post('/login', passport.authenticate('ldapauth', { session: false }), function(req, res) {
-  res.send({ status: 'ok' });
-});
 
 app.set('views', __dirname + '/../client');
 app.set('view engine', 'ejs');
@@ -71,10 +84,14 @@ app.set('view engine', 'ejs');
 const config = common.serverConfig;
 
 
+app.get('/login', function(req, res) {
+  res.render('login');
+});
 
-
-// sert le contenu statique de ../client, c.a.d les pages web.
-app.use(express.static(__dirname + '/../client/statics'));
+app.post('/login', passport.authenticate('ldapauth', { session: true }), function(req, res) {
+  // req.session.userAuthorized = true;
+  res.send({ status: 'ok' });
+});
 
 
 app.all('*', function(req, res, next) {
@@ -84,13 +101,26 @@ app.all('*', function(req, res, next) {
     ip: req.ip,
     method: req.method,
     path: req.path,
-    query: req.query
+    query: req.query,
+    authorized: (req.session.passport && req.session.passport.user ? true + ' (' + req.session.passport
+      .user + ')' : false)
 
   };
 
   common.log('access', accessInfos)
-    .then(next);
-})
+    .then(() => {
+
+      if (req.session.passport && req.session.passport.user)
+        next();
+      else
+        res.redirect('login');
+
+    });
+});
+
+
+// sert le contenu statique de ../client, c.a.d les pages web.
+app.use(express.static(__dirname + '/../client/statics'));
 
 
 app.get('/', function(req, res) {
