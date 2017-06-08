@@ -127,6 +127,9 @@ if (!BYPASS_AUTHENTICATION)
  */
 function sendTour(req, res, fileNum) {
 
+  console.log(req.method);
+  console.log(req.body);
+
   let options = {
     root: __dirname
   };
@@ -145,7 +148,14 @@ function sendTour(req, res, fileNum) {
 
   let dateString = now.getFullYear() + '-' + (now.getMonth() + 1) + '-' + now.getDate();
 
-  manageTours.getTourByQueryNum(req.query.num, dateString)
+  let num;
+
+  if (req.method == 'POST')
+    num = req.body.num;
+  else
+    num = req.query.num;
+
+  manageTours.getTourByQueryNum(num, dateString)
     .then((files) => {
 
       res.sendFile(files[fileNum], options);
