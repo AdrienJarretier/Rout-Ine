@@ -7,6 +7,8 @@ strict mode code can sometimes be made to run faster than identical code that's 
 Third, strict mode prohibits some syntax likely to be defined in future versions of ECMAScript.
 */
 
+const BYPASS_AUTHENTICATION = true;
+
 var bodyParser = require('body-parser');
 const common = require('./common.js');
 const express = require('express');
@@ -30,8 +32,10 @@ const parseSchedule = require('./parseSchedule.js');
 const utils = require('./utils.js');
 
 
-passport.use(new LdapStrategy(common.LdapStrategy_OPTS,
+passport.use('ad', new LdapStrategy(common.LdapStrategy_OPTS.ldap,
   function(user, done) {
+
+    console.log('valid');
 
     let memberOfAuthorizedGroup = false;
 
@@ -92,7 +96,7 @@ const config = common.serverConfig;
 //   res.render('login');
 // });
 
-app.post('/validateLogin', passport.authenticate('ldapauth', { session: true }), function(req, res) {
+app.post('/validateLogin', passport.authenticate('ad', { session: true }), function(req, res) {
 
   res.redirect('/');
 });
@@ -118,7 +122,7 @@ app.all('*', function(req, res, next) {
   common.log('access', accessInfos, 1)
     .then(() => {
 
-      if (req.session.passport && req.session.passport.user)
+      if ((req.session.passport && req.session.passport.user) || BYPASS_AUTHENTICATION)
         next();
       else
         res.render('login');
