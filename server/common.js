@@ -18,6 +18,9 @@ var iconv = require('iconv-lite');
 
 const serverConfig = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 
+const LdapStrategy_OPTS = JSON.parse(fs.readFileSync('configLdap.json', 'utf8'));
+exports.LdapStrategy_OPTS = LdapStrategy_OPTS;
+
 function readFile(file, encoding) {
 
   return new Promise((resolve, reject) => {
@@ -75,9 +78,14 @@ function writeJson(file, object) {
  *
  * @param {String} type The type of log, see config.json logs
  * @param {Object} object with custom informations to write, stringified before writing
+ * @param {Integer} precision la decimale de seconde de precision pour le log, entre 0 et 3
+ * @param {Bool} notOverwrite si vrai les logs qui arrivent exactment en meme temps ne seront pas ecrases
  *
  */
-function log(type, msgObject) {
+function log(type, msgObject, precision, notOverwrite) {
+
+  if(!precision)
+    precision = 3;
 
   let logFile = serverConfig.logs.dir + '/' + serverConfig.logs[type];
 
@@ -96,10 +104,20 @@ function log(type, msgObject) {
 
       let currentDate = new Date();
 
-      let dateTimeString = currentDate.toLocaleDateString() + '_' + currentDate.toLocaleTimeString() + '.' +
-        currentDate.getMilliseconds();
+      let millis = Math.round(currentDate.getMilliseconds() / Math.pow(10, 3 - precision));
 
-      logObject[dateTimeString] = msgObject;
+      let dateTimeString = currentDate.toLocaleDateString() + '_' + currentDate.toLocaleTimeString() + (
+        precision > 0 ? '.' + millis : '');
+
+      if (notOverwrite) {
+        let keyIncrement = 1;
+
+        while (logObject[dateTimeString + keyIncrement])
+          ++keyIncrement;
+
+        dateTimeString += keyIncrement;
+      } else if (!logObject[dateTimeString])
+        logObject[dateTimeString] = msgObject;
 
       return writeJson(logFile, logObject);
 
@@ -118,17 +136,9 @@ exports.writeInLog = writeInLog;
 
 function logError(errorMsg) {
 
-  return log('errors', info);
+  return log('errors', info, null, true);
 }
 exports.logError = logError;
-
-
-
-function logInfo(info) {
-
-  return log('infos', info);
-}
-exports.logInfo = logInfo;
 
 
 

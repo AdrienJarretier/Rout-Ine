@@ -2,3 +2,4 @@
 node_modules/*
 exampleTours/*
 uploads/*
+configLdap.json

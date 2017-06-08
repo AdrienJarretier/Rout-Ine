@@ -7,11 +7,14 @@ strict mode code can sometimes be made to run faster than identical code that's 
 Third, strict mode prohibits some syntax likely to be defined in future versions of ECMAScript.
 */
 
+const BYPASS_AUTHENTICATION = true;
+
 var bodyParser = require('body-parser');
 const common = require('./common.js');
 const express = require('express');
-var multer = require('multer')
+var multer = require('multer');
 const mysql = require('mysql');
+const session = require('express-session');
 /*
   chargement des différents modules :
   - express (web framework)
@@ -23,8 +26,38 @@ const osrm = require('./osrm.js');
 const ga2 = require('./ga2.js');
 const manageTours = require('./manageTours.js');
 const parseSchedule = require('./parseSchedule.js');
-const testTournee = require('./testTournee.js');
 const utils = require('./utils.js');
+
+let passport, LdapStrategy;
+
+if (!BYPASS_AUTHENTICATION) {
+
+  passport = require('passport');
+  LdapStrategy = require('passport-ldapauth');
+
+  passport.use('ad', new LdapStrategy(common.LdapStrategy_OPTS.ad,
+    function(user, done) {
+
+      console.log('valid');
+
+      let memberOfAuthorizedGroup = false;
+
+      for (let g of user.memberOf) {
+
+        if (g.match(/.*GG_LOG_78010_USER.*/i))
+          memberOfAuthorizedGroup = true;
+
+      }
+
+      if (memberOfAuthorizedGroup)
+        return done(null, user);
+      else
+        return done(null, false, { message: 'Vous n\'êtes pas dans un groupe autorisé à utiliser Rout-Ine.' });
+
+    }
+  ));
+
+}
 
 
 var upload = multer({ dest: 'uploads/' });
@@ -32,19 +65,56 @@ var upload = multer({ dest: 'uploads/' });
 let app = express();
 // The app object conventionally denotes the Express application
 
-app.set('views', __dirname + '/../client');
-app.set('view engine', 'ejs');
+app.use(session({
+  secret: 'keyboard cat',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false }
+}))
+
+
+if (!BYPASS_AUTHENTICATION) {
+
+  app.use(passport.initialize());
+  app.use(passport.session());
+
+  passport.serializeUser(function(user, done) {
+    done(null, user.name);
+  });
+
+  passport.deserializeUser(function(name, done) {
+    done(null, name);
+  });
+
+}
 
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
+app.set('views', __dirname + '/../client');
+app.set('view engine', 'ejs');
+
+
 const config = common.serverConfig;
 
 
+// app.get('/login', function(req, res) {
+
+//   console.log('req.originalUrl');
+//   console.log(req.originalUrl);
+
+//   res.render('login');
+// });
+
+if (!BYPASS_AUTHENTICATION)
+  app.post('/validateLogin', passport.authenticate('ad', { session: true }), function(req, res) {
+
+    res.redirect('/');
+  });
 
 
-// sert le contenu statique de ../client, c.a.d les pages web.
-app.use(express.static(__dirname + '/../client/statics'));
+app.use(express.static(__dirname + '/../client/statics/notSecure'));
+app.use(express.static(__dirname + '/../client/statics/notSecure/extLibs'));
 
 
 app.all('*', function(req, res, next) {
@@ -58,9 +128,26 @@ app.all('*', function(req, res, next) {
 
   };
 
-  common.log('access', accessInfos)
-    .then(next);
-})
+  if (!BYPASS_AUTHENTICATION)
+    accessInfos.authorized = (req.session.passport && req.session.passport.user ? true + ' (' +
+      req.session.passport.user + ')' : false);
+  else
+    accessInfos.authorized = 'authentication disabled';
+
+  common.log('access', accessInfos, 1)
+    .then(() => {
+
+      if ((req.session.passport && req.session.passport.user) || BYPASS_AUTHENTICATION)
+        next();
+      else
+        res.render('login');
+
+    });
+});
+
+
+// sert le contenu statique de ../client, c.a.d les pages web.
+app.use(express.static(__dirname + '/../client/statics'));
 
 
 app.get('/', function(req, res) {
@@ -93,40 +180,6 @@ app.get('/beneficiaries', function(req, res) {
     res.send(addressesGeoJson);
   });
 
-});
-
-
-// repondre aux requetes get sur l'url /trip
-app.get('/testTournee', function(req, res) {
-
-  // quand la Promise retournee par getTrip est realisee
-  // on peut envoyer le tableau de donnees au client{
-  testTournee.getAll().then((trips) => {
-
-    let promises = [];
-
-    for (let i in trips) {
-
-      promises.push(common.writeJson('tests/tourTrip' + i + '.json', trips[i].osrmTrip.trips[0]));
-
-
-      for (let j in trips[i].osrmTrip.waypoints) {
-
-        trips[i].addresses.features[j].setWaypointIndex(trips[i].osrmTrip.waypoints[j].waypoint_index);
-
-      }
-
-      promises.push(common.writeJson('tests/tourAddresses' + i + '.json', trips[i].addresses));
-
-    }
-
-    Promise.all(promises)
-      .then(() => {
-
-        res.send(trips);
-      });
-
-  });
 });
 
 app.get('/listResults', function(req, res) {

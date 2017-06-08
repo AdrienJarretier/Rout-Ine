@@ -29,7 +29,8 @@ function geocode_google(address) {
 
   return new Promise((resolve, reject) => {
 
-    const requestUrl = "http://maps.googleapis.com/maps/api/geocode/json?sensor=false&address=" + encodeURIComponent(address);
+    const requestUrl = "http://maps.googleapis.com/maps/api/geocode/json?sensor=false&address=" +
+      encodeURIComponent(address);
 
     requestsQ.push({ requestUrl: requestUrl }, function(response) {
 
@@ -41,7 +42,8 @@ function geocode_google(address) {
 
         let coordinates = response.results[0].geometry.location;
 
-        common.logInfo('adresse [' + address + '] géocodée avec google, (' + coordinates['lat'] + ', ' + coordinates['lng'] + ')');
+        common.log('infos', 'adresse [' + address + '] géocodée avec google, (' + coordinates['lat'] +
+          ', ' + coordinates['lng'] + ')', null, true);
 
         resolve(coordinates);
 
@@ -99,7 +101,9 @@ function geocode_ban(address) {
         'lng': bestFeature.geometry.coordinates[0]
       };
 
-      common.logInfo('adresse [' + address + '] géocodée avec ban (score ' + bestScore + '), (' + coordinates['lat'] + ', ' + coordinates['lng'] + '), autres possibilités : ' + (i - 1));
+      common.log('infos', 'adresse [' + address + '] géocodée avec ban (score ' + bestScore + '), (' +
+        coordinates['lat'] + ', ' + coordinates['lng'] + '), autres possibilités : ' + (i - 1),
+        null, true);
 
       resolve(coordinates);
     });
@@ -136,7 +140,7 @@ function geocode(addressObject) {
         },
         (error) => {
 
-          common.logInfo(error);
+          common.log('infos', error, null, true);
 
           return geocode_ban(address);
 
