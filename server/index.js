@@ -15,9 +15,6 @@ const express = require('express');
 var multer = require('multer');
 const mysql = require('mysql');
 const session = require('express-session');
-
-const passport = require('passport');
-const LdapStrategy = require('passport-ldapauth');
 /*
   chargement des différents modules :
   - express (web framework)
@@ -31,28 +28,36 @@ const manageTours = require('./manageTours.js');
 const parseSchedule = require('./parseSchedule.js');
 const utils = require('./utils.js');
 
+let passport, LdapStrategy;
 
-passport.use('ad', new LdapStrategy(common.LdapStrategy_OPTS.ldap,
-  function(user, done) {
+if (!BYPASS_AUTHENTICATION) {
 
-    console.log('valid');
+  passport = require('passport');
+  LdapStrategy = require('passport-ldapauth');
 
-    let memberOfAuthorizedGroup = false;
+  passport.use('ad', new LdapStrategy(common.LdapStrategy_OPTS.ad,
+    function(user, done) {
 
-    for (let g of user.memberOf) {
+      console.log('valid');
 
-      if (g.match(/.*GG_LOG_78010_USER.*/i))
-        memberOfAuthorizedGroup = true;
+      let memberOfAuthorizedGroup = false;
+
+      for (let g of user.memberOf) {
+
+        if (g.match(/.*GG_LOG_78010_USER.*/i))
+          memberOfAuthorizedGroup = true;
+
+      }
+
+      if (memberOfAuthorizedGroup)
+        return done(null, user);
+      else
+        return done(null, false, { message: 'Vous n\'êtes pas dans un groupe autorisé à utiliser Rout-Ine.' });
 
     }
+  ));
 
-    if (memberOfAuthorizedGroup)
-      return done(null, user);
-    else
-      return done(null, false, { message: 'Vous n\'êtes pas dans un groupe autorisé à utiliser Rout-Ine.' });
-
-  }
-));
+}
 
 
 var upload = multer({ dest: 'uploads/' });
@@ -67,16 +72,21 @@ app.use(session({
   cookie: { secure: false }
 }))
 
-app.use(passport.initialize());
-app.use(passport.session());
 
-passport.serializeUser(function(user, done) {
-  done(null, user.name);
-});
+if (!BYPASS_AUTHENTICATION) {
 
-passport.deserializeUser(function(name, done) {
-  done(null, name);
-});
+  app.use(passport.initialize());
+  app.use(passport.session());
+
+  passport.serializeUser(function(user, done) {
+    done(null, user.name);
+  });
+
+  passport.deserializeUser(function(name, done) {
+    done(null, name);
+  });
+
+}
 
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
@@ -96,10 +106,11 @@ const config = common.serverConfig;
 //   res.render('login');
 // });
 
-app.post('/validateLogin', passport.authenticate('ad', { session: true }), function(req, res) {
+if (!BYPASS_AUTHENTICATION)
+  app.post('/validateLogin', passport.authenticate('ad', { session: true }), function(req, res) {
 
-  res.redirect('/');
-});
+    res.redirect('/');
+  });
 
 
 app.use(express.static(__dirname + '/../client/statics/notSecure'));
@@ -113,11 +124,13 @@ app.all('*', function(req, res, next) {
     ip: req.ip,
     method: req.method,
     path: req.path,
-    query: req.query,
-    authorized: (req.session.passport && req.session.passport.user ? true + ' (' + req.session.passport
-      .user + ')' : false)
+    query: req.query
 
   };
+
+  if (!BYPASS_AUTHENTICATION)
+    accessInfos.authorized = (req.session.passport && req.session.passport.user ? true + ' (' +
+      req.session.passport.user + ')' : false);
 
   common.log('access', accessInfos, 1)
     .then(() => {
