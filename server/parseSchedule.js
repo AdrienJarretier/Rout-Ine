@@ -354,11 +354,11 @@ function updateBenef(benef, dbCon) {
             if (rows.length == 0) {
 
               const sqlInsertBenef =
-                ' INSERT INTO beneficiary(name, birthdate, address_additional, address_id, note) \n' +
-                ' VALUES(?,?,?,?,?) ; ';
+                ' INSERT INTO beneficiary(name, birthdate, address_additional, address_id, diet, note) \n' +
+                ' VALUES(?,?,?,?,?,?) ; ';
 
               const insertBenef = mysql.format(sqlInsertBenef, [benef.name, benef.birthdate, benef.address_additional,
-                addressId, benef.note
+                addressId, benef.diet, benef.note
               ]);
 
               return dbQuery(insertBenef, dbCon)
@@ -371,12 +371,11 @@ function updateBenef(benef, dbCon) {
             } else {
 
               const sqlUpdateBenef = ' UPDATE beneficiary \n' +
-                ' SET birthdate = ?, address_additional = ?, note = ? \n' +
+                ' SET birthdate = ?, address_additional = ?, diet = ?, note = ? \n' +
                 ' WHERE id = ? ; ';
 
               const updateBenef = mysql.format(sqlUpdateBenef, [benef.birthdate, benef.address_additional,
-                benef.note,
-                rows[0].id
+                benef.diet, benef.note, rows[0].id
               ]);
 
               return dbQuery(updateBenef, dbCon)
