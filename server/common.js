@@ -18,8 +18,11 @@ var iconv = require('iconv-lite');
 
 const serverConfig = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 
-const LdapStrategy_OPTS = JSON.parse(fs.readFileSync('configLdap.json', 'utf8'));
-exports.LdapStrategy_OPTS = LdapStrategy_OPTS;
+if (serverConfig.requireLdapAuth) {
+
+  exports.LdapStrategy_OPTS = JSON.parse(fs.readFileSync('configLdap.json', 'utf8'));
+}
+
 
 function readFile(file, encoding) {
 
@@ -84,7 +87,7 @@ function writeJson(file, object) {
  */
 function log(type, msgObject, precision, notOverwrite) {
 
-  if(!precision)
+  if (!precision)
     precision = 3;
 
   let logFile = serverConfig.logs.dir + '/' + serverConfig.logs[type];

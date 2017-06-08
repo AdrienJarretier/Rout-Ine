@@ -7,8 +7,6 @@ strict mode code can sometimes be made to run faster than identical code that's 
 Third, strict mode prohibits some syntax likely to be defined in future versions of ECMAScript.
 */
 
-const BYPASS_AUTHENTICATION = true;
-
 var bodyParser = require('body-parser');
 const common = require('./common.js');
 const express = require('express');
@@ -21,6 +19,10 @@ const session = require('express-session');
   - fs : systeme de fichiers
   - mysql
 */
+
+const BYPASS_AUTHENTICATION = !common.serverConfig.requireLdapAuth;
+
+
 const db = require('./db.js');
 const osrm = require('./osrm.js');
 const ga2 = require('./ga2.js');
@@ -28,19 +30,21 @@ const manageTours = require('./manageTours.js');
 const parseSchedule = require('./parseSchedule.js');
 const utils = require('./utils.js');
 
-const passport = require('passport');
-const LdapStrategy = require('passport-ldapauth');
-
-passport.use('ldap', new LdapStrategy(common.LdapStrategy_OPTS.ldap,
-  function(user, done) {
-
-    console.log('valid');
-    return done(null, user);
-
-  }
-));
+let passport, LdapStrategy;
 
 if (!BYPASS_AUTHENTICATION) {
+
+  passport = require('passport');
+  LdapStrategy = require('passport-ldapauth');
+
+  passport.use('ldap', new LdapStrategy(common.LdapStrategy_OPTS.ldap,
+    function(user, done) {
+
+      console.log('valid');
+      return done(null, user);
+
+    }
+  ));
 
   passport.use('ad', new LdapStrategy(common.LdapStrategy_OPTS.ad,
     function(user, done) {
@@ -77,9 +81,9 @@ app.use(session({
   cookie: { secure: false }
 }))
 
-app.use(passport.initialize());
-
 if (!BYPASS_AUTHENTICATION) {
+
+  app.use(passport.initialize());
 
   app.use(passport.session());
 
@@ -161,54 +165,39 @@ function sendTour(req, res, fileNum) {
 
 }
 
-app.post('/downloadAddresses', passport.authenticate('ldap', { session: false }), function(req, res) {
+function saveTabletLogs(req, res) {
 
-  sendTour(req, res, 1);
-
-});
-
-app.post('/downloadTrip', passport.authenticate('ldap', { session: false }), function(req, res) {
-
-  sendTour(req, res, 0);
-
-});
+  common.readFile(req.file.path)
+    .then((msg) => {
 
 
-app.post('/tabletLogsUpload', upload.single('file'), passport.authenticate('ldap', { session: false }),
-  function(req, res) {
+      let logFile = common.serverConfig.logs.dir + '/' + common.serverConfig.logs.tablets;
 
-    common.readFile(req.file.path)
-      .then((msg) => {
+      common.readFile(logFile)
+        .then((content) => {
 
+            return JSON.parse(content);
 
-        let logFile = common.serverConfig.logs.dir + '/' + common.serverConfig.logs.tablets;
+          },
+          (err) => {
 
-        common.readFile(logFile)
-          .then((content) => {
-
-              return JSON.parse(content);
-
-            },
-            (err) => {
-
-              return {};
-
-            })
-          .then((logObject) => {
-
-            Object.assign(logObject, JSON.parse(msg));
-
-            return common.writeJson(logFile, logObject);
+            return {};
 
           })
-          .then(res.send('ok'))
+        .then((logObject) => {
 
-      });
+          Object.assign(logObject, JSON.parse(msg));
 
-  });
+          return common.writeJson(logFile, logObject);
 
+        })
+        .then(res.send('ok'))
 
-app.post('/getNumberOfTours', passport.authenticate('ldap', { session: false }), function(req, res) {
+    });
+
+}
+
+function sendNumberOfTours(req, res) {
 
   db.getNumberOfTours()
     .then((numberOfTours) => {
@@ -217,7 +206,34 @@ app.post('/getNumberOfTours', passport.authenticate('ldap', { session: false }),
 
     });
 
+}
+
+function authenticateIfRequired(req, res, next) {
+
+  if (!BYPASS_AUTHENTICATION)
+    passport.authenticate('ldap', { session: false });
+  else
+    next();
+
+}
+
+
+
+app.post('/downloadAddresses', authenticateIfRequired, function(req, res) {
+
+  sendTour(req, res, 1);
+
 });
+
+app.post('/downloadTrip', authenticateIfRequired, function(req, res) {
+
+  sendTour(req, res, 0);
+
+});
+
+app.post('/tabletLogsUpload', upload.single('file'), authenticateIfRequired, saveTabletLogs);
+
+app.post('/getNumberOfTours', authenticateIfRequired, sendNumberOfTours);
 
 
 app.use(express.static(__dirname + '/../client/statics/notSecure'));
@@ -384,16 +400,7 @@ io.on('connection', function(socket) {
 });
 
 
-app.get('/getNumberOfTours', function(req, res) {
-
-  db.getNumberOfTours()
-    .then((numberOfTours) => {
-
-      res.send({ numberOfTours: numberOfTours });
-
-    });
-
-});
+app.get('/getNumberOfTours', sendNumberOfTours);
 
 app.get('/downloadAddresses', function(req, res) {
 
