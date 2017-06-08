@@ -107,7 +107,7 @@ app.all('*', function(req, res, next) {
 
   };
 
-  common.log('access', accessInfos)
+  common.log('access', accessInfos, 1)
     .then(() => {
 
       if (req.session.passport && req.session.passport.user)
