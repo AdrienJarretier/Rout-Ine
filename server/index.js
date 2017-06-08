@@ -32,11 +32,19 @@ const utils = require('./utils.js');
 passport.use(new LdapStrategy(common.LdapStrategy_OPTS,
   function(user, done) {
 
-    console.log(user.memberOf);
+    let memberOfAuthorizedGroup = false;
 
+    for (let g of user.memberOf) {
 
+      if (g.match(/.*GG_LOG_78010_USER.*/i))
+        memberOfAuthorizedGroup = true;
 
-    return done(null, { fsdfsd: 'opjopj' });
+    }
+
+    if (memberOfAuthorizedGroup)
+      return done(null, user);
+    else
+      return done(null, false, { message: 'Vous n\'êtes pas dans un groupe autorisé à utiliser Rout-Ine.' });
 
   }
 ));
@@ -53,8 +61,6 @@ app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
 app.post('/login', passport.authenticate('ldapauth', { session: false }), function(req, res) {
-  console.log('req');
-  console.log(req.user);
   res.send({ status: 'ok' });
 });
 
