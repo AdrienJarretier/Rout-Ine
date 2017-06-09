@@ -128,7 +128,9 @@
 
                   });
 
-                fillAddressesListGroup(date);
+                let dietsCount = fillAddressesListGroup(date);
+
+                fillTableDietsSummary(dietsCount, date);
 
               });
 
@@ -170,6 +172,73 @@
 
         });
 
+        function fillTableDietsSummary(dietsCount, date) {
+
+          let dietMapCodeName = {
+            '10': 'Normaux',
+            '20': 'Régimes'
+          };
+
+          $('#dietsSummary thead').find("th:gt(0)").remove();
+          $('#dietsSummary tbody').empty();
+          $('#dietsSummary tfoot').find("td:gt(0)").remove();
+
+          let csvDietsSummary = ['Repas;'];
+
+          for (let dietCode in dietMapCodeName)
+            csvDietsSummary.push(dietMapCodeName[dietCode] + ';');
+
+          csvDietsSummary.push('Total;');
+
+          for (let tourNum in dietsCount) {
+
+            let cellText = 'Tournée ' + (1 + parseInt(tourNum));
+
+            $('#dietsSummary thead tr').append($('<th>').text(cellText));
+            csvDietsSummary[0] += cellText + ';';
+
+            cellText = dietsCount[tourNum]['total'];
+            $('#dietsSummary tfoot tr').append($('<td>').text(cellText));;
+            csvDietsSummary[dietsCount.length - 1] += cellText + ';';
+
+          }
+
+          let li = 1;
+          for (let dietCode in dietMapCodeName) {
+
+            let row = $('<tr>').append($('<td>').text(dietMapCodeName[dietCode]));
+
+            for (let tourNum in dietsCount) {
+              row.append($('<td>').text(dietsCount[tourNum][dietCode]));
+              csvDietsSummary[li] += dietsCount[tourNum][dietCode] + ';';;
+            }
+
+            $('#dietsSummary tbody').append(row);
+
+            ++li;
+
+          }
+
+          for (let l in csvDietsSummary)
+            csvDietsSummary[l] = csvDietsSummary[l].substr(0, csvDietsSummary[l].length) + '\n';
+
+          let exportLink = $('<a href="#">').append($('<i class="ion-share icons-nav">'));
+
+          exportLink.click((e) => {
+
+            e.preventDefault();
+
+            var file = new File(csvDietsSummary, "recapitulatifRepas" + date.toLocaleDateString() + ".csv", {
+              type: "text/csv;charset=utf-8"
+            });
+            saveAs(file);
+
+          });
+
+          $('#dietsSummary thead tr').append($('<th>').html(exportLink));
+
+        }
+
         function fillAddressesListGroup(date) {
 
           $('#addressesListGroup').empty();
@@ -180,7 +249,8 @@
 
             dietsCount.push({
               '10': 0,
-              '20': 0
+              '20': 0,
+              'total': 0
             });
 
           }
@@ -217,6 +287,7 @@
                     let diet = benef.diet;
 
                     ++dietsCount[tourNum][diet];
+                    ++dietsCount[tourNum]['total'];
 
                     // console.log(tourNum);
                     // console.log(diet);
@@ -255,63 +326,7 @@
             }
 
           }
-
-          console.log(dietsCount);
-
-          $('#dietsSummary thead').find("th:gt(0)").remove();
-          $('#dietsSummary tbody').empty();
-          $('#dietsSummary tfoot').find("td:gt(0)").remove();
-
-          for (let tourNum in dietsCount) {
-
-            $('#dietsSummary thead tr').append($('<th>').text('Tournée ' + (1 + parseInt(tourNum))));
-
-          }
-          let exportLink = $('<a href="#">').append($('<i class="ion-share icons-nav">'));
-
-          exportLink.click((e) => {
-
-            e.preventDefault();
-
-            var file = new File(['csvDietsSummary'], "recapitulatifRepas" + date.toLocaleDateString() + ".txt", {
-              type: "text/plain;charset=utf-8"
-            });
-            saveAs(file);
-
-          });
-
-          $('#dietsSummary thead tr').append($('<th>').html(exportLink));
-
-          let dietMapCodeName = {
-            '10': 'Normaux',
-            '20': 'Régimes'
-          };
-
-          let totaux = [];
-          totaux.length = dietsCount.length;
-          totaux.fill(0);
-
-          console.log(totaux);
-
-          for (let dietCode in dietMapCodeName) {
-
-            let row = $('<tr>').append($('<td>').text(dietMapCodeName[dietCode]));
-
-            for (let tourNum in dietsCount) {
-              row.append($('<td>').text(dietsCount[tourNum][dietCode]));
-              totaux[tourNum] += dietsCount[tourNum][dietCode];
-            }
-
-            $('#dietsSummary tbody').append(row);
-
-          }
-
-          for (let total of totaux) {
-
-            $('#dietsSummary tfoot tr').append($('<td>').text(total));
-
-          }
-
+          return dietsCount;
         }
 
         $.get('beneficiaries', function(fullAddressesData) {
