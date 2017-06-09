@@ -105,8 +105,8 @@
 
           let infosList = $('#infos');
 
-          infosList.append($('<div class="row">').append($('<div class="col-xs-12">')).html("génération " + bestResult.genNumber));
-          infosList.append($('<div class="row">').append($('<div class="col-xs-12">')).text('id partition : ' + bestResult.partitionId));
+          // infosList.append($('<div class="row">').append($('<div class="col-xs-12">')).html("génération " + bestResult.genNumber));
+          // infosList.append($('<div class="row">').append($('<div class="col-xs-12">')).text('id partition : ' + bestResult.partitionId));
           infosList.append($('<div class="row">').append($('<div class="col-xs-12">')).text('obtenu en ' + utils.s2hours(bestResult.totalTime / 1000, true)));
 
           for (let i in tours) {
@@ -116,7 +116,7 @@
             let colorColumnSize = 5;
 
             infosList.append($('<div class="row">')
-              .append($('<div class="col-xs-' + colorColumnSize + '">').text(markersColors[i] + ' : ').css('color', markersColors[i]))
+              .append($('<div class="col-xs-' + colorColumnSize + '">').text(' Tournée ' + (parseInt(i) + 1) + ' : ').css('color', markersColors[i]))
               .append($('<div class="col-xs-' + (12 - colorColumnSize) + '">').text(utils.s2hours(tour.trip.trips[0].duration, false) + '( ' + (tour.addresses.features.length - 1) + ' )').css('color', markersColors[i])));
 
             let routeLayer = L.geoJSON(tour.trip.trips[0].geometry).addTo(map);
@@ -166,49 +166,49 @@
     <%- include('partials/header.ejs', INC_OPT) %>
       <div class="container-fluid">
         <!-- <main> -->
-          <div class="row" id="main">
-            <div class="col-xs-3">
-              <form id='formSchedule'>
-                <div class="form-group">
-                  <label for="nbTrips">Nombre de tournées : </label>
-                  <input class="form-control" id="nbTrips" name="nbTrips" type="number">
-                  <div id="errorTours" class="alert alert-danger" role="alert">Au moins 2 tournées nécessaire</div>
-                </div>
-                <!--           <div class="form-group">
+        <div class="row" id="main">
+          <div class="col-xs-3">
+            <form id='formSchedule'>
+              <div class="form-group">
+                <label for="nbTrips">Nombre de tournées : </label>
+                <input class="form-control" id="nbTrips" name="nbTrips" type="number">
+                <div id="errorTours" class="alert alert-danger" role="alert">Au moins 2 tournées nécessaire</div>
+              </div>
+              <!--           <div class="form-group">
             <label for="popSize">PopSize : </label>
             <input class="form-control" id="popSize" name="popSize" type="number">
           </div> -->
-                <div class="form-group">
-                  <label for="stopTime">Temps d'arrêt par adresse : </label>
-                  <input class="form-control" id="stopTime" name="stopTime" type="number">
-                  <div id="errorStopTime" class="alert alert-danger" role="alert">Doit être positif</div>
-                </div>
-                <!--           <div class="form-group">
+              <div class="form-group">
+                <label for="stopTime">Temps d'arrêt par adresse : </label>
+                <input class="form-control" id="stopTime" name="stopTime" type="number">
+                <div id="errorStopTime" class="alert alert-danger" role="alert">Doit être positif</div>
+              </div>
+              <!--           <div class="form-group">
             <label for="maxStops">Nombre maximum de livraisons par tournee : </label>
             <input class="form-control" id="maxStops" name="maxStops" type="number">
             <div id="errorTooSmall" class="alert alert-danger" role="alert">Maximum trop petit</div>
           </div> -->
-                <!--           <div class="form-group">
+              <!--           <div class="form-group">
             <label for="inputSchedule">Sélection du planning</label>
             <input type="file" id="inputSchedule" name="inputSchedule">
           </div> -->
-                <!--        <div class="form-group">
+              <!--        <div class="form-group">
             <label for="daySelection">Jour à calculer</label>
             <select id="daySelection" name="daySelection" class="form-control">
             </select>
           </div> -->
-                <button id="startGa" class="btn btn-primary" type="button">Démarrer le calcul</button>
-                <button id="stopGa" class="btn btn-danger" type="button">Stop</button>
-              </form>
-            </div>
-            <div class="col-xs-6">
-              <div id="map"></div>
-            </div>
-            <div class="col-xs-3">
-              <p id="infos">
-              </p>
-            </div>
+              <button id="startGa" class="btn btn-primary" type="button">Démarrer le calcul</button>
+              <button id="stopGa" class="btn btn-danger" type="button">Stop</button>
+            </form>
           </div>
+          <div class="col-xs-6">
+            <div id="map"></div>
+          </div>
+          <div class="col-xs-3">
+            <p id="infos">
+            </p>
+          </div>
+        </div>
         <!-- </main> -->
       </div>
   </body>
