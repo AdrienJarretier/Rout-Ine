@@ -199,7 +199,7 @@
 
             cellText = dietsCount[tourNum]['total'];
             $('#dietsSummary tfoot tr').append($('<td>').text(cellText));;
-            csvDietsSummary[dietsCount.length - 1] += cellText + ';';
+            csvDietsSummary[csvDietsSummary.length - 1] += cellText + ';';
 
           }
 
