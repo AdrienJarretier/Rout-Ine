@@ -19,5 +19,5 @@
     "tablets": "tablets.log",
     "access": "access.log"
   },
-  "requireLdapAuth": false
+  "requireLdapAuth": true
 }
