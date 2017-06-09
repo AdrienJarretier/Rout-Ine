@@ -23,6 +23,11 @@
         let numberOfTours;
         let beneficiariesFullAddressesData;
 
+        const dietMapCodeName = {
+          '10': 'Normaux',
+          '20': 'Régimes'
+        };
+
         $('#loadTourProgress').css('visibility', 'hidden');
 
         let currentProgress = 0;
@@ -128,12 +133,14 @@
 
                   });
 
-                let dietsCount = fillAddressesListGroup(date);
+                let addressesInformations = fillAddressesListGroup(date);
+                let dietsCount = addressesInformations.dietsCount;
+                let tourDetails = addressesInformations.tourDetails;
 
                 fillTableDietsSummary(dietsCount, date);
 
-                addExportTourLink(0);
-                addExportTourLink(6);
+                for (let i = 0; i < numberOfTours + 1; ++i)
+                  addExportTourLink(i, tourDetails, date);
 
               });
 
@@ -176,11 +183,6 @@
         });
 
         function fillTableDietsSummary(dietsCount, date) {
-
-          let dietMapCodeName = {
-            '10': 'Normaux',
-            '20': 'Régimes'
-          };
 
           $('#dietsSummary thead').find("th:gt(0)").remove();
           $('#dietsSummary tbody').empty();
@@ -242,18 +244,30 @@
 
         }
 
-        function addExportTourLink(tourNum) {
+        function addExportTourLink(tourNum, tourDetails, date) {
 
           let exportLink = $('<a href="#">').append($('<i class="ion-share icons-nav">')).append(' Export tournée ' + (tourNum + 1));
+
+          let headers = ['adresse', 'bénéficiaire(s)', 'complément', 'tel1', 'tel2', 'repas', 'annotation'];
+
+          let csvTourDetail = [headers.join(';') + '\n'];
+
+          for (let d of tourDetails[tourNum]) {
+
+            csvTourDetail.push(['"' + d.address + '"', '"' + d.name + '"', '"' + d.additional + '"', d.phones[0], d.phones[1], d.diet, '"' + d.note + '"'].join(';') + '\n');
+
+          }
 
           exportLink.click((e) => {
 
             e.preventDefault();
 
-            // var file = new File(csvDietsSummary, "recapitulatifRepas" + date.toLocaleDateString() + ".csv", {
-            //   type: "text/csv;charset=utf-8"
-            // });
-            // saveAs(file);
+            console.log(tourDetails[tourNum]);
+
+            var file = new File(csvTourDetail, "Tournée_" + tourNum + '_' + date.toLocaleDateString() + ".csv", {
+              type: "text/csv;charset=utf-8"
+            });
+            saveAs(file);
 
           });
 
@@ -267,6 +281,7 @@
 
 
           let dietsCount = [];
+          let tourDetails = [];
 
           for (let j = 0; j < numberOfTours + 1; ++j) {
 
@@ -275,6 +290,8 @@
               '20': 0,
               'total': 0
             });
+
+            tourDetails.push([]);
 
           }
 
@@ -311,6 +328,16 @@
 
                     ++dietsCount[tourNum][diet];
                     ++dietsCount[tourNum]['total'];
+
+                    tourDetails[tourNum].push({
+                      address: textParts.address,
+                      name: benef.name,
+                      additional: benef.address_additional,
+                      phones: benef.phones,
+                      diet: dietMapCodeName[benef.diet],
+                      note: benef.note,
+                      index_in_tour: addr.tour.index_in_tour
+                    });
 
                     // console.log(tourNum);
                     // console.log(diet);
@@ -349,7 +376,19 @@
             }
 
           }
-          return dietsCount;
+
+          for (let tourD of tourDetails) {
+            tourD.sort((a, b) => {
+
+              return a.index_in_tour - b.index_in_tour;
+
+            });
+          }
+
+          return {
+            dietsCount: dietsCount,
+            tourDetails: tourDetails
+          };
         }
 
         $.get('beneficiaries', function(fullAddressesData) {
