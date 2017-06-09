@@ -23,7 +23,7 @@
         let numberOfTours;
         let beneficiariesFullAddressesData;
 
-        $('#loadTourProgress').hide();
+        $('#loadTourProgress').css('visibility', 'hidden');
 
         let currentProgress = 0;
 
@@ -87,10 +87,7 @@
               link.click(function(e) {
 
                 e.preventDefault();
-
-                currentProgress = 0;
-                updtProgress();
-                $('#loadTourProgress').show();
+                $('#loadTourProgress').css('visibility', 'visible');
 
                 let promises = [];
 
@@ -102,7 +99,10 @@
                 Promise.all(promises)
                   .then((tres) => {
 
-                    $('#loadTourProgress').hide();
+                    $('#loadTourProgress').css('visibility', 'hidden');
+
+                    currentProgress = 0;
+                    updtProgress();
 
                     let result = {
                       trips: [],
@@ -131,6 +131,9 @@
                 let dietsCount = fillAddressesListGroup(date);
 
                 fillTableDietsSummary(dietsCount, date);
+
+                addExportTourLink(0);
+                addExportTourLink(6);
 
               });
 
@@ -239,9 +242,29 @@
 
         }
 
+        function addExportTourLink(tourNum) {
+
+          let exportLink = $('<a href="#">').append($('<i class="ion-share icons-nav">')).append(' Export tournée ' + (tourNum + 1));
+
+          exportLink.click((e) => {
+
+            e.preventDefault();
+
+            // var file = new File(csvDietsSummary, "recapitulatifRepas" + date.toLocaleDateString() + ".csv", {
+            //   type: "text/csv;charset=utf-8"
+            // });
+            // saveAs(file);
+
+          });
+
+          $('#exporTourCSV').append(exportLink).append($('<br>'));
+        }
+
         function fillAddressesListGroup(date) {
 
           $('#addressesListGroup').empty();
+          $('#exporTourCSV').empty();
+
 
           let dietsCount = [];
 
@@ -460,8 +483,7 @@
                   </div>
                 </div>
                 <div class="row">
-                  <p id="infos">
-                  </p>
+                  <p id="exporTourCSV"></p>
                 </div>
               </div>
               <div class="col-xs-9">
