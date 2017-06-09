@@ -1,3 +1,22 @@
+# Rout-Ine
+
+Le serveur osrm est démonisé avec supervisor `sudo apt install supervisor`
+
+https://www.digitalocean.com/community/tutorials/how-to-set-up-an-osrm-server-on-ubuntu-14-04#step-10-%E2%80%94-install-and-configure-supervisor
+
+config :
+```bash
+sudo nano /etc/supervisor/conf.d/osrm.conf
+
+[program:osrm]
+directory=/chemin/absolu/dossier/contenant/albi_large.osrm
+command=osrm-routed albi_large.osrm --max-trip-size 1000 --max-table-size 700
+user=[utilisateur propriétaire du processus osrm-routed]
+```
+
+le processus node exécutant Rout-Ine est lui démonisé avec forever `sudo npm install -g forever`
+[documentation forever](https://github.com/foreverjs/forever)
+
 ### Installer NodeJs sur Ubuntu
 
 ```bash
