@@ -211,7 +211,7 @@ function sendNumberOfTours(req, res) {
 function authenticateIfRequired(req, res, next) {
 
   if (!BYPASS_AUTHENTICATION)
-    passport.authenticate('ldap', { session: false });
+    passport.authenticate('ldap', { session: false })(req, res, next);
   else
     next();
 
