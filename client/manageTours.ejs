@@ -84,7 +84,9 @@
 
               let link = $('<a href="#">').text('tournée du ' + date.toLocaleDateString());
 
-              link.click(function() {
+              link.click(function(e) {
+
+                e.preventDefault();
 
                 currentProgress = 0;
                 updtProgress();
@@ -264,16 +266,21 @@
 
             $('#dietsSummary thead tr').append($('<th>').text('Tournée ' + (1 + parseInt(tourNum))));
 
-            // for (let i = 0; i < rows.length; ++i) {
-            //   rows[i].append($('<td>').text(dietsCount[dietCode]));
-            // }
-            // rows[rows.length - 1]
-
-            // row.append($('<td>').text(dietsCount[dietCode]));
-
-            // $('#dietsSummary tbody').append(row);
-
           }
+          let exportLink = $('<a href="#">').append($('<i class="ion-share icons-nav">'));
+
+          exportLink.click((e) => {
+
+            e.preventDefault();
+
+            var file = new File(['csvDietsSummary'], "recapitulatifRepas" + date.toLocaleDateString() + ".txt", {
+              type: "text/plain;charset=utf-8"
+            });
+            saveAs(file);
+
+          });
+
+          $('#dietsSummary thead tr').append($('<th>').html(exportLink));
 
           let dietMapCodeName = {
             '10': 'Normaux',
