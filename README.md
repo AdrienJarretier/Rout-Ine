@@ -45,6 +45,12 @@ utilisation :
 watchify utils.js -o ../client/statics/utils.js -s utils -v
 ```
 
+### Installer la base de données
+
+L'application fonctionne avec une base de données MySQL qui doit être créée avec le script [ccas_food_delivery_tours.sql](https://github.com/AdrienJarretier/Rout-Ine/blob/master/ccas_food_delivery_tours.sql)
+
+les paramètres de connexion à la base sont présents dans [config.json](https://github.com/AdrienJarretier/Rout-Ine/blob/master/server/config.json)
+
 ### Démarrer le serveur
 ```bash
 node .
@@ -62,6 +68,8 @@ C'est tout, `ctrl-c` pour arrêter le serveur
 Pour démarrer avec OSRM il faut d'abord des données Open Street Map
 on peut en obtenir sur (https://mapzen.com/data/metro-extracts),
 Télécharger les données au format **osm.pbf**
+
+Je conseille d'enregistrer ce fichier dans un dossier dédié à cette carte
 
 Mon fichier utilisé sera ici nommée **albi_large.osm.pbf** :
 
