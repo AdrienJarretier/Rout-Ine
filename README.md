@@ -12,7 +12,7 @@ command=osrm-routed albi_large.osrm --max-trip-size 1000 --max-table-size 700
 user=[utilisateur propriétaire du processus osrm-routed]
 ```
 
-le processus node exécutant Rout-Ine peut aussi être démonisé avec sypervisor
+le processus node exécutant Rout-Ine peut aussi être démonisé avec supervisor
 
 config :
 ```bash
@@ -22,6 +22,11 @@ sudo nano /etc/supervisor/conf.d/rout-ine.conf
 directory=/chemin/absolu/Rout-Ine/server
 command=node .
 user=[utilisateur propriétaire du processus rout-ine]
+```
+
+Il suffit ensuite de redémarrer le service supervisor
+```bash
+sudo service supervisor restart
 ```
 
 ### Installer NodeJs sur Ubuntu
