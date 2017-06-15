@@ -206,23 +206,46 @@
             $('#dietsSummary tfoot tr').append($('<td>').text(cellText));;
             csvDietsSummary[csvDietsSummary.length - 1] += cellText + ';';
 
+
           }
+          let cellText = 'Total';
+          $('#dietsSummary thead tr').append($('<th>').text(cellText));
+
 
           let li = 1;
+          let sumDiets = 0;//Somme des repas de ce type de régime
+          let tmpSumDiets = 0;
           for (let dietCode in dietMapCodeName) {
 
             let row = $('<tr>').append($('<td>').text(dietMapCodeName[dietCode]));
 
+            //Rempli le tableau avec le nombre du type de repas specifie pour la tournee selectionee and la somme du nombre de repas de la tournee
             for (let tourNum in dietsCount) {
               row.append($('<td>').text(dietsCount[tourNum][dietCode]));
-              csvDietsSummary[li] += dietsCount[tourNum][dietCode] + ';';;
+              csvDietsSummary[li] += dietsCount[tourNum][dietCode] + ';';
+              sumDiets += dietsCount[tourNum][dietCode]; //somme des repas de ce regime
+
             }
 
             $('#dietsSummary tbody').append(row);
 
             ++li;
 
+            csvDietsSummary[li] += sumDiets + ';'; 
+            if (dietCode == 10){
+            row.append($('<td>').text(sumDiets)); //Affiche nb de repas normaux totaux et nb de repas totaux
+            tmpSumDiets = sumDiets;
+            }else{
+              let sumDietsSpec = sumDiets - tmpSumDiets;
+              row.append($('<td>').text(sumDietsSpec)); //Affiche nb de repas normaux totaux et nb de repas totaux
+            }
+
           }
+                    cellText = sumDiets;
+            $('#dietsSummary tfoot tr').append($('<td>').text(cellText));;
+
+
+
 
           for (let l in csvDietsSummary)
             csvDietsSummary[l] = csvDietsSummary[l].substr(0, csvDietsSummary[l].length) + '\n';
