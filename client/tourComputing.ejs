@@ -27,6 +27,8 @@
       // execute le javascript quand la page est completement chargee
       $(document).ready(function() {
 
+        $('#computeProgress').css('visibility', 'hidden');
+
         $('nav #tourComputingLink').addClass('active');
 
         const csvParse = require('csv-parse');
@@ -67,9 +69,18 @@
 
         });
 
+        socket.on('generationProgress', function(value) {
+
+        $('#computeProgress .progress-bar').css('width', value + '%');
+        $('#computeProgress .progress-bar > .sr-only').text(value + '% Complete');
+
+        });
+
         socket.on('started', function() {
 
           $('#infos').empty();
+
+          $('#computeProgress').css('visibility', 'visible');
 
           $('#startGa').prop("disabled", true);
           $('#stopGa').prop("disabled", false);
@@ -104,6 +115,8 @@
           });
 
           let infosList = $('#infos');
+
+          infosList.empty();
 
           // infosList.append($('<div class="row">').append($('<div class="col-xs-12">')).html("génération " + bestResult.genNumber));
           // infosList.append($('<div class="row">').append($('<div class="col-xs-12">')).text('id partition : ' + bestResult.partitionId));
@@ -205,6 +218,11 @@
             <div id="map"></div>
           </div>
           <div class="col-xs-3">
+            <div class="progress" id="computeProgress">
+              <div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
+                <span class="sr-only">0% Complete</span>
+              </div>
+            </div>
             <p id="infos">
             </p>
           </div>
