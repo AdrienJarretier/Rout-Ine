@@ -66,9 +66,8 @@ exports.start = function(params, socket) {
             console.log(err);
           } else
             console.log('initial pop sent');
+            reproduceForever(pop);
         });
-
-      reproduceForever(pop);
 
     });
 
@@ -844,6 +843,8 @@ exports.start = function(params, socket) {
                     console.log('partitioning #' + i + ' trip computed, done');
 
                     population.push(partition);
+
+                    socket.emit('generationProgress', population.length*100/POPULATION_SIZE);
 
                     if (population.length == POPULATION_SIZE) {
 
