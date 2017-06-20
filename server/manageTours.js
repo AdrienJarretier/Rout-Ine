@@ -31,6 +31,8 @@ function fillDb(tours) {
     })
     .then(() => {
 
+      let addressesToursAssignments = [];
+
       for (let i in tours) {
 
         let tour = tours[i];
@@ -38,9 +40,6 @@ function fillDb(tours) {
         // common.writeFile(TARGET_DIRECTORY + '/tourTrip' + i + '.json', JSON.stringify(
         //   tour.trip.trips[0], null, 2));
 
-        let dbCon = mysql.createConnection(common.serverConfig.db);
-
-        let addressesToursAssignments = [];
 
         for (let j in tour.addresses.features) {
 
@@ -56,13 +55,15 @@ function fillDb(tours) {
 
         }
 
-        db.assignAddressesToTours(addressesToursAssignments, dbCon)
-          .then(() => { dbCon.end(); });
-
         // common.writeFile(TARGET_DIRECTORY + '/tourAddresses' + i + '.json', JSON.stringify(
         //   tour.addresses, null, 2));
 
       }
+
+      let dbCon = mysql.createConnection(common.serverConfig.db);
+
+      db.assignAddressesToTours(addressesToursAssignments, dbCon)
+        .then(() => { dbCon.end(); });
 
     });
 }

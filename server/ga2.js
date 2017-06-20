@@ -19,9 +19,13 @@ exports.stop = function() {
 exports.start = function(params, socket) {
 
   let nbTrips = params.nbTrips;
-  const POPULATION_SIZE = 168;
-  // const POPULATION_SIZE = 16;
+  // const POPULATION_SIZE = 168;
+  const POPULATION_SIZE = 20;
+
+
   const STOP_TIME = params.stopTime * 60;
+
+  const MAX_RUN_TIME = 1;// le temps maximum de calcul en minutes
 
   let progress = 0;
 
@@ -122,6 +126,9 @@ exports.start = function(params, socket) {
 
             bestResult.trips = partition.subsetsTrips;
 
+            console.log(bestResult.trips);
+            console.log('----bestResult.trips');
+
             socket.emit('bestResult', bestResult);
 
             console.log('new gen sent');
@@ -177,27 +184,35 @@ exports.start = function(params, socket) {
               console.log(err);
             } else {
 
+              if (forever && bestResult.genNumber + MAX_GEN_WITHOUT_BETTER > genCount) {
+
+                progress=0;
+                socket.emit('generationProgress', 0);
+                
+                reproduceForever(nextGen);
+              }
+              else {
+                console.log('best partition found : ');
+                console.log(bestPartition);
+
+                manageTours.fillDb(bestPartition.subsetsTrips);
+
+                let timeSinceBest = (Date.now() - timeLastBest);
+
+                console.log(timeSinceBest / 1000 + ' sec without better result');
+                console.log(totalTime / 1000 + ' sec total');
+
+                console.log('*****   *****');
+                console.log(' GA STOPPED');
+                console.log('*****   *****');
+                socket.emit('stopped');
+              }
+
             }
           });
 
-        if (forever && bestResult.genNumber + MAX_GEN_WITHOUT_BETTER > genCount)
-          reproduceForever(nextGen);
-        else {
-          console.log('best partition found : ');
-          console.log(bestPartition);
+     
 
-          manageTours.fillDb(bestResult.trips);
-
-          let timeSinceBest = (Date.now() - timeLastBest);
-
-          console.log(timeSinceBest / 1000 + ' sec without better result');
-          console.log(totalTime / 1000 + ' sec total');
-
-          console.log('*****   *****');
-          console.log(' GA STOPPED');
-          console.log('*****   *****');
-          socket.emit('stopped');
-        }
       });
   }
 
@@ -234,9 +249,6 @@ exports.start = function(params, socket) {
       console.log('');
       console.log(' **************** nextGeneration **************** ');
 
-      progress=0;
-      socket.emit('generationProgress', 0);
-
       let pop = elect(currentPop);
 
       let rejectedCount = 0;
@@ -254,7 +266,7 @@ exports.start = function(params, socket) {
 
       let promises = [];
 
-      console.log('computing trips');
+      console.log('computing trips 1');
 
       for (let part of pop) {
 
@@ -264,7 +276,7 @@ exports.start = function(params, socket) {
       Promise.all(promises)
         .then(() => {
 
-          console.log('done');
+          console.log('done 1');
 
           applyPartitionsFitness(pop);
 
@@ -273,7 +285,7 @@ exports.start = function(params, socket) {
           promises.length = 0;
 
 
-          console.log('computing trips');
+          console.log('computing trips 2');
           for (let part of pop) {
 
             promises.push(part.computeAllTrips());
@@ -284,7 +296,7 @@ exports.start = function(params, socket) {
         })
         .then(() => {
 
-          console.log('done');
+          console.log('done 2');
 
           applyPartitionsFitness(pop);
 
@@ -594,7 +606,7 @@ exports.start = function(params, socket) {
             });
 
             progress++;
-            socket.emit('generationProgress', progress*100/POPULATION_SIZE);
+            socket.emit('generationProgress', progress*50/POPULATION_SIZE);
 
             resolve(this);
           });
