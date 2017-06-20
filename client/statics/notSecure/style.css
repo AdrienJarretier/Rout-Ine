@@ -88,3 +88,11 @@ header {
 #dietsSummary tfoot {
     font-weight: bold;
 }
+
+.notransition {
+  -webkit-transition: none !important;
+  -moz-transition: none !important;
+  -o-transition: none !important;
+  -ms-transition: none !important;
+  transition: none !important;
+}

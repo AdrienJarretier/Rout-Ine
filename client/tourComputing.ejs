@@ -71,8 +71,16 @@
 
         socket.on('generationProgress', function(value) {
 
-        $('#computeProgress .progress-bar').css('width', value + '%');
-        $('#computeProgress .progress-bar > .sr-only').text(value + '% Complete');
+          $('#computeProgress .progress-bar').removeClass("notransition");
+
+          if(value == 0) {
+
+            $('#computeProgress .progress-bar').addClass("notransition");
+
+          }
+
+          $('#computeProgress .progress-bar').css('width', value + '%');
+          $('#computeProgress .progress-bar > .sr-only').text(value + '% Complete');
 
         });
 

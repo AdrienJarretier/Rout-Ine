@@ -23,6 +23,8 @@ exports.start = function(params, socket) {
   // const POPULATION_SIZE = 16;
   const STOP_TIME = params.stopTime * 60;
 
+  let progress = 0;
+
   // le nombre minimal et max d'elements dans un sous ensemble pour qu'il soit accepté
   const MIN_ELEMENTS = 22;
 
@@ -134,6 +136,8 @@ exports.start = function(params, socket) {
 
             socket.emit('bestResult', bestResult);
 
+            console.log('new gen sent');
+
             console.log('best : ');
             console.log(partition);
 
@@ -183,8 +187,9 @@ exports.start = function(params, socket) {
             if (err) {
               console.log('error when sending new generation');
               console.log(err);
-            } else
-              console.log('new gen sent');
+            } else {
+
+            }
           });
 
         if (forever && bestResult.genNumber + MAX_GEN_WITHOUT_BETTER > genCount)
@@ -243,6 +248,9 @@ exports.start = function(params, socket) {
 
       console.log('');
       console.log(' **************** nextGeneration **************** ');
+
+      progress=0;
+      socket.emit('generationProgress', 0);
 
       let pop = elect(currentPop);
 
@@ -609,6 +617,9 @@ exports.start = function(params, socket) {
               return a.duration - b.duration
             });
 
+            progress++;
+            socket.emit('generationProgress', progress*100/POPULATION_SIZE);
+
             resolve(this);
           });
 
@@ -843,8 +854,6 @@ exports.start = function(params, socket) {
                     console.log('partitioning #' + i + ' trip computed, done');
 
                     population.push(partition);
-
-                    socket.emit('generationProgress', population.length*100/POPULATION_SIZE);
 
                     if (population.length == POPULATION_SIZE) {
 
