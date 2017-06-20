@@ -19,13 +19,21 @@ exports.stop = function() {
 exports.start = function(params, socket) {
 
   let nbTrips = params.nbTrips;
-  // const POPULATION_SIZE = 168;
-  const POPULATION_SIZE = 20;
+  const POPULATION_SIZE = 168;
+  // const POPULATION_SIZE = 20;
 
 
   const STOP_TIME = params.stopTime * 60;
 
-  const MAX_RUN_TIME = 1;// le temps maximum de calcul en minutes
+  const MAX_RUN_TIME = 13*60;// le temps maximum de calcul en minutes
+
+  const MS_MAX_RUN_TIME = MAX_RUN_TIME*60000;
+
+  let startRunTime = Date.now();
+
+  let runTime = Date.now()-startRunTime;
+
+  socket.emit('timeProgress', {runTime : runTime, max : MS_MAX_RUN_TIME});
 
   let progress = 0;
 
@@ -73,8 +81,6 @@ exports.start = function(params, socket) {
   const ELITISM_PERCENT = 7 / 100;
 
   const ELECTED_COUNT = Math.round(POPULATION_SIZE * ELITISM_PERCENT);
-
-  const MAX_GEN_WITHOUT_BETTER = Infinity;
 
   /**
    * en fonction du pourcentage d'elitisme,
@@ -184,7 +190,11 @@ exports.start = function(params, socket) {
               console.log(err);
             } else {
 
-              if (forever && bestResult.genNumber + MAX_GEN_WITHOUT_BETTER > genCount) {
+              let runTime = Date.now()-startRunTime;
+
+              socket.emit('timeProgress', {runTime : runTime, max : MS_MAX_RUN_TIME});
+
+              if (forever && runTime < MS_MAX_RUN_TIME) {
 
                 progress=0;
                 socket.emit('generationProgress', 0);
