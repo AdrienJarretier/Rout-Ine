@@ -28,13 +28,6 @@ exports.start = function(params, socket) {
   // le nombre minimal et max d'elements dans un sous ensemble pour qu'il soit accepté
   const MIN_ELEMENTS = 22;
 
-  // if (params.maxStops < MIN_ELEMENTS * 2) {
-
-  //   socket.emit('maxTooSmall');
-  //   return;
-  // }
-  // const MAX_ELEMENTS = params.maxStops - MIN_ELEMENTS;
-
   const MAX_ELEMENTS = Infinity;
 
   console.log('starting ga');
@@ -78,8 +71,6 @@ exports.start = function(params, socket) {
   const ELECTED_COUNT = Math.round(POPULATION_SIZE * ELITISM_PERCENT);
 
   const MAX_GEN_WITHOUT_BETTER = Infinity;
-
-  // let idealNbElementsInSubset; // calcule dans firtPopuplation apres avoir pris connaissance du nombre d'adresses et du nbTrips demande
 
   /**
    * en fonction du pourcentage d'elitisme,
@@ -130,9 +121,6 @@ exports.start = function(params, socket) {
             bestResult.totalTime = totalTime;
 
             bestResult.trips = partition.subsetsTrips;
-
-            // common.writeJson(common.serverConfig.resultsFolder + '/bestTours' + utils.currentDateTimeString() +
-            //   '.json', bestResult);
 
             socket.emit('bestResult', bestResult);
 
@@ -200,9 +188,6 @@ exports.start = function(params, socket) {
 
           manageTours.fillDb(bestResult.trips);
 
-          // common.writeJson(common.serverConfig.resultsFolder + '/bestTours' + utils.currentDateTimeString() +
-          //   '.json', bestResult);
-
           let timeSinceBest = (Date.now() - timeLastBest);
 
           console.log(timeSinceBest / 1000 + ' sec without better result');
@@ -261,19 +246,10 @@ exports.start = function(params, socket) {
 
         let child = mate(firstParent, weightedRouletteWheel(currentPop, firstParent.id));
 
-        // pop.push(child);
-
         if (acceptChild(child))
           pop.push(child);
         else
           pop.push(randomChunkify(currentPop[0].subsets[0].addressesGeoJson, nbTrips));
-
-        // else {
-        //   // forever = false;
-        //   // console.log('vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv child vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv');
-        //   // console.log(child.subsets);
-        //   // console.log(' ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ child ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ');
-        // }
       }
 
       let promises = [];
@@ -833,7 +809,6 @@ exports.start = function(params, socket) {
               }
 
               let totalAddresses = addresses.albi.length;
-              // idealNbElementsInSubset = totalAddresses / nbTrips;
 
               return addresses;
 
@@ -887,7 +862,6 @@ exports.start = function(params, socket) {
     for (let part of population) {
 
       part.fitness = HIGH - part.subsets[part.subsets.length - 1].duration + 1;
-      // part.fitness = HIGH + 1 - part.subsets[part.subsets.length - 1].duration;
 
       cumulatedFitness += part.fitness;
 
