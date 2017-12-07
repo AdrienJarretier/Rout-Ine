@@ -1,0 +1,23 @@
+{
+  "name": "locate-beneficiaries",
+  "version": "0.1.0",
+  "description": "display on a map location of beneficiaries found in db",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "jarretier adrien",
+  "license": "ISC",
+  "dependencies": {
+    "async": "^2.3.0",
+    "csv-parse": "^1.2.0",
+    "express": "^4.15.2",
+    "mysql": "^2.13.0",
+    "random-js": "^1.0.8",
+    "request": "^2.81.0",
+    "shuffle-array": "^1.0.1",
+    "socket.io": "^2.0.1",
+    "togpx": "^0.5.4",
+    "tokml": "^0.4.0"
+  }
+}

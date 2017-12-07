@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Localisation bénéficiaires - Recherche de Tournées</title>
+  <script type="text/javascript" src="utils.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script type="text/javascript" src="jquery-latest.min.js"></script>
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="leaflet/leaflet.css">
+  <script src="leaflet/leaflet.js"></script>
+  <!-- -->
+  <!-- awesome-numbered-marker -->
+  <link rel="stylesheet" href="Leaflet.awesome-numbered-marker-master/src/leaflet_awesome_number_markers.css" />
+  <script src="Leaflet.awesome-numbered-marker-master/src/leaflet_awesome_number_markers.js"></script>
+  <!--  -->
+  <link rel="stylesheet" href="Leaflet.awesome-numbered-marker-master/src/leaflet_awesome_number_markers.css" />
+  <link rel="stylesheet" href="style.css" />
+  <script>
+  'use strict';
+
+  const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoibXJmcmVlemUiLCJhIjoiY2owNWg2a2kyMDA2cjMycGZndzA2ZzZneCJ9.-wsVwihnGBO41Z9FvV_UAQ';
+
+  $(document).ready(function() {
+
+    $('#errorTooSmall').hide();
+
+    let map = L.map('map').setView([43.93002883039214, 2.1581183602941194], 13);
+
+    L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+      attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+      maxZoom: 18,
+      id: 'mapbox.streets',
+      accessToken: MAPBOX_ACCESS_TOKEN
+    }).addTo(map);
+
+    let socket = io.connect();
+
+    $('#startGa').click(function() {
+
+      socket.emit('start',
+
+        {
+          nbTrips: $('#nbTrips').val(),
+          popSize: $('#popSize').val(),
+          stopTime: $('#stopTime').val(),
+          maxStops: $('#maxStops').val()
+        }
+
+      );
+
+    });
+
+    socket.on('started', function() {
+
+      $('#errorTooSmall').hide();
+      $('#infos ul').empty();
+
+    });
+
+    socket.on('maxTooSmall', function() {
+
+      $('#errorTooSmall').show();
+
+    });
+
+    $('#stopGa').click(function() {
+
+      socket.emit('stop');
+
+    });
+
+    let routes = [];
+
+    socket.on('bestResult', function(bestResult) {
+
+      console.log(bestResult);
+
+      let markersColors = ["darkred", "blue", "green", "orange", "black", "purple"];
+
+      let tours = bestResult.trips;
+
+      routes.forEach(function(layer) {
+        map.removeLayer(layer);
+      });
+
+      let infosList = $('#infos ul');
+
+      infosList.append($('<li>').html(bestResult.genNumber + "<sup>ème</sup> génération"));
+      infosList.append($('<li>').text('id partition : ' + bestResult.partitionId));
+      infosList.append($('<li>').text('obtenu en : ' + utils.s2hours(bestResult.totalTime / 1000, true)));
+
+      for (let i in tours) {
+
+        let tour = tours[i];
+
+        infosList.append($('<li>')
+          .text(markersColors[i] + ' : ' + utils.s2hours(tour.trip.trips[0].duration, false) + '( ' + (tour.addresses.features.length - 1) + ' )'));
+
+        let routeLayer = L.geoJSON(tour.trip.trips[0].geometry).addTo(map);
+
+        routeLayer.setStyle(function(feature) {
+          return {
+            color: markersColors[i]
+          };
+        });
+
+        routes.push(routeLayer);
+
+      }
+
+      infosList.append($('<br>'));
+
+    });
+
+  });
+  </script>
+</head>
+
+<body>
+  <h1><a href="index.html">Recherche de Tournées</a></h1>
+  <nav>
+    <ul>
+      <li><a href="testTournee.html">Tournées exemples</a></li>
+      <li><a href="bestFromGa.html">Voir le meilleur resultat obtenu avec l'algorithme</a></li>
+    </ul>
+  </nav>
+  <button id="startGa">démarrer le calcul</button>
+  <button id="stopGa">Stop</button>
+  <label for="nbTrips">nombre de tournées : </label>
+  <input id="nbTrips" type="number">
+  <label for="popSize">popSize : </label>
+  <input id="popSize" type="number">
+  <label for="stopTime">temps d'arrêt par adresse : </label>
+  <input id="stopTime" type="number"> m
+  <div id="errorTooSmall">maximum trop petit</div>
+  <label for="maxStops">nombre maximum de livraisons par tournee : </label>
+  <input id="maxStops" type="number">
+  <div id="infos">
+    <ul>
+    </ul>
+  </div>
+  <div id="map"></div>
+</body>
+
+</html>

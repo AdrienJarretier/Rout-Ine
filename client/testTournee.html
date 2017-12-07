@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Localisation bénéficiaires - Tournées exemples</title>
+  <link href='json-formatter/JSONFormatter.css' media='all' rel='stylesheet' type='text/css'>
+  <script src="json-formatter/JSONFormatter.js"></script>
+  <link rel="stylesheet" href="leaflet/leaflet.css">
+  <script src="leaflet/leaflet.js"></script>
+  <script type="text/javascript" src="jquery-latest.min.js"></script>
+  <!-- groupedlayercontrol -->
+  <script src='leaflet-groupedlayercontrol-0.6.0/dist/leaflet.groupedlayercontrol.min.js'></script>
+  <link rel="stylesheet" href="leaflet-groupedlayercontrol-0.6.0/dist/leaflet.groupedlayercontrol.min.css">
+  <!--  -->
+  <script src='utils.js'></script>
+  <!-- awesome-numbered-marker -->
+  <link rel="stylesheet" href="Leaflet.awesome-numbered-marker-master/src/leaflet_awesome_number_markers.css" />
+  <script src="Leaflet.awesome-numbered-marker-master/src/leaflet_awesome_number_markers.js"></script>
+  <!--  -->
+  <link rel="stylesheet" href="style.css" />
+  <script src='common.js'></script>
+  <script src='mapFunctions.js'></script>
+  <script type="text/javascript">
+  'use strict';
+  /*
+  Strict mode makes several changes to normal JavaScript semantics.
+  First, strict mode eliminates some JavaScript silent errors by changing them to throw errors.
+  Second, strict mode fixes mistakes that make it difficult for JavaScript engines to perform optimizations:
+  strict mode code can sometimes be made to run faster than identical code that's not strict mode.
+  Third, strict mode prohibits some syntax likely to be defined in future versions of ECMAScript.
+  */
+
+  // execute le javascript quand la page est completement chargee
+  $(document).ready(function() {
+
+    let map = initMap();
+
+    // function tripLayer(geometry, color) {
+
+    //   let routeLayer = L.geoJSON(geometry);
+    //   routeLayer.setStyle(function(feature) {
+    //     return {
+    //       color: color
+    //     };
+    //   });
+
+    //   return routeLayer;
+    // }
+
+    // function layerGroup(resultTrip, tripColor) {
+    //   return L.layerGroup([
+    //     tripLayer(resultTrip, tripColor),
+    //     addressesMarkers(resultTrip)
+    //   ]);
+    // }
+
+    function s2hours(seconds) {
+
+      let hours = Math.floor(seconds / 3600);
+      let minutes = Math.ceil((seconds % 3600) / 60);
+
+      return hours + ' h ' + minutes + ' min';
+    }
+
+    function m2km(meters) {
+
+      return (Math.ceil(meters / 10) / 100) + ' km';
+    }
+
+    // demande au serveur les voyages
+    $.ajax({
+      type: "GET",
+      dataType: "json",
+      url: "testTournee",
+      success: function(tours, textStatus, jqXHR) {
+
+        let markersColors = ["darkred", "blue"];
+
+        for (let i in tours) {
+
+          let data = tours[i];
+
+          let groupName = 'Tournée ' + i;
+
+          let overlayMaps = {
+            [groupName]: {}
+          };
+
+          let tripNames = [];
+
+          console.log(data);
+
+
+
+
+          let originalRoute = data.original.routes[0];
+
+          let originalRouteLayer = L.geoJSON(originalRoute.geometry);
+          originalRouteLayer.setStyle(function(feature) {
+            return {
+              color: markersColors[i]
+            };
+          });
+
+          let group = L.layerGroup([
+            originalRouteLayer,
+            addressesMarkers(data.original.waypoints, data.addresses, markersColors[i])
+          ]);
+
+          let seconds = originalRoute.duration;
+
+          let meters = originalRoute.distance;
+
+          let tripName = 'trajet original (' + s2hours(seconds) + ') ' + m2km(meters);
+
+          tripNames.push(tripName);
+
+          overlayMaps[groupName][tripName] = group;
+
+
+
+
+          let osrmTrip = data.osrmTrip.trips[0];
+
+          let osrmTripLayer = L.geoJSON(osrmTrip.geometry);
+          osrmTripLayer.setStyle(function(feature) {
+            return {
+              color: markersColors[i]
+            };
+          });
+
+          let groupOsrmTrip = L.layerGroup([
+            osrmTripLayer,
+            addressesMarkers(data.osrmTrip.waypoints, data.addresses, markersColors[i])
+          ]);
+
+          seconds = osrmTrip.duration;
+
+          meters = osrmTrip.distance;
+
+          tripName = 'trajet par osrm trip (' + s2hours(seconds) + ') ' + m2km(meters);
+
+          tripNames.push(tripName);
+
+          overlayMaps[groupName][tripName] = groupOsrmTrip;
+
+
+
+
+          var options = {
+            // Make the "trips" group exclusive (use radio inputs)
+            exclusiveGroups: [groupName]
+          };
+
+          overlayMaps[groupName][tripNames[0]].addTo(map);
+
+          L.control.groupedLayers(null, overlayMaps, options).addTo(map);
+
+        }
+
+      },
+      error: function(jqXHR, textStatus, errorThrown) {
+        console.log("error : " + textStatus + errorThrown);
+      }
+    });
+
+  });
+  </script>
+</head>
+
+<body>
+  <h1><a href="index.html">Tournées exemples</a></h1>
+  <nav>
+    <ul>
+      <li><a href="socketio.html">Recherche de meilleures tournées</a></li>
+      <li><a href="bestFromGa.html">Voir le meilleur resultat obtenu avec l'algorithme</a></li>
+    </ul>
+  </nav>
+  <!--   <p>
+    temps total cumulé : <span id='totalTime'></span> (temps max : <span id='maxTime'></span>, trajet : <span id='maxTripNum'></span> )
+    <br> distance totale : <span id='totalDistance'></span>
+  </p> -->
+  <div id="map"></div>
+</body>
+
+</html>

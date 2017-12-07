@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Localisation bénéficiaires - Meilleur résultat</title>
+  <script type="text/javascript" src="utils.js"></script>
+  <script type="text/javascript" src="jquery-latest.min.js"></script>
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="leaflet/leaflet.css">
+  <script src="leaflet/leaflet.js"></script>
+  <!-- -->
+  <!-- awesome-numbered-marker -->
+  <link rel="stylesheet" href="Leaflet.awesome-numbered-marker-master/src/leaflet_awesome_number_markers.css" />
+  <script src="Leaflet.awesome-numbered-marker-master/src/leaflet_awesome_number_markers.js"></script>
+  <!--  -->
+  <link rel="stylesheet" href="style.css" />
+  <!-- groupedlayercontrol -->
+  <script src='leaflet-groupedlayercontrol-0.6.0/dist/leaflet.groupedlayercontrol.min.js'></script>
+  <link rel="stylesheet" href="leaflet-groupedlayercontrol-0.6.0/dist/leaflet.groupedlayercontrol.min.css">
+  <!--  -->
+  <script src='common.js'></script>
+  <script src='mapFunctions.js'></script>
+  <script>
+  'use strict';
+
+  $(document).ready(function() {
+
+    let map = initMap();
+
+    $.get("bestFromGa", function(bestResult) {
+
+      let markersColors = ["darkred", "blue", "green", "orange", "black", "purple"];
+
+      let tours = bestResult.trips;
+
+      let infosList = $('#infos ul');
+
+      infosList.append($('<li>').html(bestResult.genNumber + "<sup>ème</sup> génération"));
+      infosList.append($('<li>').text('id partition : ' + bestResult.partitionId));
+      infosList.append($('<li>').text('obtenu en : ' + utils.s2hours(bestResult.totalTime / 1000, true)));
+
+      let groupTours = 'Tournées',
+        groupMarkers = 'Adresses';
+      let overlayMaps = {
+        [groupTours]: {},
+        [groupMarkers]: {}
+      };
+
+      for (let i in tours) {
+
+        let tour = tours[i];
+
+        infosList.append($('<li>').text('durée ' + markersColors[i] + ' : ' + utils.s2hours(tour.trip.trips[0].duration, false)));
+
+        let routeLayer = L.geoJSON(tour.trip.trips[0].geometry);
+        routeLayer.setStyle(function(feature) {
+          return {
+            color: markersColors[i]
+          };
+        }).addTo(map);
+
+        console.log(tour);
+
+        let markers = addressesMarkers(tour.trip.waypoints, tour.addresses, markersColors[i]);
+
+        overlayMaps[groupTours][markersColors[i]] = routeLayer;
+        overlayMaps[groupMarkers][markersColors[i]] = markers;
+
+      }
+
+      var options = {
+        // Make the "trips" group exclusive (use radio inputs)
+        // exclusiveGroups: [groupName]
+      };
+
+      L.control.groupedLayers(null, overlayMaps, options).addTo(map);
+
+    });
+
+  });
+  </script>
+</head>
+
+<body>
+  <h1><a href="index.html">Meilleur résultat</a></h1>
+  <nav>
+    <ul>
+      <li><a href="testTournee.html">Tournées exemples</a></li>
+      <li><a href="socketio.html">Recherche de meilleures tournées</a></li>
+    </ul>
+  </nav>
+  <div id="infos">
+    <ul>
+    </ul>
+  </div>
+  <div id="map"></div>
+</body>
+
+</html>
