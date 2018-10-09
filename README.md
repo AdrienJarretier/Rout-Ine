@@ -49,7 +49,7 @@ Le fichier `utils.js` qui se trouve dans le dossier client ne doit pas être mod
 
 installation globales de ces modules :
 
-`npm instal -g browserify watchify`
+`npm install -g browserify watchify`
 
 utilisation :
 
