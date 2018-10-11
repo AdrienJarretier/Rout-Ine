@@ -63,7 +63,13 @@ function writeFile(file, content, append) {
 
     fs.writeFileSync(fd, content);
 
-    fs.close(fd);
+    fs.close(fd, (err) => {
+
+
+      if(err)
+        console.err(err);
+
+    });
     resolve();
 
   });

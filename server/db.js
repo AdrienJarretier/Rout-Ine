@@ -94,7 +94,7 @@ exports.albiAddresses = albiAddresses;
  *
  * @returns {Promise} la promesse de retourner le tableau contenant les adresses.
  */
-function getAddresses(names, minDeliveryDate, maxDeliveryDate) {
+function getAddresses(minDeliveryDate, maxDeliveryDate) {
 
   return new Promise((resolve, reject) => {
 
@@ -728,6 +728,32 @@ function getOutsideAddresses(deliveryDate) {
 }
 exports.getOutsideAddresses = getOutsideAddresses;
 
+
+function getAllBeneficiaries() {
+
+  return new Promise((resolve, reject) => {
+
+    const sqlSelectAll =
+      ' SELECT * \n ' +
+      ' FROM beneficiary \n ' +
+      ' INNER JOIN address ON address.id = beneficiary.address_id \n ' +
+      ' ; ';
+
+    let dbCon = mysql.createConnection(common.serverConfig.db);
+
+    query(sqlSelectAll, dbCon)
+      .then((rows) => {
+
+        dbCon.end();
+
+        resolve(rows);
+
+      });
+
+  });
+
+}
+exports.getAllBeneficiaries = getAllBeneficiaries;
 
 
 function query(statement, dbCon) {
