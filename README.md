@@ -1,5 +1,10 @@
 # Rout-Ine
 
+Visualisation de la résolution par l'algorithme génétique sur un processeur i5-4200M (processeur portable, 2 coeurs hyperthreadés architecture Haswell) :
+![Gif Résolution](ga.gif)
+
+
+
 Le serveur osrm est démonisé avec supervisor `sudo apt install supervisor`
 
 config :
