@@ -37,7 +37,7 @@ function readFile(file, encoding) {
       } else {
 
         let fileContent = fs.readFileSync(fd, (encoding ? null : 'utf8'));
-        fs.close(fd);
+        fs.close(fd, () => {});
 
         if (encoding) {
 
